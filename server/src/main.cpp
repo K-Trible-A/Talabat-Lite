@@ -1,29 +1,17 @@
 #include "../include/database.hpp"
-#include <iostream>
+#include "../include/server.hpp"
+
 using namespace std;
 
+void server::handleClient(int clientFD){
+  int code;
+  server::recv(clientFD, &code, sizeof(code));
+  //Action
+}
+
 int main() {
-  Database db("example.db");
-
-  // Create a table
-  db.execute(
-      "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)");
-
-  // Insert data
-  db.execute("INSERT INTO users (name) VALUES ('Alice')");
-  db.execute("INSERT INTO users (name) VALUES ('Bob')");
-
-  // Query data
-  auto results = db.query("SELECT distinct name FROM users");
-
-  // Print results
-  for (const auto &row : results) {
-    for (const auto &col : row) {
-      cout << col << " ";
-    }
-    cout << endl;
-  }
-  cout << endl;
+  Database db("Database.db");
+  server srv("127.0.0.1", 57000, 20);
 
   return 0;
 }

@@ -36,4 +36,10 @@ public:
    
    static int updateData (); // update data in the database   
 
+<<<<<<< HEAD
+=======
+	   
+   static int remProduct (int ID) // remove a product with a given id
+   
+>>>>>>> 1b1a83d (Modified merchant header file : changed the constant of maximum size for product and merchant name, convering the functions into static ones, removed unnecessary functions and add new ones)
 };
