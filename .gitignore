@@ -1,3 +1,2 @@
 *.vim
-server-client-side
-client/Networking
+server-client-test/
