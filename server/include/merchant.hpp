@@ -7,14 +7,6 @@ const int MAX_SIZE = 30; // maximum size for merchant name and prodcut name
 const int MAX_ADDRESS = 100; // maximum size for merchant's address
 const int MAX_PRODUCTS = 100; // maximum number of produtcts for each merchant
 
-struct product
-{
-    char name[MAX];
-	int id;
-	int merchant_id; // the merchant(s) that has this products
-	float price;
-};
-
 class Merchant {
 
 private:
@@ -27,8 +19,6 @@ private:
   ,name TEXT NOT NULL , price REAL NOT NULL , FOREIGN KEY (merchant_id) REFERENCES Merch(id));
 
 */
-   product [MAX_PRODUCTS];
-
    struct merch 
    {
        char name[MAX];
@@ -46,7 +36,4 @@ public:
    
    static int updateData (); // update data in the database   
 
-	   
-   static int remProduct (int ID) // remove a product with a given id
-   
 };
