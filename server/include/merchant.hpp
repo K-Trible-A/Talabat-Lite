@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const int MAX_SIZE = 50; // maximum size for merchant name and prodcut name
+const int MAX_SIZE = 30; // maximum size for merchant name and prodcut name
 const int MAX_ADDRESS = 100; // maximum size for merchant's address
 const int MAX_PRODUCTS = 100; // maximum number of produtcts for each merchant
 
@@ -39,17 +39,14 @@ private:
 
 public:
    
-   Merchant(); // a constructor which will generate an id for the merchant
    
-   int setData (); // an included function in the constructor to get the merchant's data
+   static int storeData (); // storing merchant data in the database 
    
-   int addItem (); // add a product  
+   static int addItem (); // add a product  
    
-   int setAddress ();
-
-   int setCardNum ();
+   static int updateData (); // update data in the database   
 
 	   
-   int remProduct (int ID) // remove a product
+   static int remProduct (int ID) // remove a product with a given id
    
 };
