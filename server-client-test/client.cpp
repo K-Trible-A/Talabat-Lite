@@ -9,7 +9,15 @@ struct MyStruct {
 };
 
 int main() {
-  client clnt("127.0.0.1", 57000);
+  string IP;
+  int portNum;
+  std::cout << "Enter IP address of the server :" << std::endl;
+  std::cin >> IP;
+  std::cout << "Enter the port number :" << std::endl;
+  std::cin >> portNum;
+  std::cout << "Enter the queue size :" << std::endl;
+
+  client clnt(IP, portNum);
   bool ok = clnt.connect();
   if (!ok) {
     cout << "Connection error!" << endl;
@@ -27,7 +35,6 @@ int main() {
   string s(temp);
   delete[] temp;
   cout << "string received : " << s << endl << endl;
-
 
   ok = clnt.connect();
   if (!ok) {
