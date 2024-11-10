@@ -6,7 +6,8 @@
 using namespace std;
 int main()
 {
-    // code to test fuctions
+    // code to test login fuctions
     // code to test database
+    // code to test registration functions
     return 0;
 }
