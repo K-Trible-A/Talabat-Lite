@@ -4,10 +4,10 @@
 
 using namespace std;
 
-void server::handleClient(int clientFD){
+void server::handleClient(int clientFD) {
   int code;
   server::recv(clientFD, &code, sizeof(code));
-  //Action
+  // Action
 }
 
 int main() {
@@ -22,6 +22,8 @@ int main() {
   std::cout << "Enter the queue size :" << std::endl;
   std::cin >> queueSz;
   server srv(IP, portNum, queueSz);
+
+  srv.listenLoop(); // Start accepting clients connections.
 
   return 0;
 }
