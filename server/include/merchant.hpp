@@ -27,9 +27,9 @@ class Merchant
 {
     private:
         /* 
-            CREATE TABLE merchant (id INTEGER PRIMARY KEY , name TEXT NOT NULL , pickup_address TEXT NOT NULL 
+            CREATE TABLE merchant (id INTEGER PRIMARY KEY , name TEXT NOT NULL , pickupAddress TEXT NOT NULL 
             , email TEXT NOT NULL UNIQUE , password TEXT NOT NULL ,
-            national_id TEXT NOT NULL , keywords TEXT NOT NULL , phone TEXT NOT NULL ,business_type INTEGER NOT NULL ,
+            nationalId TEXT NOT NULL , keywords TEXT NOT NULL , phone TEXT NOT NULL ,businessType INTEGER NOT NULL ,
             country TEXT NOT NULL , city TEXT NOT NULL);
          */ 
 

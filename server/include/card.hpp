@@ -1,15 +1,16 @@
-#define CNUM_SIZE 17
-#define EXP_SIZE 6  // maximum size for expiry date length
+#define CNUM_SIZE 17 /// length of card number
+#define EXP_SIZE 6  // length of expiry date string
+#define CVV_SIZE 4 // length of CVV number                    
 class card 
 {
 private:
 
-    /* CREATE TABLE card (client_id INTEGER PRIMARY KEY , card_number TEXT NOT NULL , 
-            CVV INTEGER NOT NULL , expiry_date TEXT NOT NULL); */
+    /* CREATE TABLE card (clientId INTEGER PRIMARY KEY , cardNumber TEXT NOT NULL , 
+            CVV TEXT NOT NULL , expiryDate TEXT NOT NULL); */
     public:
         int clientId;
         char cardNumber[CNUM_SIZE];
         char expiryDate[EXP_SIZE];
-        int CVV;
+        char CVV[CVV_SIZE];
 
 };
