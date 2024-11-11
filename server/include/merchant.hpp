@@ -1,8 +1,7 @@
 #include <sqlite3.h>
 #include "card.hpp"
+#include "constants.hpp"
 
-#define MAX_SIZE 31 // Maximum size for merhcant name, password, card number, phone number and national ID
-#define MAX_ADDRESS 101 // Maximum size for merhcant pickup address, email and keyword
                         
 enum {GROCERY = 1 , RESTAURANT = 2 , PHARMACY = 3}; 
 
@@ -10,20 +9,20 @@ struct merch
 {
    int id;
    int businessType;
-   char name[MAX_SIZE];
-   char pickupAddress[MAX_ADDRESS];
-   char email[MAX_ADDRESS];
-   char password[MAX_SIZE];
-   char nationalId[MAX_SIZE];
-   char keywords[MAX_ADDRESS];
-   char phone[MAX_SIZE];
-   char country[MAX_SIZE];
-   char city[MAX_SIZE];
+   char name[MAX_NAME_LENGTH];
+   char pickupAddress[MAX_ADDRESS_LENGTH];
+   char email[MAX_EMAIL_LENGTH];
+   char password[MAX_PASSWORD_LENGTH];
+   char nationalId[NATIONAL_ID_LENGTH];
+   char keywords[MAX_ADDRESS_LENGTH];
+   char phone[PHONE_NUMBER_LENGTH];
+   char country[MAX_NAME_LENGTH];
+   char city[MAX_NAME_LENGTH];
    card merchCard;
 
 };
  
-class Merchant
+class merchant
 {
     private:
         /* 
