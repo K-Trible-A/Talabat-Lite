@@ -1,5 +1,5 @@
 #define CNUM_SIZE 17
-#define EXP_SIZE 31  // maximum size for expiry date length
+#define EXP_SIZE 6  // maximum size for expiry date length
 class card 
 {
 private:
