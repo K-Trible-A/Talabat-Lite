@@ -1,4 +1,3 @@
-#include <sqlite3.h>
 #include "card.hpp"
 #include "constants.hpp"
 
