@@ -1,3 +1,4 @@
+#pragma once
 const int MAX_NAME_LENGTH = 31;
 const int MAX_EMAIL_LENGTH = 61;
 const int MAX_ADDRESS_LENGTH = 101;
