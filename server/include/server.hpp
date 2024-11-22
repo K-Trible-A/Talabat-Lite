@@ -15,6 +15,8 @@ private:
   void listenSkt(int qSize);
   // returns clientFD
   int acceptClient();
+  // Append functions to actions[]
+  void appendFuncs();
 
 public:
   server(const std::string &IP, int portNum, int qSize);
@@ -23,6 +25,11 @@ public:
   // Hanle each client in a thread then close his socket.
   void handleClient(int clientFD);
 
-  static void send(int clientFD, const void *data, size_t sz);
-  static void recv(int clientFD, void *data, size_t sz);
+  static void send(int clientFD, const int& num);
+  static void send(int clientFD, const float& num);
+  static void send(int clientFD, const std::string& s);
+
+  static int recvInt(int clientFD);
+  static float recvFloat(int clientFD);
+  static std::string recvString(int clientFD);
 };

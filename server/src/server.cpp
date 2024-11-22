@@ -1,11 +1,15 @@
 #include "../include/server.hpp"
-#include <cstdlib>
+#include "../include/actions.hpp"
+#include "../include/constants.hpp"
+#include <cstring>
 #include <iostream>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <thread>
 
 using namespace std;
+
+extern funcPtr actions[MAX_ACTIONS];
 
 void server::setAddr(const std::string &IP, int portNum, int queueSize) {
   serverFD = socket(AF_INET, SOCK_STREAM, 0);
@@ -40,6 +44,7 @@ server::server(const std::string &IP, int portNum, int qSize) {
   setAddr(IP, portNum, qSize);
   bindSkt();
   listenSkt(qSize);
+  appendFuncs();
   cout << "Server is up and running..." << endl;
 }
 
@@ -66,9 +71,44 @@ void server::listenLoop() {
   }
 }
 
-void server::send(int clientFD, const void* data, size_t sz) {
-  ::send(clientFD, data, sz, 0);
+void server::send(int clientFD, const int& num) {
+  ::send(clientFD, &num, sizeof(num), 0);
 }
-void server::recv(int clientFD, void* data, size_t sz) {
-  ::recv(clientFD, data, sz, 0);
+void server::send(int clientFD, const float& num) {
+  ::send(clientFD, &num, sizeof(num), 0);
+}
+void server::send(int clientFD, const std::string& s) {
+  int sz = s.size() + 1;
+  server::send(clientFD, sz);
+  char buff[sz];
+  memset(buff, 0, sizeof(buff));
+  strcpy(buff, s.c_str());
+  ::send(clientFD, buff, sizeof(buff), 0);
+}
+
+int server::recvInt(int clientFD) {
+  int revd;
+  ::recv(clientFD, &revd, sizeof(revd), 0);
+  return revd = ntohl(revd);
+}
+float server::recvFloat(int clientFD) {
+  uint32_t revd;
+  ::recv(clientFD, &revd, sizeof(revd), 0);
+  revd = ntohl(revd);
+  float ret;
+  memcpy(&ret, &revd, sizeof(revd));
+  return ret;
+}
+std::string server::recvString(int clientFD) {
+  int sz = server::recvInt(clientFD);
+  char buff[sz + 1];
+  ::recv(clientFD, buff, sz * sizeof(char), 0);
+  buff[sz] = '\0';
+  return string(buff);
+}
+
+///////////
+void server::appendFuncs() {
+  actions[FIRST_CONNECTION] = firstConnection;
+  actions[AUTHENTICATE_CLIENT] = authClient;
 }
