@@ -1,1 +1,0 @@
-/home/abdalrahman/git/Talabat-Lite/client/app/build/intermediates/cxx/Debug/145x1s42/obj/x86
