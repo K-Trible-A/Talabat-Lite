@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Talabat Lite</string>
+    <string name="server_ip_address_label">Server IP Address:</string>
+    <string name="enter_ip_address_hint">Enter IP Address</string>
+    <string name="port_number_label">Port Number:</string>
+    <string name="enter_port_number_hint">Enter Port Number</string>
+    <string name="connect_server_button_label">Connect</string>
+    <string name="loginLabelText">Login</string>
+    <string name="hintEmailLogin">Email</string>
+    <string name="passwordLogin">Password</string>
+    <string name="loginButton">Login</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+</resources>
