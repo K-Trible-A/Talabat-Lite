@@ -1,5 +1,5 @@
 #include "../include/database.hpp"
-#include<iostream>
+#include <iostream>
 
 Database::Database(const string &dbName) {
   if (sqlite3_open(dbName.c_str(), &db) != SQLITE_OK) {
@@ -44,4 +44,25 @@ vector<vector<string>> Database::query(const string &sql) {
 
   sqlite3_finalize(stmt);
   return result;
+}
+
+void Database::createSchema() {
+  this->execute( // User login
+      "CREATE TABLE IF NOT EXISTS users ("
+      "id INT AUTO_INCREMENT PRIMARY KEY,"
+      "email TEXT NOT NULL UNIQUE,"
+      "password TEXT NOT NULL"
+      ");");
+  this->execute(  // Merchant information
+      "CREATE TABLE merchant (merchantId INTEGER PRIMARY KEY, name TEXT NOT "
+      "NULL, pickupAddress TEXT NOT NULL, email TEXT NOT NULL UNIQUE, "
+      "password TEXT NOT NULL, nationalId TEXT NOT NULL , keywords TEXT NOT "
+      "NULL, phoneNum TEXT NOT NULL ,businessType TEXT NOT NULL,"
+      "country TEXT NOT NULL , city TEXT NOT NULL);");
+  this->execute( // Card information
+    "CREATE TABLE card (clientId INTEGER PRIMARY"
+                "KEY, cardNumber TEXT NOT NULL, CVV TEXT NOT  NULL,"
+                "expiryDate TEXT NOT NULL);");
+
+  // Other tables
 }
