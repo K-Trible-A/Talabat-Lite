@@ -1,0 +1,4 @@
+- Card number
+- Expiry
+- CVV code
+- save the card information in the user profile.

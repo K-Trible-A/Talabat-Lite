@@ -1,0 +1,6 @@
+- View list of items in the cart (name, picture and price). With ability to:
+	- Go to that item activity.
+	- Counter to number of each item.
+	- Remove item.
+- Payment summary: total {price, discount, delivery fee, service fee}.
+- [[Specification And Diagram/Checkout Activity]]

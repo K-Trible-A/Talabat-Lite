@@ -1,0 +1,1 @@
+Like the Merchant Activity but with ability to edit some attributes not just view.

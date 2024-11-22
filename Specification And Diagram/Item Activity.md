@@ -1,0 +1,2 @@
+- Name, description, picture and price.
+- Number of items (counter) and Add item to cart.

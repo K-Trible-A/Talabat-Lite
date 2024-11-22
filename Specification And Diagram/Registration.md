@@ -1,0 +1,2 @@
+- Common information  between all types of accounts needs to be taken first: name, phone number, email, password, country, city.
+- Choose account type.

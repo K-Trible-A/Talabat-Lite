@@ -1,0 +1,3 @@
+- View and edit all the information user entered in the registration.
+- Set payment method.
+- Set profile picture (optional feature).

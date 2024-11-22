@@ -1,0 +1,3 @@
+- Name, profile & cover pictures, keywords (with max number of words), rating (stars and number of rated).
+- Discounts from all categories
+- All Categories and their items.

@@ -1,0 +1,2 @@
+- View and edit all the information gathered from the registration.
+- Add profile picture (optional feature).

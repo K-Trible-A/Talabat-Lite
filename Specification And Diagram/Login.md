@@ -1,0 +1,6 @@
+- Entering account type, email address and password.
+- Checks the database for authentication.
+- If the server returns true:
+	- Goes to the suitable next activity if authentication succeed depending on the type of the account, else provide a toast of wrong authentication.
+- Else
+	- Provide a toast of Wrong email or password.

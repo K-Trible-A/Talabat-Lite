@@ -1,0 +1,13 @@
+- Active orders. (optional)
+	- Summary information and state of the order.
+- View various shop types
+- View top 3 most frequent shops for the customer.
+- View shops of all types sorted by:
+	- Top rated (default).
+	- alphabetical order.
+	- More (optional feature).
+- View cart.
+#### Footer
+- Home == [[Customer MainActivity]]
+- [[Specification And Diagram/Search]]
+- [[Specification And Diagram/Customer profile]]

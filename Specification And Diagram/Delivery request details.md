@@ -1,0 +1,11 @@
+- Shows (merchant name, request id, pickup location (google maps link), drop-off location (google maps link), customer contact, devilry payment).
+- If it's not accepted yet by the courier:
+	- Accept or Close
+		- In case of Accept a request goes to the server to check the state of the order request if it's still open.
+			- If it's open respond with true and start the request.
+			- If not toast a "The request is not available" and return to the [[Specification And Diagram/Delivery Activity]].
+- Else
+	- Update status of the request
+		- Picked up
+		- On the way
+		- Delivered
