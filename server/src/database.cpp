@@ -54,13 +54,13 @@ void Database::createSchema() {
       "password TEXT NOT NULL"
       ");");
   this->execute(  // Merchant information
-      "CREATE TABLE merchant (merchantId INTEGER PRIMARY KEY, name TEXT NOT "
+      "CREATE TABLE IF NOT EXISTS merchant (merchantId INTEGER PRIMARY KEY, name TEXT NOT "
       "NULL, pickupAddress TEXT NOT NULL, email TEXT NOT NULL UNIQUE, "
       "password TEXT NOT NULL, nationalId TEXT NOT NULL , keywords TEXT NOT "
       "NULL, phoneNum TEXT NOT NULL ,businessType TEXT NOT NULL,"
       "country TEXT NOT NULL , city TEXT NOT NULL);");
   this->execute( // Card information
-    "CREATE TABLE card (clientId INTEGER PRIMARY"
+    "CREATE TABLE IF NOT EXISTS card (clientId INTEGER PRIMARY"
                 "KEY, cardNumber TEXT NOT NULL, CVV TEXT NOT  NULL,"
                 "expiryDate TEXT NOT NULL);");
 
