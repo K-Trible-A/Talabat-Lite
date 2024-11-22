@@ -1,18 +1,21 @@
+#include "../include/constants.hpp"
 #include "../include/database.hpp"
 #include "../include/server.hpp"
 #include <iostream>
 
 using namespace std;
 
+Database db("Database.db");
+funcPtr actions[MAX_ACTIONS];
+
 void server::handleClient(int clientFD) {
-  int code;
-  server::recv(clientFD, &code, sizeof(code));
-  // Action
+  int code = server::recvInt(clientFD);
+  actions[code](clientFD);
+  close(clientFD);
 }
 
 int main() {
-  Database db("Database.db");
-
+  db.createSchema();
   string IP;
   int portNum, queueSz;
   std::cout << "Enter IP address of the server :" << std::endl;
