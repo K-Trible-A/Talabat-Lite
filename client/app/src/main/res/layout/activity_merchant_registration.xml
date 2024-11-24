@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        tools:context=".MerchantRegistrationActivity" >
+
+
+        <EditText
+            android:id="@+id/businessName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:hint="Business Name"
+            android:inputType="text"
+            android:maxLength="30"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/businessType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text="Business Type:"
+            android:textSize="22sp" />
+
+        <RadioGroup
+            android:id="@+id/radioType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="10dp">
+
+            <RadioButton
+                android:id="@+id/grocery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Grocery"
+                android:textSize="22sp" />
+
+            <RadioButton
+                android:id="@+id/restaurant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Restaurant"
+                android:textSize="22sp" />
+
+            <RadioButton
+                android:id="@+id/pharmacy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pharmacy"
+                android:textSize="22sp" />
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/keywords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:hint="Keywords"
+            android:maxLength="100"
+            android:inputType="text"
+            android:textSize="22sp" />
+
+
+        <EditText
+            android:id="@+id/pickupAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:hint="Pickup address"
+            android:maxLength="100"
+            android:inputType="text"
+            android:textSize="22sp" />
+
+        <EditText
+            android:id="@+id/nationalID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:hint="National ID"
+            android:maxLength="16"
+            android:inputType="number"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/addCard"
+            android:layout_width="130dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="25dp"
+            android:text="Add card"
+            android:textSize="19sp" />
+
+        <Button
+            android:id="@+id/submit"
+            android:layout_width="125dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="25dp"
+            android:text="Submit"
+            android:textSize="22sp" />
+
+    </LinearLayout>
+
+</ScrollView>
