@@ -23,8 +23,6 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
     String expiryDateStr = "null";
     String CVVStr = "null";
     final String[] selectedRadio = new String[1];
-    String IP = "192.168.1.6";
-    int portNum = 57000;
     Button submit , addCard;
     int businessType = -1;
     RadioGroup radioType;
@@ -144,7 +142,6 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
             socketHelper.getInstance().close();
 
         } catch (IOException e) {
-            Log.e("Socket", "Connection failed", e);
             runOnUiThread(() -> Toast.makeText(MerchantRegistrationActivity.this, "Failed to connect!", Toast.LENGTH_SHORT).show());
         }
 
