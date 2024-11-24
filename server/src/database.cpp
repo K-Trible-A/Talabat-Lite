@@ -54,7 +54,7 @@ void Database::createSchema() {
       "password TEXT NOT NULL"
       ");");
   this->execute(  // Merchant information
-      "CREATE TABLE IF NOT EXISTS merchant (merchantId INTEGER PRIMARY KEY AUTOINCREMENT ,cardId INTEGER NOT NULL , businessName TEXT NOT NULL,"
+      "CREATE TABLE IF NOT EXISTS merchant (merchantId INTEGER PRIMARY KEY AUTOINCREMENT ,cardId INTEGER NULL , businessName TEXT NOT NULL,"
       "businessType TEXT NOT NULL , keywords TEXT NOT NULL,"
       "pickupAddress TEXT NOT NULL , nationalID TEXT NOT NULL,"
       "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN KEY(merchantId) REFERENCES users(id));");
