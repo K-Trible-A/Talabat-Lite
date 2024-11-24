@@ -1,4 +1,4 @@
-package com.example.kaaa;
+package com.kaaa.talabat_lite;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
