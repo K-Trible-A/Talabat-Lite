@@ -1,7 +1,6 @@
 #include "../include/actions.hpp"
 #include "../include/database.hpp"
 #include "../include/server.hpp"
-#include <iostream>
 
 #include <string>
 using namespace std;
