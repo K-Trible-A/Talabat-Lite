@@ -1,4 +1,4 @@
-#include "../include/database.hpp"
+#include "database.hpp"
 #include <iostream>
 
 Database::Database(const string &dbName) {
@@ -51,7 +51,12 @@ void Database::createSchema() {
       "CREATE TABLE IF NOT EXISTS users ("
       "id INT AUTO_INCREMENT PRIMARY KEY,"
       "email TEXT NOT NULL UNIQUE,"
-      "password TEXT NOT NULL"
+      "password TEXT NOT NULL,"
+      "name TEXT NOT NULL,"
+      "phoneNumber TEXT NOT NULL UNIQUE,"
+      "country TEXT NOT NULL,"
+      "city TEXT NOT NULL,"
+      "accountType ENUM NOT NULL"
       ");");
   this->execute(  // Merchant information
       "CREATE TABLE IF NOT EXISTS merchant (merchantId INTEGER PRIMARY KEY, name TEXT NOT "
@@ -63,6 +68,9 @@ void Database::createSchema() {
     "CREATE TABLE IF NOT EXISTS card (clientId INTEGER PRIMARY"
                 "KEY, cardNumber TEXT NOT NULL, CVV TEXT NOT  NULL,"
                 "expiryDate TEXT NOT NULL);");
-
+  this->execute( "CREATE TABLE IF NOT EXIST customer ("
+                 "customerId INT AUTO_INCREMENT PRIMARY KEY,"
+                 "deliveryAddress  TEXT NOT NULL"
+                 ");");
   // Other tables
 }
