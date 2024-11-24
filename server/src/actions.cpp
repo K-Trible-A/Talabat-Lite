@@ -28,7 +28,6 @@ void authClient(int clientFD) {
 
 void addMerchant(int clientFD)
 {
-  static int id = 0; 
   enum {grocery = 1 , restaurant = 2 , pharmacy = 3};
   string type;
   string businessName = server::recvString(clientFD);
@@ -52,14 +51,24 @@ void addMerchant(int clientFD)
           break; 
   }
 
-  id++;
-  string cardId = to_string(id);
-  const string merchExec = "INSERT INTO merchant (cardId ,businessName, businessType, keywords, pickupAddress, nationalID) VALUES ('" + cardId + "','" + businessName + "','" + type + "','" + keywords + "','" + pickupAddress + "','" + nationaID + "');";
+  string cardExec;
+  string cardId;
 
-  const string cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES ('" + cardNumber + "','" + CVV + "','" + expiryDate + "');";
+  if (cardNumber == "null")
+      cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES (NULL,NULL,NULL)";
+  else
+  cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES ('" + cardNumber + "','" + CVV + "','" + expiryDate + "');";
+      const string cardExecConst = cardExec;    
+      db.execute(cardExecConst);
+      const string sql = "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "'";
+      vector <vector<string>> ans = db.query(sql);
+      if (ans.empty())
+      cardId = "NULL";
+      else 
+      cardId = ans[0][0];
+      const string merchExec = "INSERT INTO merchant (cardId,businessName,businessType,keywords,pickupAddress,nationalID) VALUES ('" + cardId + "','" + businessName + "','" + type + "','" + keywords + "','" + pickupAddress + "','" + nationaID + "')";
       db.execute(merchExec);
-      db.execute(cardExec);
       const int ok = 1;
-  server::send(clientFD,ok);
+      server::send(clientFD,ok);
 
 }
