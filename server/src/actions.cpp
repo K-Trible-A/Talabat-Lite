@@ -28,7 +28,7 @@ void authClient(int clientFD) {
 
 void addMerchant(int clientFD)
 {
-  
+  static int id = 0; 
   enum {grocery = 1 , restaurant = 2 , pharmacy = 3};
   string type;
   string businessName = server::recvString(clientFD);
@@ -51,11 +51,15 @@ void addMerchant(int clientFD)
           type = "pharmacy";
           break; 
   }
-  const string merchExec = "INSERT INTO merchant (businessName, businessType, keywords, pickupAddress, nationalID) VALUES ('" + businessName + "','" + type + "','" + keywords + "','" + pickupAddress + "','" + nationaID + "');";
+
+  id++;
+  string cardId = to_string(id);
+  const string merchExec = "INSERT INTO merchant (cardId ,businessName, businessType, keywords, pickupAddress, nationalID) VALUES ('" + cardId + "','" + businessName + "','" + type + "','" + keywords + "','" + pickupAddress + "','" + nationaID + "');";
 
   const string cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES ('" + cardNumber + "','" + CVV + "','" + expiryDate + "');";
       db.execute(merchExec);
       db.execute(cardExec);
       const int ok = 1;
   server::send(clientFD,ok);
+
 }
