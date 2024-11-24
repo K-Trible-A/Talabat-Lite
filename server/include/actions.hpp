@@ -7,3 +7,5 @@
 void firstConnection(int);
 // Login authentication
 void authClient(int);
+// Insert merchant data into database 
+void addMerchant(int);
