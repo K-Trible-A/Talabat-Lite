@@ -14,3 +14,5 @@ const int AUTHENTICATE_CLIENT = 1011;
 // 102XXX
 
 //103XXX
+
+const int ADD_MERCHANT = 1030;
