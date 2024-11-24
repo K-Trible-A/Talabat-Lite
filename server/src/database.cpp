@@ -60,8 +60,8 @@ void Database::createSchema() {
       "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN KEY(merchantId) REFERENCES users(id));");
   this->execute( // Card information
     "CREATE TABLE IF NOT EXISTS card (cardId INTEGER PRIMARY KEY AUTOINCREMENT,"
-                "cardNumber TEXT NOT NULL , CVV TEXT NOT NULL,"
-                "expiryDate TEXT NOT NULL);");
+                "cardNumber TEXT NULL , CVV TEXT NULL,"
+                "expiryDate TEXT NULL);");
 
   // Other tables
 }
