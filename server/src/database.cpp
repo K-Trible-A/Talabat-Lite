@@ -68,14 +68,14 @@ void Database::createSchema() {
     "CREATE TABLE IF NOT EXISTS card (clientId INTEGER PRIMARY"
                 "KEY, cardNumber TEXT NOT NULL, CVV TEXT NOT  NULL,"
                 "expiryDate TEXT NOT NULL);");
-  this->execute( "CREATE TABLE IF NOT EXIST customer ("
+  this->execute( "CREATE TABLE IF NOT EXISTS customer ("
                  "customerId INT AUTO_INCREMENT PRIMARY KEY,"
                  "deliveryAddress  TEXT NOT NULL,"
+                 "userId INT,"
+                 "cardId INT,"
                  "FOREIGN KEY (userId) REFERENCES users (id)"
-                 "ON DELETE CASCADE"
                  "ON UPDATE CASCADE,"
                  "FOREIGN KEY (cardId) REFERENCES users (clientId)"
-                 "ON DELETE CASCADE"
                  "ON UPDATE CASCADE"
                  ");");
   // Other tables
