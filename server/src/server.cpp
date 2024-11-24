@@ -111,4 +111,5 @@ std::string server::recvString(int clientFD) {
 void server::appendFuncs() {
   actions[FIRST_CONNECTION] = firstConnection;
   actions[AUTHENTICATE_CLIENT] = authClient;
+  actions[ADD_MERCHANT] = addMerchant;
 }
