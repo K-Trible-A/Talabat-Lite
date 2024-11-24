@@ -2,7 +2,6 @@ package com.kaaa.talabat_lite;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -87,8 +86,6 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
 
     private void addMerchant()
     {
-        socketHelper.getInstance().IP = IP;
-        socketHelper.getInstance().portNum = portNum;
         String businessNameStr = businessName.getText().toString().trim();
         String keywordsStr = keywords.getText().toString().trim();
         String pickupAddressStr = pickupAddress.getText().toString().trim();
