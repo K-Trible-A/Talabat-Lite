@@ -1,15 +1,16 @@
-package com.example.merchant;
+package com.example.kaaa;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,6 +30,21 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
     RadioGroup radioType;
     Intent cardIntent;
 
+
+    private final ActivityResultLauncher<Intent> cardActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        cardNumberStr = data.getStringExtra("cardNumber");
+                        expiryDateStr = data.getStringExtra("expiryDate");
+                        CVVStr = data.getStringExtra("CVV");
+                        Toast.makeText(this, "Card details received!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Card entry canceled", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,25 +66,20 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
 
     private void setupListeners ()
     {
-        radioType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.grocery)
-                    businessType = 1;
-                else if (checkedId == R.id.restaurant)
-                    businessType = 2;
-                else if (checkedId == R.id.pharmacy)
-                    businessType = 3;
-                RadioButton selected = findViewById(checkedId);
-                selectedRadio[0] = selected.getText().toString();
-            }
+        radioType.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.grocery)
+                businessType = 1;
+            else if (checkedId == R.id.restaurant)
+                businessType = 2;
+            else if (checkedId == R.id.pharmacy)
+                businessType = 3;
+            RadioButton selected = findViewById(checkedId);
+            selectedRadio[0] = selected.getText().toString();
         });
-        addCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cardIntent = new Intent(MerchantRegistrationActivity.this,CardActivity.class);
-                startActivityForResult(cardIntent,1);
-            }
+        addCard.setOnClickListener(v -> {
+            cardIntent = new Intent(MerchantRegistrationActivity.this, CardActivity.class);
+            cardActivityResultLauncher.launch(cardIntent);
+
         });
 
         submit.setOnClickListener(view -> new Thread(this::addMerchant).start());
@@ -145,6 +156,7 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
         {
             if (resultCode == RESULT_OK)
             {
+                assert data != null;
                 cardNumberStr = data.getStringExtra("cardNumber");
                 expiryDateStr = data.getStringExtra("expiryDate");
                 CVVStr = data.getStringExtra("CVV");
