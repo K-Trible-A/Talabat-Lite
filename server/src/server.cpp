@@ -112,4 +112,5 @@ void server::appendFuncs() {
   actions[FIRST_CONNECTION] = firstConnection;
   actions[AUTHENTICATE_CLIENT] = authClient;
   actions[ADD_MERCHANT] = addMerchant;
+  actions[ADD_COURIER] = addCourier;
 }

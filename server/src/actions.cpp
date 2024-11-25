@@ -72,3 +72,45 @@ void addMerchant(int clientFD)
       server::send(clientFD,ok);
 
 }
+void addCourier(int clientFD)
+{
+    enum {car = 1 , motorcycle = 2 , bicycle = 3};
+    string type;
+    int vehicleType = server::recvInt(clientFD);
+    string nationaID = server::recvString(clientFD);
+    string cardNumber = server::recvString(clientFD);
+    string expiryDate = server::recvString(clientFD);
+    string CVV = server::recvString(clientFD);
+    switch (vehicleType)
+    {
+        case 1:
+            type = "car";
+            break;
+        case 2:
+            type = "motorcycle";
+            break;
+        case 3:
+            type = "bicycle";
+            break;
+    }
+
+    string cardExec;
+    string cardId;
+
+    if (cardNumber == "null")
+        cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES (NULL,NULL,NULL)";
+    else
+        cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES ('" + cardNumber + "','" + CVV + "','" + expiryDate + "');";
+    const string cardExecConst = cardExec;
+    db.execute(cardExecConst);
+    const string sql = "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "'";
+    vector <vector<string>> ans = db.query(sql);
+    if (ans.empty())
+        cardId = "NULL";
+    else
+        cardId = ans[0][0];
+    const string courExec = "INSERT INTO courier (cardId,vehicleType,nationalID) VALUES ('" + cardId  + "','" + type  + "','" + nationaID + "')";
+    db.execute(courExec);
+    const int ok = 1;
+    server::send(clientFD,ok);
+}
