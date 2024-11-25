@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private void connectServer() {
         String IP = editTextIp.getText().toString().trim();
         String portNumStr = editTextPort.getText().toString().trim();
-
         if (!validIP(IP) || portNumStr.isEmpty()) {
             runOnUiThread(() -> Toast.makeText(MainActivity.this, "Invalid IP or port number", Toast.LENGTH_SHORT).show());
             return;
