@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Existing content like a TextView or other components -->
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter for Registration"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textSize="24sp"
+        tools:ignore="HardcodedText" />
+
+    <!-- Your new user input form -->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/editTextName"
+        android:layout_width="match_parent"
+        android:layout_height="57dp"
+        android:hint="Your Name"
+        android:inputType="textPersonName"
+        android:textColorHint="#546E7A"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Phone Number"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/editTextPhone"
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:hint="Your Phone Number"
+        android:inputType="phone"
+        android:textColorHint="#546E7A"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/editTextEmail"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Your Email"
+        android:inputType="textEmailAddress"
+        android:textColorHint="#546E7A"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Password"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/editTextPassword"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:hint="Your Password"
+        android:inputType="textPassword"
+        android:textColorHint="#546E7A"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Country"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/editTextCountry"
+        android:layout_width="match_parent"
+        android:layout_height="57dp"
+        android:hint="Your Country"
+        android:inputType="text"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="City"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/editTextCity"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:hint="Your City"
+        android:inputType="text"
+        android:textColorHint="#546E7A"
+        tools:ignore="Autofill,HardcodedText,VisualLintTextFieldSize" />
+    <!-- RadioGroup for User Type Selection -->
+    <RadioGroup
+        android:id="@+id/radioGroupUserType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioCustomer"
+            android:layout_width="126dp"
+            android:layout_height="match_parent"
+            android:text="Customer"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            tools:ignore="HardcodedText" />
+
+        <RadioButton
+            android:id="@+id/radioCourier"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:text="Courier"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            tools:ignore="HardcodedText" />
+
+        <RadioButton
+            android:id="@+id/radioMerchant"
+            android:layout_width="125dp"
+            android:layout_height="67dp"
+            android:text="Merchant"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            tools:ignore="HardcodedText" />
+    </RadioGroup>
+
+    <!-- Submit Button -->
+    <Button
+        android:id="@+id/buttonSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
+</LinearLayout>
