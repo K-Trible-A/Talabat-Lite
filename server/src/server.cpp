@@ -147,12 +147,43 @@ float server::recvFloat(int clientFD) {
   return ret;
 }
 std::string server::recvString(int clientFD) {
-  int sz = server::recvInt(clientFD);
-  char buff[sz + 1];
-  ::recv(clientFD, buff, sz * sizeof(char), 0);
-  buff[sz] = '\0';
-  return string(buff);
+  // Step 1: Receive the size of the string first
+  uint32_t string_size;
+  ssize_t bytes_received = recv(clientFD, &string_size, sizeof(string_size), 0);
+  if (bytes_received == -1) {
+    perror("Error receiving string size");
+    return "";
+  }
+  if (bytes_received == 0) {
+    std::cerr << "Connection closed unexpectedly" << std::endl;
+    return "";
+  }
+  // Convert received size to host byte order (in case of network byte order)
+  string_size = ntohl(string_size); // Network-to-host byte order conversion
+  // Step 2: Allocate a buffer for the actual data based on the string size
+  std::string received_data;
+  received_data.resize(string_size); // Resize the string to hold the data
+  // Step 3: Receive the actual string data in chunks
+  size_t total_received = 0;
+  size_t CHUNK_SIZE = 1024;
+  while (total_received < string_size) {
+    size_t chunk_size = std::min(CHUNK_SIZE, string_size - total_received);
+    bytes_received =
+        recv(clientFD, &received_data[total_received], chunk_size, 0);
+    if (bytes_received == -1) {
+      perror("Error receiving data");
+      return "";
+    }
+    if (bytes_received == 0) {
+      std::cerr << "Connection closed unexpectedly while receiving data"
+                << std::endl;
+      return "";
+    }
+    total_received += bytes_received;
+  }
+  return received_data;
 }
+
 std::pair<unsigned char *, uint32_t> server::recvImg(int clientFD) {
   // First, receive the size of the image
   uint32_t imageSize = 0;
