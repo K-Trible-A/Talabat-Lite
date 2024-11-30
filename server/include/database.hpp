@@ -15,6 +15,7 @@ public:
 
   // Specify database tables and relationships
   void createSchema();
+  sqlite3* getDB();
   bool execute(const string &);                 // executes sql
   vector<vector<string>> query(const string &); // get query output
 };
