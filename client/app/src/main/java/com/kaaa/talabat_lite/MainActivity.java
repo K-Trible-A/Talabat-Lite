@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(1010);
+            socketHelper.getInstance().sendInt(globals.FIRST_CONNECTION);
             socketHelper.getInstance().close();
             runOnUiThread(() -> {
                 Toast.makeText(MainActivity.this, "Connected to server", Toast.LENGTH_SHORT).show();
