@@ -5,6 +5,7 @@
     <!-- permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:name=".Talabat_Lite"
@@ -33,13 +34,21 @@
         </activity>
         <activity
             android:name=".CardActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".MerchantRegistrationActivity"
             android:exported="true">
         </activity>
         <activity
             android:name=".UserRegistrationActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".ItemActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".AddItemActivity"
             android:exported="true">
         </activity>
 
