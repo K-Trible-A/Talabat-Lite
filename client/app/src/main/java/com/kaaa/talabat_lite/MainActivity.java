@@ -71,5 +71,4 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to Connect", Toast.LENGTH_SHORT).show());
         }
-    }
-}
+    }}
