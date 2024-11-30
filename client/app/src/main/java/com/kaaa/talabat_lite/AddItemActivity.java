@@ -32,7 +32,7 @@ public class AddItemActivity extends AppCompatActivity {
                         imgPreview.setImageBitmap(selectedImage);
                         imgPreview.setVisibility(ImageView.VISIBLE);
                     } catch (IOException e) {
-                        Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                        runOnUiThread(()->Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show());
                     }
                 }
             });
@@ -69,7 +69,7 @@ public class AddItemActivity extends AppCompatActivity {
         String price = etItemPrice.getText().toString().trim();
 
         if (name.isEmpty() || description.isEmpty() || price.isEmpty() || selectedImage == null) {
-            Toast.makeText(this, "Please fill all fields and upload an image", Toast.LENGTH_SHORT).show();
+            runOnUiThread(()->Toast.makeText(this, "Please fill all fields and upload an image", Toast.LENGTH_SHORT).show());
             return;
         }
 
