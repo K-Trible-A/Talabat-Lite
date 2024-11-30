@@ -52,7 +52,9 @@ public class ItemActivity extends AppCompatActivity {
                 // After background task, update UI on the main thread
                 mainHandler.post(() -> {
                     itemName.setText(item.name);
-                    itemPrice.setText(String.valueOf(item.price));
+                    // Round the price to 1 decimal place
+                    String formattedPrice = String.format("%.1f", item.price);
+                    itemPrice.setText(formattedPrice);
                     itemDescription.setText(item.description);
                     itemImage.setImageBitmap(item.img);
                 });
