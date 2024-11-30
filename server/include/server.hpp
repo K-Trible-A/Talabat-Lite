@@ -28,8 +28,10 @@ public:
   static void send(int clientFD, const int& num);
   static void send(int clientFD, const float& num);
   static void send(int clientFD, const std::string& s);
+  static void sendImg(int clientFD, const std::string& img);
 
   static int recvInt(int clientFD);
   static float recvFloat(int clientFD);
   static std::string recvString(int clientFD);
+  static std::pair<unsigned char*, uint32_t> recvImg(int clientFD);
 };
