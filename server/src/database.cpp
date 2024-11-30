@@ -106,6 +106,16 @@ void Database::createSchema() {
       "nationalID TEXT NOT NULL,"
       "FOREIGN KEY(cardId) REFERENCES card(cardId),"
       "FOREIGN KEY(userId) REFERENCES users(id));");
+  this->execute(  // Merchant information
+      "CREATE TABLE IF NOT EXISTS merchant (merchantId INTEGER PRIMARY KEY AUTOINCREMENT ,cardId INTEGER NULL , businessName TEXT NOT NULL,"
+      "businessType TEXT NOT NULL , keywords TEXT NOT NULL,"
+      "pickupAddress TEXT NOT NULL , nationalID TEXT NOT NULL,"
+      "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN KEY(merchantId) REFERENCES users(id));");
+  this->execute(  // Courier information
+      "CREATE TABLE IF NOT EXISTS courier (courierId INTEGER PRIMARY KEY AUTOINCREMENT ,cardId INTEGER NULL ,"
+      "vehicleType TEXT NOT NULL ,"
+      "nationalID TEXT NOT NULL,"
+      "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN KEY(courierId) REFERENCES users(id));");
   this->execute( // Card information
       "CREATE TABLE IF NOT EXISTS card ("
       "cardId INTEGER PRIMARY KEY AUTOINCREMENT,"

@@ -13,3 +13,5 @@ void addMerchant(int);
 void addItem(int);
 // Send Item data to the client
 void retrieveItem(int);
+//Insert Courier data into database
+void addCourier(int);
