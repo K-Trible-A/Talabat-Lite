@@ -2,6 +2,7 @@ package com.kaaa.talabat_lite;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -57,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
 
         try {
             socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(1011);
+            socketHelper.getInstance().sendInt(globals.AUTHENTICATE_CLIENT);
 
             socketHelper.getInstance().sendString(email);
             socketHelper.getInstance().sendString(pass);
@@ -66,7 +67,9 @@ public class LoginActivity extends AppCompatActivity {
 
             socketHelper.getInstance().close();
 
-            if(ok == 1){
+            if(ok != -1){
+                globals.userId = ok;
+                Log.i("USERID", String.valueOf(ok));
                 runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login success!", Toast.LENGTH_SHORT).show());
             }
             else{

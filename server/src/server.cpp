@@ -1,11 +1,14 @@
 #include "../include/server.hpp"
 #include "../include/actions.hpp"
 #include "../include/constants.hpp"
+#include <algorithm>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <thread>
+#include <vector>
 
 using namespace std;
 
@@ -71,19 +74,63 @@ void server::listenLoop() {
   }
 }
 
-void server::send(int clientFD, const int& num) {
+void server::send(int clientFD, const int &num) {
   ::send(clientFD, &num, sizeof(num), 0);
 }
-void server::send(int clientFD, const float& num) {
+void server::send(int clientFD, const float &num) {
   ::send(clientFD, &num, sizeof(num), 0);
 }
-void server::send(int clientFD, const std::string& s) {
-  int sz = s.size() + 1;
+
+void server::send(int clientFD, const std::string &s) {
+  int sz = s.size() + 1; // Including null-terminator
+  // First, send the size of the string
   server::send(clientFD, sz);
-  char buff[sz];
-  memset(buff, 0, sizeof(buff));
-  strcpy(buff, s.c_str());
-  ::send(clientFD, buff, sizeof(buff), 0);
+  // Allocate a buffer large enough for a chunk
+  size_t chunkSize = 1024; // You can adjust this chunk size as needed
+  size_t bytesSent = 0;
+  while (bytesSent < sz) {
+    // Calculate the remaining data to be sent
+    size_t remaining = sz - bytesSent;
+    size_t currentChunkSize = std::min(chunkSize, remaining);
+    // Create a buffer for the current chunk
+    std::vector<char> buff(currentChunkSize);
+    // Copy the appropriate portion of the string into the buffer
+    std::memcpy(buff.data(), s.c_str() + bytesSent, currentChunkSize);
+    // Send the current chunk
+    ssize_t result = ::send(clientFD, buff.data(), currentChunkSize, 0);
+    if (result == -1) {
+      // Handle send error (e.g., log it, throw exception, etc.)
+      perror("send failed");
+      return;
+    }
+    // Update the number of bytes sent
+    bytesSent += result;
+    // Optional: Handle partial send (if needed)
+    if (result < currentChunkSize) {
+      std::cerr << "Warning: Partial send of chunk." << std::endl;
+    }
+  }
+}
+
+void server::sendImg(int clientFD, const std::string &image_data) {
+  int image_size = image_data.size();
+  server::send(clientFD, image_size);
+  // Now send the image in chunks
+  size_t bytes_sent = 0;
+  size_t CHUNK_SIZE = 1024;
+  while (bytes_sent < image_size) {
+    // Calculate the remaining bytes to send
+    size_t remaining_bytes = image_size - bytes_sent;
+    size_t chunk_size = std::min(remaining_bytes, CHUNK_SIZE);
+    // Send the chunk
+    ssize_t sent_chunk =
+        ::send(clientFD, image_data.data() + bytes_sent, chunk_size, 0);
+    if (sent_chunk == -1) {
+      std::cerr << "Send failed." << std::endl;
+      return;
+    }
+    bytes_sent += sent_chunk;
+  }
 }
 
 int server::recvInt(int clientFD) {
@@ -106,11 +153,61 @@ std::string server::recvString(int clientFD) {
   buff[sz] = '\0';
   return string(buff);
 }
+std::pair<unsigned char *, uint32_t> server::recvImg(int clientFD) {
+  // First, receive the size of the image
+  uint32_t imageSize = 0;
+  ssize_t bytesReceived = recv(clientFD, &imageSize, sizeof(imageSize), 0);
+  if (bytesReceived <= 0) {
+    std::cerr << "Failed to receive image size or connection lost!"
+              << std::endl;
+    return {NULL, 0};
+  }
+
+  // Convert the received size from network byte order to host byte order
+  imageSize = ntohl(imageSize);
+
+  std::cout << "Image size: " << imageSize << " bytes" << std::endl;
+
+  // Allocate memory for the image data (raw pointer)
+  unsigned char *imageData = new unsigned char[imageSize];
+
+  // Receive the image data in chunks and store it in the buffer
+  size_t totalBytesReceived = 0;
+  while (totalBytesReceived < imageSize) {
+    bytesReceived = recv(clientFD, imageData + totalBytesReceived,
+                         imageSize - totalBytesReceived, 0);
+    if (bytesReceived == -1) {
+      std::cerr << "Error receiving image data!" << std::endl;
+      delete[] imageData; // Free the memory before returning
+      return {NULL, 0};
+    } else if (bytesReceived == 0) {
+      std::cerr << "Connection closed before receiving complete image!"
+                << std::endl;
+      delete[] imageData; // Free the memory before returning
+      return {NULL, 0};
+    }
+    totalBytesReceived += bytesReceived;
+  }
+
+  return {imageData, imageSize};
+
+  // Optionally, write the received image data to a file
+  std::ofstream outFile("received_image.jpg", std::ios::binary);
+  outFile.write(reinterpret_cast<char *>(imageData), imageSize);
+  outFile.close();
+
+  std::cout << "Image received and saved as 'received_image.jpg'" << std::endl;
+
+  // Free the allocated memory
+  delete[] imageData;
+}
 
 ///////////
 void server::appendFuncs() {
   actions[FIRST_CONNECTION] = firstConnection;
   actions[AUTHENTICATE_CLIENT] = authClient;
   actions[ADD_MERCHANT] = addMerchant;
+  actions[ADD_ITEM] = addItem;
+  actions[RETRIEVE_ITEM] = retrieveItem;
   actions[ADD_COURIER] = addCourier;
 }
