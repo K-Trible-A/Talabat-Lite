@@ -6,6 +6,7 @@ const int MAX_ACTIONS = 1e6;
 
 // Codes (Like a simple protocol to make server understand receiver) :
 // 100XXX
+
 const int ADD_COURIER = 1000;
 // 101XXX
 const int FIRST_CONNECTION = 1010;
