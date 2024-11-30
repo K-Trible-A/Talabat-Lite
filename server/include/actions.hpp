@@ -15,3 +15,7 @@ void addItem(int);
 void retrieveItem(int);
 //Insert Courier data into database
 void addCourier(int);
+// Insert user data into database
+void addUser(int);
+// Insert Customer data into database
+void addCustomer(int);

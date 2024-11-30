@@ -14,7 +14,8 @@ const int AUTHENTICATE_CLIENT = 1011;
 const int ADD_ITEM = 1012;
 const int RETRIEVE_ITEM = 1013;
 // 102XXX
-
+const int ADD_USER=1020;
+const int ADD_CUSTOMER=1021;
 //103XXX
 
 const int ADD_MERCHANT = 1030;

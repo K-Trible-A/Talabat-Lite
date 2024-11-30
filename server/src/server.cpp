@@ -210,4 +210,6 @@ void server::appendFuncs() {
   actions[ADD_ITEM] = addItem;
   actions[RETRIEVE_ITEM] = retrieveItem;
   actions[ADD_COURIER] = addCourier;
+  actions[ADD_USER]=addUser;
+  actions[ADD_CUSTOMER]=addCustomer;
 }
