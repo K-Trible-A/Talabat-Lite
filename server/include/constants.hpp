@@ -10,7 +10,8 @@ const int MAX_ACTIONS = 1e6;
 // 101XXX
 const int FIRST_CONNECTION = 1010;
 const int AUTHENTICATE_CLIENT = 1011;
-
+const int ADD_ITEM = 1012;
+const int RETRIEVE_ITEM = 1013;
 // 102XXX
 
 //103XXX
