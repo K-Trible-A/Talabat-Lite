@@ -12,6 +12,8 @@ const int FIRST_CONNECTION = 1010;
 const int AUTHENTICATE_CLIENT = 1011;
 
 // 102XXX
+const int ADD_USER=1020;
+const int ADD_CUSTOMER=1021;
 
 //103XXX
 
