@@ -9,3 +9,7 @@ void firstConnection(int);
 void authClient(int);
 // Insert merchant data into database 
 void addMerchant(int);
+// Add item data into database
+void addItem(int);
+// Send Item data to the client
+void retrieveItem(int);
