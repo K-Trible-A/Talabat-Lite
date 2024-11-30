@@ -57,9 +57,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         try {
-            socketHelper.getInstance().IP = "10.0.2.2";
-            socketHelper.getInstance().portNum = 57000;
-
             socketHelper.getInstance().connect();
             socketHelper.getInstance().sendInt(globals.AUTHENTICATE_CLIENT);
 
