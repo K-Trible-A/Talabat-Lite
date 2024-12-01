@@ -96,18 +96,44 @@ public class CourierRegistrationActivity extends AppCompatActivity {
         }
 
         try {
+            Intent intent = getIntent();
+            String name = intent.getStringExtra("userName");
+            String phone = intent.getStringExtra("userPhone");
+            String email = intent.getStringExtra("userEmail");
+            String password = intent.getStringExtra("userPassword");
+            String country = intent.getStringExtra("userCountry");
+            String city = intent.getStringExtra("userCity");
+            int accountType=intent.getIntExtra("accountType",0);
             socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(1000);
-            socketHelper.getInstance().sendInt(vehicleType);
-            socketHelper.getInstance().sendString(nationalIDStr);
-            socketHelper.getInstance().sendString(cardNumberStr);
-            socketHelper.getInstance().sendString(expiryDateStr);
-            socketHelper.getInstance().sendString(CVVStr);
-            int ok = socketHelper.getInstance().recvInt();
-            if (ok == 1) {
-                runOnUiThread(() -> Toast.makeText(CourierRegistrationActivity.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
+            socketHelper.getInstance().sendInt(globals.ADD_USER);
+            socketHelper.getInstance().sendString(name);
+            socketHelper.getInstance().sendString(phone);
+            socketHelper.getInstance().sendString(email);
+            socketHelper.getInstance().sendString(password);
+            socketHelper.getInstance().sendString(country);
+            socketHelper.getInstance().sendString(city);
+            socketHelper.getInstance().sendInt(accountType);
+            int ok1 = socketHelper.getInstance().recvInt();
+            if(ok1==1) {
+                int userId=socketHelper.getInstance().recvInt();
+                socketHelper.getInstance().close();
+                socketHelper.getInstance().connect();
+                socketHelper.getInstance().sendInt(1000);
+                socketHelper.getInstance().sendInt(vehicleType);
+                socketHelper.getInstance().sendString(nationalIDStr);
+                socketHelper.getInstance().sendString(cardNumberStr);
+                socketHelper.getInstance().sendString(expiryDateStr);
+                socketHelper.getInstance().sendString(CVVStr);
+                int ok = socketHelper.getInstance().recvInt();
+                if (ok == 1) {
+                    runOnUiThread(() -> Toast.makeText(CourierRegistrationActivity.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
+                }
+                socketHelper.getInstance().close();
             }
-            socketHelper.getInstance().close();
+            else {
+                socketHelper.getInstance().close();
+                runOnUiThread(() -> Toast.makeText(CourierRegistrationActivity.this, "This email or phoneNumber has already registered", Toast.LENGTH_SHORT).show());
+            }
 
         } catch (IOException e) {
             runOnUiThread(() -> Toast.makeText(CourierRegistrationActivity.this, "Failed to connect!", Toast.LENGTH_SHORT).show());

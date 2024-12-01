@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 
 public class CustomerRegistration extends AppCompatActivity {
-    private Intent outIntent;
     private EditText editTextStreet ;
     private Button buttoncreat;
 
@@ -38,17 +37,42 @@ public class CustomerRegistration extends AppCompatActivity {
         }
         try {
             Intent intent = getIntent();
-            int userId = intent.getIntExtra("userId",0);// 0 is the default value
+            String name = intent.getStringExtra("userName");
+            String phone = intent.getStringExtra("userPhone");
+            String email = intent.getStringExtra("userEmail");
+            String password = intent.getStringExtra("userPassword");
+            String country = intent.getStringExtra("userCountry");
+            String city = intent.getStringExtra("userCity");
+            int accountType=intent.getIntExtra("accountType",0);
             socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(globals.ADD_CUSTOMER);
-            socketHelper.getInstance().sendString(street);
-            socketHelper.getInstance().sendInt(userId);
-            int ok = socketHelper.getInstance().recvInt();
-            socketHelper.getInstance().close();
-            if (ok == 1) {
-                runOnUiThread(()->Toast.makeText(CustomerRegistration.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
-                outIntent = new Intent(this, LoginActivity.class);
-                startActivity(outIntent);
+            socketHelper.getInstance().sendInt(globals.ADD_USER);
+            socketHelper.getInstance().sendString(name);
+            socketHelper.getInstance().sendString(phone);
+            socketHelper.getInstance().sendString(email);
+            socketHelper.getInstance().sendString(password);
+            socketHelper.getInstance().sendString(country);
+            socketHelper.getInstance().sendString(city);
+            socketHelper.getInstance().sendInt(accountType);
+            int ok1 = socketHelper.getInstance().recvInt();
+            if(ok1==1) {
+                int userId=socketHelper.getInstance().recvInt();
+                socketHelper.getInstance().close();
+                socketHelper.getInstance().connect();
+                socketHelper.getInstance().sendInt(globals.ADD_CUSTOMER);
+                socketHelper.getInstance().sendString(street);
+                socketHelper.getInstance().sendInt(userId);
+                int ok2 = socketHelper.getInstance().recvInt();
+                socketHelper.getInstance().close();
+                if (ok2 == 1) {
+                    runOnUiThread(() -> Toast.makeText(CustomerRegistration.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
+                    Intent outIntent = new Intent(CustomerRegistration.this, LoginActivity.class);
+                    startActivity(outIntent);
+                }
+            }
+            else
+            {
+                socketHelper.getInstance().close();
+                runOnUiThread(() -> Toast.makeText(CustomerRegistration.this, "This email or phoneNumber has already registered", Toast.LENGTH_SHORT).show());
             }
 
         } catch (IOException e) {
