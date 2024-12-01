@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 
 public class CustomerRegistration extends AppCompatActivity {
-
+    private Intent outIntent;
     private EditText editTextStreet ;
     private Button buttoncreat;
 
@@ -47,6 +47,8 @@ public class CustomerRegistration extends AppCompatActivity {
             socketHelper.getInstance().close();
             if (ok == 1) {
                 runOnUiThread(()->Toast.makeText(CustomerRegistration.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
+                outIntent = new Intent(this, LoginActivity.class);
+                startActivity(outIntent);
             }
 
         } catch (IOException e) {
