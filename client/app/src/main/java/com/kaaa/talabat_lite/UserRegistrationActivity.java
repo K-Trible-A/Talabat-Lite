@@ -68,7 +68,7 @@ public class UserRegistrationActivity extends AppCompatActivity {
         }
         try {
             socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(1020);
+            socketHelper.getInstance().sendInt(globals.ADD_USER);
             socketHelper.getInstance().sendString(name);
             socketHelper.getInstance().sendString(phone);
             socketHelper.getInstance().sendString(email);
