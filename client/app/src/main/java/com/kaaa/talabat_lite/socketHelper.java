@@ -52,12 +52,21 @@ public class socketHelper {
         outputStream.flush();
     }
     public void sendString(String str) throws IOException{
-        // Sending string size first
+        // Sending string size first (to be handled as a 4-byte integer)
         int sz = str.length();
         sendInt(sz);
-        // Sending the string
-        byte[] Data = str.getBytes(StandardCharsets.UTF_8);
-        outputStream.write(Data);
+        // Convert string to byte array using UTF-8 encoding
+        byte[] data = str.getBytes(StandardCharsets.UTF_8);
+        // Send the byte array in chunks to handle large data
+        int offset = 0;
+        int chunkSize = 1024; // 1KB chunks (you can adjust the chunk size as needed)
+        while (offset < data.length) {
+            int remaining = data.length - offset;
+            int bytesToSend = Math.min(chunkSize, remaining);
+            outputStream.write(data, offset, bytesToSend);
+            offset += bytesToSend;
+        }
+        // Ensure all data is sent
         outputStream.flush();
     }
     public void sendImg(Bitmap selectedImage) throws IOException {
