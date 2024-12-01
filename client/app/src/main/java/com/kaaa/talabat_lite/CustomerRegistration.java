@@ -1,5 +1,6 @@
 package com.kaaa.talabat_lite;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,8 +12,8 @@ import java.io.IOException;
 
 public class CustomerRegistration extends AppCompatActivity {
 
-    EditText editTextStreet ;
-    Button buttoncreat;
+    private EditText editTextStreet ;
+    private Button buttoncreat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +37,12 @@ public class CustomerRegistration extends AppCompatActivity {
             return;
         }
         try {
+            Intent intent = getIntent();
+            int userId = intent.getIntExtra("userId",0);// 0 is the default value
             socketHelper.getInstance().connect();
             socketHelper.getInstance().sendInt(1021);
             socketHelper.getInstance().sendString(street);
+            socketHelper.getInstance().sendInt(userId);
             int ok = socketHelper.getInstance().recvInt();
             socketHelper.getInstance().close();
             if (ok == 1) {

@@ -14,9 +14,9 @@ import java.io.IOException;
 
 public class UserRegistrationActivity extends AppCompatActivity {
 
-    EditText editTextName, editTextPhone, editTextEmail, editTextPassword, editTextCountry, editTextCity;
-    Button buttonSubmit;
-    RadioGroup radioGroupUserType;
+    private EditText editTextName, editTextPhone, editTextEmail, editTextPassword, editTextCountry, editTextCity;
+    private Button buttonSubmit;
+    private RadioGroup radioGroupUserType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,25 +79,30 @@ public class UserRegistrationActivity extends AppCompatActivity {
             else if (userType.equals("Merchant")) socketHelper.getInstance().sendInt(2);
             else socketHelper.getInstance().sendInt(3);
             int ok = socketHelper.getInstance().recvInt();
-            socketHelper.getInstance().close();
             if (ok == 1) {
+                int userId=socketHelper.getInstance().recvInt();
+                socketHelper.getInstance().close();
                 runOnUiThread(()->Toast.makeText(UserRegistrationActivity.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
                 if (userType.equals("Customer")) {
                     // go to next activity
                     Intent intent = new Intent(UserRegistrationActivity.this, CustomerRegistration.class);
+                    intent.putExtra("userId", userId);          // Pass UserId as integer
                     startActivity(intent);
                 }
                 else if (userType.equals("Merchant")) {
                     Intent intent = new Intent(UserRegistrationActivity.this, MerchantRegistrationActivity.class);
+                    intent.putExtra("userId", userId);          // Pass UserId as integer
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(UserRegistrationActivity.this, CourierRegistrationActivity.class);
+                    intent.putExtra("userId", userId);          // Pass UserId as integer
                     startActivity(intent);
                 }
             }
             else
             {
-                runOnUiThread(()->Toast.makeText(UserRegistrationActivity.this, "this email has already registered", Toast.LENGTH_SHORT).show());
+                socketHelper.getInstance().close();
+                runOnUiThread(()->Toast.makeText(UserRegistrationActivity.this, "this email or phoneNumber  has already registered", Toast.LENGTH_SHORT).show());
             }
 
         } catch (IOException e) {
