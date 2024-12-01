@@ -211,3 +211,33 @@ void addCourier(int clientFD)
     const int ok = 1;
     server::send(clientFD,ok);
 }
+void addUser(int clientFD)
+{
+  enum {Customer = 1 , Merchant = 2 , Courier = 3};
+  string name = server::recvString(clientFD);
+  string phoneNumber=server::recvString(clientFD);
+  string email = server::recvString(clientFD);
+  string password = server::recvString(clientFD);
+  string country = server::recvString(clientFD);
+  string city = server::recvString(clientFD);
+  int accountType = server::recvInt(clientFD);
+  const string sql ="SELECT * FROM users WHERE email = '" + email + "';";
+  vector<vector<string>> ans = db.query(sql);
+  int ok = 0;
+      if (ans.empty())
+        ok = 1;
+  if(ok==1)
+  {
+      const string userExec = "INSERT INTO users (email,password,name,phoneNumber,country,city,accountType) VALUES ( '" +email + "','" + password + "','" + name + "','" + phoneNumber +"','" + country + "','" + city + "','"+ std::to_string(accountType) +"');";
+      db.execute(userExec);
+  }
+  server::send(clientFD, ok);
+}
+void addCustomer(int clientFD)
+{
+  string deliveryAddress = server::recvString(clientFD);
+  const string customerExec = "INSERT INTO customer (deliveryAddress) VALUES ('" + deliveryAddress +"');";
+      db.execute(customerExec);
+      const int ok = 1;
+      server::send(clientFD,ok);
+}

@@ -88,11 +88,16 @@ vector<vector<string>> Database::query(const string &sql) {
 void Database::createSchema() {
   //Enable foreign keys support
   this->execute("PRAGMA foreign_keys = ON;");
-  this->execute( // User login
+  this->execute( // user information
       "CREATE TABLE IF NOT EXISTS users ("
-      "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+      "id INTEGER  PRIMARY KEY AUTOINCREMENT,"
       "email TEXT NOT NULL UNIQUE,"
-      "password TEXT NOT NULL"
+      "password TEXT NOT NULL,"
+      "name TEXT NOT NULL,"
+      "phoneNumber TEXT NOT NULL UNIQUE,"
+      "country TEXT NOT NULL,"
+      "city TEXT NOT NULL,"
+      "accountType INTEGER NOT NULL"
       ");");
   this->execute( // Merchant information
       "CREATE TABLE IF NOT EXISTS merchant ("
@@ -124,6 +129,17 @@ void Database::createSchema() {
       "CVV INTEGER NULL,"
       "expiryDate TEXT NULL,"
       "FOREIGN KEY(userId) REFERENCES users(id));");
+  this->execute( // customer infromation
+                 "CREATE TABLE IF NOT EXISTS customer ("
+                 "customerId  INTEGER PRIMARY KEY AUTOINCREMENT,"
+                 "deliveryAddress  TEXT NOT NULL,"
+                 "userId INTEGER,"
+                 "cardId INTEGER,"
+                 "FOREIGN KEY (userId) REFERENCES users (id)"
+                 "ON UPDATE CASCADE,"
+                 "FOREIGN KEY (cardId) REFERENCES card (cardId)"
+                 "ON UPDATE CASCADE"
+                 ");");
   this->execute( // Item information
       "CREATE TABLE IF NOT EXISTS item ("
       "itemId INTEGER PRIMARY KEY AUTOINCREMENT,"
