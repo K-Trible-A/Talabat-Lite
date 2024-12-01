@@ -40,7 +40,7 @@ public class CustomerRegistration extends AppCompatActivity {
             Intent intent = getIntent();
             int userId = intent.getIntExtra("userId",0);// 0 is the default value
             socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(1021);
+            socketHelper.getInstance().sendInt(globals.ADD_CUSTOMER);
             socketHelper.getInstance().sendString(street);
             socketHelper.getInstance().sendInt(userId);
             int ok = socketHelper.getInstance().recvInt();
