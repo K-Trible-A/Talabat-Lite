@@ -14,9 +14,9 @@ import java.io.IOException;
 
 public class UserRegistrationActivity extends AppCompatActivity {
 
-    EditText editTextName, editTextPhone, editTextEmail, editTextPassword, editTextCountry, editTextCity;
-    Button buttonSubmit;
-    RadioGroup radioGroupUserType;
+    private EditText editTextName, editTextPhone, editTextEmail, editTextPassword, editTextCountry, editTextCity;
+    private Button buttonSubmit;
+    private RadioGroup radioGroupUserType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +28,8 @@ public class UserRegistrationActivity extends AppCompatActivity {
         // Set OnClickListener for the Submit button
         setupListeners();
     }
-    private void initUI()
-    {
+
+    private void initUI() {
         editTextName = findViewById(R.id.editTextName);
         editTextPhone = findViewById(R.id.editTextPhone);
         editTextEmail = findViewById(R.id.editTextEmail);
@@ -39,9 +39,11 @@ public class UserRegistrationActivity extends AppCompatActivity {
         buttonSubmit = findViewById(R.id.buttonSubmit);
         radioGroupUserType = findViewById(R.id.radioGroupUserType);
     }
-    private void setupListeners(){
+
+    private void setupListeners() {
         buttonSubmit.setOnClickListener(view -> new Thread(this::addUserData).start());
     }
+
     private void addUserData() {
         // Retrieve the user input
         String name = editTextName.getText().toString();
@@ -59,49 +61,58 @@ public class UserRegistrationActivity extends AppCompatActivity {
         // Validate the fields
         if (name.isEmpty() || phone.isEmpty() || email.isEmpty() || password.isEmpty() || country.isEmpty() || city.isEmpty()) {
 
-            runOnUiThread(()->Toast.makeText(UserRegistrationActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show());
+            runOnUiThread(() -> Toast.makeText(UserRegistrationActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show());
             return;
         }
         if (selectedId == -1) { // No radio button selected
-            runOnUiThread(()->Toast.makeText(UserRegistrationActivity.this, "Please select a user type", Toast.LENGTH_SHORT).show());
+            runOnUiThread(() -> Toast.makeText(UserRegistrationActivity.this, "Please select a user type", Toast.LENGTH_SHORT).show());
             return;
         }
-        try {
+            /*
             socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(1020);
+            socketHelper.getInstance().sendInt(globals.ADD_USER);
             socketHelper.getInstance().sendString(name);
             socketHelper.getInstance().sendString(phone);
             socketHelper.getInstance().sendString(email);
             socketHelper.getInstance().sendString(password);
             socketHelper.getInstance().sendString(country);
             socketHelper.getInstance().sendString(city);
-            if (userType.equals("Customer")) socketHelper.getInstance().sendInt(1);
-            else if (userType.equals("Merchant")) socketHelper.getInstance().sendInt(2);
-            else socketHelper.getInstance().sendInt(3);
-            int ok = socketHelper.getInstance().recvInt();
-            socketHelper.getInstance().close();
-            if (ok == 1) {
-                runOnUiThread(()->Toast.makeText(UserRegistrationActivity.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
-                if (userType.equals("Customer")) {
-                    // go to next activity
-                    Intent intent = new Intent(UserRegistrationActivity.this, CustomerRegistration.class);
-                    startActivity(intent);
-                }
-                else if (userType.equals("Merchant")) {
-                    Intent intent = new Intent(UserRegistrationActivity.this, MerchantRegistrationActivity.class);
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(UserRegistrationActivity.this, CourierRegistrationActivity.class);
-                    startActivity(intent);
-                }
-            }
-            else
-            {
-                runOnUiThread(()->Toast.makeText(UserRegistrationActivity.this, "this email has already registered", Toast.LENGTH_SHORT).show());
-            }
-
-        } catch (IOException e) {
-            runOnUiThread(()->Toast.makeText(UserRegistrationActivity.this, "Failed to connect!", Toast.LENGTH_SHORT).show());
+            */
+        int accountType;
+        if (userType.equals("Customer")) accountType = 1;
+        else if (userType.equals("Merchant")) accountType = 2;
+        else accountType = 3;
+        if (userType.equals("Customer")) {
+            // go to next activity
+            Intent intent = new Intent(UserRegistrationActivity.this, CustomerRegistration.class);
+            intent.putExtra("userName", name); // pass userName as string
+            intent.putExtra("userPhone", phone); // pass userPhone as string
+            intent.putExtra("userEmail", email); // pass userEmail as string
+            intent.putExtra("userPassword", password); // pass userPassword as string
+            intent.putExtra("userCountry", country); // pass userCounty as string
+            intent.putExtra("userCity", city); // pass usercity as string
+            intent.putExtra("accountType", accountType); // pass accountType as int
+            startActivity(intent);
+        } else if (userType.equals("Merchant")) {
+            Intent intent = new Intent(UserRegistrationActivity.this, MerchantRegistrationActivity.class);
+            intent.putExtra("userName", name); // pass userName as string
+            intent.putExtra("userPhone", phone); // pass userPhone as string
+            intent.putExtra("userEmail", email); // pass userEmail as string
+            intent.putExtra("userPassword", password); // pass userPassword as string
+            intent.putExtra("userCountry", country); // pass userCounty as string
+            intent.putExtra("userCity", city); // pass userCity as string
+            intent.putExtra("accountType", accountType); // pass accountType as int
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(UserRegistrationActivity.this, CourierRegistrationActivity.class);// Pass UserId as integer
+            intent.putExtra("userName", name); // pass userName as string
+            intent.putExtra("userPhone", phone); // pass userPhone as string
+            intent.putExtra("userEmail", email); // pass userEmail as string
+            intent.putExtra("userPassword", password); // pass userPassword as string
+            intent.putExtra("userCountry", country); // pass userCounty as string
+            intent.putExtra("userCity", city); // pass usercity as string
+            intent.putExtra("accountType", accountType); // pass accountType as int
+            startActivity(intent);
         }
         // Show the data
     }

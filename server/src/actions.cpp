@@ -223,8 +223,10 @@ void addUser(int clientFD)
   int accountType = server::recvInt(clientFD);
   const string sql ="SELECT * FROM users WHERE email = '" + email + "';";
   vector<vector<string>> ans = db.query(sql);
+  const string sql1 ="SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
+  vector<vector<string>> ans1 = db.query(sql1);
   int ok = 0;
-      if (ans.empty())
+      if (ans.empty() && ans1.empty())
         ok = 1;
   if(ok==1)
   {
@@ -232,11 +234,19 @@ void addUser(int clientFD)
       db.execute(userExec);
   }
   server::send(clientFD, ok);
+  if(ok==1)
+  {
+  const string sql2 ="SELECT id FROM users WHERE email = '" + email + "';";
+  vector<vector<string>> ans2 = db.query(sql2);
+  int userId=std::stoi(ans2[0][0]);
+  server::send(clientFD,userId);
+  }
 }
 void addCustomer(int clientFD)
 {
   string deliveryAddress = server::recvString(clientFD);
-  const string customerExec = "INSERT INTO customer (deliveryAddress) VALUES ('" + deliveryAddress +"');";
+  int userId = server::recvInt(clientFD);
+  const string customerExec = "INSERT INTO customer (deliveryAddress,userId) VALUES ('" + deliveryAddress + "','" + std::to_string(userId) +"');";
       db.execute(customerExec);
       const int ok = 1;
       server::send(clientFD,ok);
