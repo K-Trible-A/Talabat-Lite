@@ -128,7 +128,7 @@ void Database::createSchema() {
                  "CREATE TABLE IF NOT EXISTS customer ("
                  "customerId  INTEGER PRIMARY KEY AUTOINCREMENT,"
                  "deliveryAddress  TEXT NOT NULL,"
-                 "userId INTEGER,"
+                 "userId INTEGER NOT NULL UNIQUE,"
                  "cardId INTEGER,"
                  "FOREIGN KEY (userId) REFERENCES users (id)"
                  "ON UPDATE CASCADE,"
