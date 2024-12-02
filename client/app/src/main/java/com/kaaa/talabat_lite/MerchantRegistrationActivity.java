@@ -1,7 +1,11 @@
 package com.kaaa.talabat_lite;
 
+import static com.kaaa.talabat_lite.globals.ADD_MERCHANT;
+import static com.kaaa.talabat_lite.globals.ADD_USER;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -18,9 +22,9 @@ import java.io.IOException;
 public class MerchantRegistrationActivity extends AppCompatActivity {
 
     EditText businessName ,keywords ,pickupAddress ,nationalID;
-    String cardNumberStr = "null";
-    String expiryDateStr = "null";
-    String CVVStr = "null";
+    String cardNumberStr = "";
+    String expiryDateStr = "";
+    String CVVStr = "";
     final String[] selectedRadio = new String[1];
     Button submit , addCard;
     int businessType = -1;
@@ -120,6 +124,11 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
             runOnUiThread(() -> Toast.makeText(MerchantRegistrationActivity.this, "national ID has 16 numbers!", Toast.LENGTH_SHORT).show());
             return;
         }
+        if (cardNumberStr.isEmpty() || CVVStr.isEmpty() || expiryDateStr.isEmpty())
+        {
+            runOnUiThread(() -> Toast.makeText(MerchantRegistrationActivity.this, "Fill card information!", Toast.LENGTH_SHORT).show());
+            return;
+        }
 
         try {
             socketHelper.getInstance().connect();
@@ -131,20 +140,33 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
             String country = intent.getStringExtra("userCountry");
             String city = intent.getStringExtra("userCity");
             int accountType=intent.getIntExtra("accountType",0);
-            socketHelper.getInstance().sendInt(globals.ADD_USER);
-            socketHelper.getInstance().sendString(name);
-            socketHelper.getInstance().sendString(phone);
-            socketHelper.getInstance().sendString(email);
-            socketHelper.getInstance().sendString(password);
-            socketHelper.getInstance().sendString(country);
-            socketHelper.getInstance().sendString(city);
+            socketHelper.getInstance().sendInt(ADD_USER);
+            if (name != null) {
+                socketHelper.getInstance().sendString(name);
+            }
+            if (phone != null) {
+                socketHelper.getInstance().sendString(phone);
+            }
+            if (email != null) {
+                socketHelper.getInstance().sendString(email);
+            }
+            if (password != null) {
+                socketHelper.getInstance().sendString(password);
+            }
+            if (country != null) {
+                socketHelper.getInstance().sendString(country);
+            }
+            if (city != null) {
+                socketHelper.getInstance().sendString(city);
+            }
             socketHelper.getInstance().sendInt(accountType);
             int ok1 = socketHelper.getInstance().recvInt();
             if(ok1==1) {
                 int userId=socketHelper.getInstance().recvInt();
                 socketHelper.getInstance().close();
                 socketHelper.getInstance().connect();
-                socketHelper.getInstance().sendInt(1030);
+                socketHelper.getInstance().sendInt(ADD_MERCHANT);
+                socketHelper.getInstance().sendInt(userId);
                 socketHelper.getInstance().sendString(businessNameStr);
                 socketHelper.getInstance().sendInt(businessType);
                 socketHelper.getInstance().sendString(keywordsStr);
