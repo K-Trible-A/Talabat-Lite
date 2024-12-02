@@ -243,4 +243,7 @@ void server::appendFuncs() {
   actions[ADD_COURIER] = addCourier;
   actions[ADD_USER]=addUser;
   actions[ADD_CUSTOMER]=addCustomer;
+  actions[GET_MERCHANT_DATA] = getMerchantData;
+  actions[CHANGE_PICKUP_ADDRESS] = changePickupAddress;
+  actions[CHECK_ACCOUNT_TYPE] = checkAccountType;
 }
