@@ -128,7 +128,7 @@ public class socketHelper {
 
         // Close resources
         byteArrayOutputStream.close();
-        return receivedString;
+        return receivedString.trim();
     }
     public Bitmap recvImg() throws IOException {
         // Convert the byte array to an integer (image size)
