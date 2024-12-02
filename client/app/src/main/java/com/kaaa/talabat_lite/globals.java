@@ -7,5 +7,9 @@ public class globals {
     public static final int ADD_ITEM = 1012;
     public static final int RETRIEVE_ITEM = 1013;
     public static  final int ADD_USER=1020;
-    public static  final int ADD_CUSTOMER=1021; 
+    public static  final int ADD_CUSTOMER=1021;
+    public static final int ADD_MERCHANT = 1030;
+    public static final int GET_MERCHANT_DATA = 1031;
+    public static final int CHANGE_PICKUP_ADDRESS = 1032;
+    public static final int CHECK_ACCOUNT_TYPE = 1033;
 }
