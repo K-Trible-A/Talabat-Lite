@@ -28,8 +28,6 @@ public class MerchantProfileFragment extends Fragment {
     TextView profileBusinessName;
     Button changeAddressButton;
     String businessName, type, keywords, pickupAddress;
-    String IP = "192.168.1.6";
-    int portNum = 57000;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     Intent changePickupAddressIntent;
