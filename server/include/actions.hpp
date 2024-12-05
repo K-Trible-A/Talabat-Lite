@@ -19,3 +19,9 @@ void addCourier(int);
 void addUser(int);
 // Insert Customer data into database
 void addCustomer(int);
+// Get merchant data from database
+void getMerchantData(int);
+// Change merchant's pickup address
+void changePickupAddress(int);
+// Check account type after login
+void checkAccountType(int);
