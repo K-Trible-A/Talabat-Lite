@@ -295,16 +295,11 @@ void changePickupAddress (int clientFD)
 void checkAccountType(int clientFD)
 {
     
-    string accountType;
     int userId = server::recvInt(clientFD);
     const string sql = "SELECT accountType FROM users WHERE id = " + to_string(userId);
     vector <vector<string>> ans = db.query(sql);
-    if (ans[0][0] == "1")
-        accountType = "customer";
-    else if (ans[0][0] == "2")
-        accountType = "merchant";
-    else if (ans[0][0] == "3")
-        accountType = "courier";
+    int accountType = stoi(ans[0][0]);
+    accountType+=50;
     server::send(clientFD,accountType);
-
+    
 }
