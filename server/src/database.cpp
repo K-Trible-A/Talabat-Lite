@@ -109,6 +109,7 @@ void Database::createSchema() {
       "keywords TEXT NOT NULL,"
       "pickupAddress TEXT NOT NULL,"
       "nationalID TEXT NOT NULL,"
+      "rating REAL NOT NULL,"
       "FOREIGN KEY(cardId) REFERENCES card(cardId),"
       "FOREIGN KEY(userId) REFERENCES users(id));");
   this->execute(  // Courier information
@@ -125,16 +126,16 @@ void Database::createSchema() {
       "expiryDate TEXT NULL,"
       "FOREIGN KEY(userId) REFERENCES users(id));");
   this->execute( // customer infromation
-                 "CREATE TABLE IF NOT EXISTS customer ("
-                 "customerId  INTEGER PRIMARY KEY AUTOINCREMENT,"
-                 "deliveryAddress  TEXT NOT NULL,"
-                 "userId INTEGER NOT NULL UNIQUE,"
-                 "cardId INTEGER,"
-                 "FOREIGN KEY (userId) REFERENCES users (id)"
-                 "ON UPDATE CASCADE,"
-                 "FOREIGN KEY (cardId) REFERENCES card (cardId)"
-                 "ON UPDATE CASCADE"
-                 ");");
+      "CREATE TABLE IF NOT EXISTS customer ("
+      "customerId  INTEGER PRIMARY KEY AUTOINCREMENT,"
+      "deliveryAddress  TEXT NOT NULL,"
+      "userId INTEGER NOT NULL UNIQUE,"
+      "cardId INTEGER,"
+      "FOREIGN KEY (userId) REFERENCES users (id)"
+      "ON UPDATE CASCADE,"
+      "FOREIGN KEY (cardId) REFERENCES card (cardId)"
+      "ON UPDATE CASCADE"
+      ");");
   this->execute( // Item information
       "CREATE TABLE IF NOT EXISTS item ("
       "itemId INTEGER PRIMARY KEY AUTOINCREMENT,"
