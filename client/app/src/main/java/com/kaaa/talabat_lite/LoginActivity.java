@@ -75,8 +75,8 @@ public class LoginActivity extends AppCompatActivity {
                 socketHelper.getInstance().connect();
                 socketHelper.getInstance().sendInt(globals.CHECK_ACCOUNT_TYPE);
                 socketHelper.getInstance().sendInt(globals.userId);
-                String accountType = socketHelper.getInstance().recvString().trim();
-                if (accountType.equals("merchant"))
+                int accountType = socketHelper.getInstance().recvInt();
+                if (accountType == globals.MERCHANT)
                 {
                     afterLoginIntent = new Intent(LoginActivity.this,MerchantActivity.class);
                     startActivity(afterLoginIntent);
