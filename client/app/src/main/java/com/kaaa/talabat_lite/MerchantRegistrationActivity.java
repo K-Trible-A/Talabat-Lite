@@ -30,7 +30,7 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
     int businessType = -1;
     RadioGroup radioType;
     Intent cardIntent;
-
+    Intent loginIntent;
 
     private final ActivityResultLauncher<Intent> cardActivityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -178,6 +178,8 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
                 int ok = socketHelper.getInstance().recvInt();
                 if (ok == 1) {
                     runOnUiThread(() -> Toast.makeText(MerchantRegistrationActivity.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
+                    loginIntent = new Intent(MerchantRegistrationActivity.this,LoginActivity.class);
+                    startActivity(loginIntent);
                 }
                 socketHelper.getInstance().close();
             }
