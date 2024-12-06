@@ -59,26 +59,22 @@ void addMerchant(int clientFD) {
     break;
   }
 
+  int ok = 1;
   string cardId;
-
-  const string cardExec =
-      "INSERT INTO card (userId,cardNumber,CVV,expiryDate) VALUES (" +
-      to_string(userId) + ",'" + cardNumber + "','" + CVV + "','" + expiryDate +
-      "');";
-  db.execute(cardExec);
+  string tableName = "card";
+  vector<string> columns = {"userId", "cardNumber", "CVV", "expiryDate"};
+  vector<string> values = {to_string(userId), cardNumber, CVV, expiryDate};
+  ok &= db.insertData(tableName, columns, values);
   const string sql =
       "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "';";
   vector<vector<string>> ans = db.query(sql);
   cardId = ans[0][0];
-  const string merchExec = "INSERT INTO merchant "
-                           "(userId,cardId,businessName,businessType,keywords,"
-                           "pickupAddress,nationalID,rating) VALUES (" +
-                           to_string(userId) + ",'" + cardId + "','" +
-                           businessName + "','" + type + "','" + keywords +
-                           "','" + pickupAddress + "','" + nationaID + "',0" +
-                           ");";
-  db.execute(merchExec);
-  const int ok = 1;
+  tableName = "merchant";
+  columns = {"userId",   "cardId",        "businessName", "businessType",
+             "keywords", "pickupAddress", "nationalID",   "rating"};
+  values = {to_string(userId), cardId,        businessName, type,
+            keywords,          pickupAddress, nationaID,    "0"};
+  ok &= db.insertData(tableName, columns, values);
   server::send(clientFD, ok);
 }
 
@@ -287,16 +283,9 @@ void getMerchantData(int clientFD) {
 void changePickupAddress(int clientFD) {
   int userId = server::recvInt(clientFD);
   string pickupAddress = server::recvString(clientFD);
-
-  const string sql = "UPDATE merchant "
-                     "SET pickupAddress = '" +
-                     pickupAddress +
-                     "' "
-                     "WHERE userId = " +
-                     to_string(userId) + " ;";
-
-  db.execute(sql);
-  int ok = 1;
+  const string condition = "userId = " + to_string(userId);
+  int ok =
+      db.updateData("merchant", {"pickupAddress"}, {pickupAddress}, condition);
   server::send(clientFD, ok);
 }
 
