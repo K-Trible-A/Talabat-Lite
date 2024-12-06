@@ -4,7 +4,6 @@ import static com.kaaa.talabat_lite.globals.CHANGE_PICKUP_ADDRESS;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -62,6 +61,7 @@ public class ChangePickupAddressActivity extends AppCompatActivity {
                 runOnUiThread(()-> Toast.makeText(ChangePickupAddressActivity.this, "Changed address successfully!", Toast.LENGTH_SHORT).show());
             }
             merchantIntent = new Intent(ChangePickupAddressActivity.this,MerchantActivity.class);
+            merchantIntent.putExtra("fragment","profile");
             startActivity(merchantIntent);
 
         } catch (IOException e) {
