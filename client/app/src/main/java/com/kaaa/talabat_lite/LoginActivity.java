@@ -16,11 +16,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 
 public class LoginActivity extends AppCompatActivity {
+
     private EditText editTextEmail, editTextPass;
     private Button buttonLogin;
     private TextView registrationText;
     private ProgressBar progressBar;
     Intent outIntent;
+    Intent afterLoginIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,8 +71,17 @@ public class LoginActivity extends AppCompatActivity {
 
             if(ok != -1){
                 globals.userId = ok;
-                Log.i("USERID", String.valueOf(ok));
                 runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login success!", Toast.LENGTH_SHORT).show());
+                socketHelper.getInstance().connect();
+                socketHelper.getInstance().sendInt(globals.CHECK_ACCOUNT_TYPE);
+                socketHelper.getInstance().sendInt(globals.userId);
+                int accountType = socketHelper.getInstance().recvInt();
+                if (accountType == globals.MERCHANT)
+                {
+                    afterLoginIntent = new Intent(LoginActivity.this,MerchantActivity.class);
+                    startActivity(afterLoginIntent);
+                }
+
             }
             else{
                 runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login failed!", Toast.LENGTH_SHORT).show());
