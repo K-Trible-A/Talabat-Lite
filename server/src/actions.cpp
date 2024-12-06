@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
+#include <cmath>
 
 using namespace std;
 
@@ -36,6 +37,7 @@ void authClient(int clientFD) {
 void addMerchant(int clientFD) {
   enum { grocery = 1, restaurant = 2, pharmacy = 3 };
   string type;
+  int userId = server::recvInt(clientFD);
   string businessName = server::recvString(clientFD);
   int businessType = server::recvInt(clientFD);
   string keywords = server::recvString(clientFD);
@@ -44,6 +46,8 @@ void addMerchant(int clientFD) {
   string cardNumber = server::recvString(clientFD);
   string expiryDate = server::recvString(clientFD);
   string CVV = server::recvString(clientFD);
+
+
   switch (businessType) {
   case 1:
     type = "grocery";
@@ -56,30 +60,21 @@ void addMerchant(int clientFD) {
     break;
   }
 
-  string cardExec;
-  string cardId;
+    string cardId;
 
-  if (cardNumber == "null")
-    cardExec =
-        "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES (NULL,NULL,NULL)";
-  else
-    cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES ('" +
-               cardNumber + "','" + CVV + "','" + expiryDate + "');";
-  const string cardExecConst = cardExec;
-  db.execute(cardExecConst);
+  const string cardExec = "INSERT INTO card (userId,cardNumber,CVV,expiryDate) VALUES (" + to_string(userId) + ",'"
+               + cardNumber + "','" + CVV + "','" + expiryDate + "');";
+    db.execute(cardExec);
   const string sql =
       "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "'";
   vector<vector<string>> ans = db.query(sql);
-  if (ans.empty())
-    cardId = "NULL";
-  else
-    cardId = ans[0][0];
+      cardId = ans[0][0];
   const string merchExec = "INSERT INTO merchant "
-                           "(cardId,businessName,businessType,keywords,"
-                           "pickupAddress,nationalID) VALUES ('" +
+                           "(userId,cardId,businessName,businessType,keywords,"
+                           "pickupAddress,nationalID,rating) VALUES (" + to_string(userId) + ",'" + 
                            cardId + "','" + businessName + "','" + type +
                            "','" + keywords + "','" + pickupAddress + "','" +
-                           nationaID + "')";
+                           nationaID + "',0" +")";
   db.execute(merchExec);
   const int ok = 1;
   server::send(clientFD, ok);
@@ -250,4 +245,75 @@ void addCustomer(int clientFD)
       db.execute(customerExec);
       const int ok = 1;
       server::send(clientFD,ok);
+}
+
+void getMerchantData (int clientFD)
+{
+
+     int userId = server::recvInt(clientFD);
+
+     string sql = "SELECT merchant.* FROM users "
+                  "JOIN merchant ON users.id = merchant.merchantId "
+                  "WHERE users.id = '" + to_string(userId) + "';";
+
+     vector <vector<string>> ans = db.query(sql);
+
+     string businessName = ans[0][3];
+     string type = ans[0][4];
+     string keywords = ans[0][5];
+     string pickupAddress = ans[0][6];
+     float rating = stof(ans[0][8]);
+     rating = round(rating * 10) / 10;
+     server::send(clientFD,businessName);
+     server::send(clientFD,type);
+     server::send(clientFD,keywords);
+     server::send(clientFD,pickupAddress);
+     server::send(clientFD,rating);
+
+     int ok = 1;
+
+     server::send(clientFD,ok);
+    
+}
+
+void changePickupAddress (int clientFD)
+{
+    int userId = server::recvInt(clientFD);
+    cout << "userID = " << userId << endl;
+    string pickupAddress = server::recvString(clientFD);
+    cout << "New address is: " << pickupAddress << endl;
+
+    const string sql = "UPDATE merchant "
+                       "SET pickupAddress = '" + pickupAddress + "' "
+                       "WHERE userId = " + to_string(userId);
+
+    db.execute(sql);
+    int ok = 1;
+    server::send(clientFD,ok);
+                    
+
+}
+
+void checkAccountType(int clientFD)
+{
+    enum {CUSTOMER = 51 , MERCHANT = 52 , COURIER = 53};
+    int userId = server::recvInt(clientFD);
+    cout << "user id = " << endl;
+    const string sql = "SELECT accountType FROM users WHERE id = " + to_string(userId);
+    vector <vector<string>> ans = db.query(sql);
+    int accountType = stoi(ans[0][0]);
+    switch (accountType)
+    {
+        case 1:
+            accountType = CUSTOMER;
+            break;
+        case 2:
+            accountType = MERCHANT;
+            break;
+        case 3:
+            accountType = COURIER;
+            break;
+    }
+    server::send(clientFD,accountType);
+    
 }

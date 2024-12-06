@@ -10,4 +10,16 @@
     <string name="passwordLogin">Password</string>
     <string name="loginButton">Login</string>
     <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="profile">profile</string>
+    <string name="home_fragment">Home fragment</string>
+    <string name="items_fragment">Items fragment</string>
+    <string name="ScrollView">ScrollView</string>
+    <string name="todo">TODO</string>
+    <string name="business_name">Business name</string>
+    <string name="business_type_field">Business Type</string>
+    <string name="keywords">Keywords</string>
+    <string name="pickup_address">Pickup Address</string>
+    <string name="keywords_field">Keywords</string>
+    <string name="pickup_address_field">Pickup address</string>
+    <string name="business_type">Business type</string>
 </resources>
