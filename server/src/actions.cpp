@@ -2,11 +2,11 @@
 #include "../include/database.hpp"
 #include "../include/server.hpp"
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
-#include <cmath>
 
 using namespace std;
 
@@ -47,7 +47,6 @@ void addMerchant(int clientFD) {
   string expiryDate = server::recvString(clientFD);
   string CVV = server::recvString(clientFD);
 
-
   switch (businessType) {
   case 1:
     type = "grocery";
@@ -60,21 +59,24 @@ void addMerchant(int clientFD) {
     break;
   }
 
-    string cardId;
+  string cardId;
 
-  const string cardExec = "INSERT INTO card (userId,cardNumber,CVV,expiryDate) VALUES (" + to_string(userId) + ",'"
-               + cardNumber + "','" + CVV + "','" + expiryDate + "');";
-    db.execute(cardExec);
+  const string cardExec =
+      "INSERT INTO card (userId,cardNumber,CVV,expiryDate) VALUES (" +
+      to_string(userId) + ",'" + cardNumber + "','" + CVV + "','" + expiryDate +
+      "');";
+  db.execute(cardExec);
   const string sql =
-      "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "'";
+      "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "';";
   vector<vector<string>> ans = db.query(sql);
-      cardId = ans[0][0];
+  cardId = ans[0][0];
   const string merchExec = "INSERT INTO merchant "
                            "(userId,cardId,businessName,businessType,keywords,"
-                           "pickupAddress,nationalID,rating) VALUES (" + to_string(userId) + ",'" + 
-                           cardId + "','" + businessName + "','" + type +
-                           "','" + keywords + "','" + pickupAddress + "','" +
-                           nationaID + "',0" +")";
+                           "pickupAddress,nationalID,rating) VALUES (" +
+                           to_string(userId) + ",'" + cardId + "','" +
+                           businessName + "','" + type + "','" + keywords +
+                           "','" + pickupAddress + "','" + nationaID + "',0" +
+                           ");";
   db.execute(merchExec);
   const int ok = 1;
   server::send(clientFD, ok);
@@ -156,162 +158,165 @@ void retrieveItem(int clientFD) {
   float price = stof(res[0][1]);
   string desc = res[0][2];
   cout << name << ' ' << name.size() << endl;
-    cout << price << endl;
-    cout << desc << ' ' <<  desc.size() << endl;
+  cout << price << endl;
+  cout << desc << ' ' << desc.size() << endl;
 
-  server::send(clientFD, name);  // Name
+  server::send(clientFD, name); // Name
   server::sendImg(clientFD, res[0][3]);
   server::send(clientFD, desc);  // Description
   server::send(clientFD, price); // Price
 }
-void addCourier(int clientFD)
-{
-    enum {car = 1 , motorcycle = 2 , bicycle = 3};
-    string type;
-    int vehicleType = server::recvInt(clientFD);
-    string nationaID = server::recvString(clientFD);
-    string cardNumber = server::recvString(clientFD);
-    string expiryDate = server::recvString(clientFD);
-    string CVV = server::recvString(clientFD);
-    switch (vehicleType)
-    {
-        case 1:
-            type = "car";
-            break;
-        case 2:
-            type = "motorcycle";
-            break;
-        case 3:
-            type = "bicycle";
-            break;
-    }
+void addCourier(int clientFD) {
+  enum { car = 1, motorcycle = 2, bicycle = 3 };
+  string type;
+  int vehicleType = server::recvInt(clientFD);
+  string nationaID = server::recvString(clientFD);
+  string cardNumber = server::recvString(clientFD);
+  string expiryDate = server::recvString(clientFD);
+  string CVV = server::recvString(clientFD);
+  switch (vehicleType) {
+  case 1:
+    type = "car";
+    break;
+  case 2:
+    type = "motorcycle";
+    break;
+  case 3:
+    type = "bicycle";
+    break;
+  }
 
-    string cardExec;
-    string cardId;
+  string cardExec;
+  string cardId;
 
-    if (cardNumber == "null")
-        cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES (NULL,NULL,NULL)";
-    else
-        cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES ('" + cardNumber + "','" + CVV + "','" + expiryDate + "');";
-    const string cardExecConst = cardExec;
-    db.execute(cardExecConst);
-    const string sql = "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "'";
-    vector <vector<string>> ans = db.query(sql);
-    if (ans.empty())
-        cardId = "NULL";
-    else
-        cardId = ans[0][0];
-    const string courExec = "INSERT INTO courier (cardId,vehicleType,nationalID) VALUES ('" + cardId  + "','" + type  + "','" + nationaID + "')";
-    db.execute(courExec);
-    const int ok = 1;
-    server::send(clientFD,ok);
+  if (cardNumber == "null")
+    cardExec =
+        "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES (NULL,NULL,NULL);";
+  else
+    cardExec = "INSERT INTO card (cardNumber,CVV,expiryDate) VALUES ('" +
+               cardNumber + "','" + CVV + "','" + expiryDate + "');";
+  const string cardExecConst = cardExec;
+  db.execute(cardExecConst);
+  const string sql =
+      "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "';";
+  vector<vector<string>> ans = db.query(sql);
+  if (ans.empty())
+    cardId = "NULL";
+  else
+    cardId = ans[0][0];
+  const string courExec =
+      "INSERT INTO courier (cardId,vehicleType,nationalID) VALUES ('" + cardId +
+      "','" + type + "','" + nationaID + "');";
+  db.execute(courExec);
+  const int ok = 1;
+  server::send(clientFD, ok);
 }
-void addUser(int clientFD)
-{
-  enum {Customer = 1 , Merchant = 2 , Courier = 3};
+void addUser(int clientFD) {
+  enum { Customer = 1, Merchant = 2, Courier = 3 };
   string name = server::recvString(clientFD);
-  string phoneNumber=server::recvString(clientFD);
+  string phoneNumber = server::recvString(clientFD);
   string email = server::recvString(clientFD);
   string password = server::recvString(clientFD);
   string country = server::recvString(clientFD);
   string city = server::recvString(clientFD);
   int accountType = server::recvInt(clientFD);
-  const string sql ="SELECT * FROM users WHERE email = '" + email + "';";
+  const string sql = "SELECT * FROM users WHERE email = '" + email + "';";
   vector<vector<string>> ans = db.query(sql);
-  const string sql1 ="SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
+  const string sql1 =
+      "SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
   vector<vector<string>> ans1 = db.query(sql1);
   int ok = 0;
-      if (ans.empty() && ans1.empty())
-        ok = 1;
-  if(ok==1)
-  {
-      const string userExec = "INSERT INTO users (email,password,name,phoneNumber,country,city,accountType) VALUES ( '" +email + "','" + password + "','" + name + "','" + phoneNumber +"','" + country + "','" + city + "','"+ std::to_string(accountType) +"');";
-      db.execute(userExec);
+  if (ans.empty() && ans1.empty())
+    ok = 1;
+  if (ok == 1) {
+    const string userExec = "INSERT INTO users "
+                            "(email,password,name,phoneNumber,country,city,"
+                            "accountType) VALUES ( '" +
+                            email + "','" + password + "','" + name + "','" +
+                            phoneNumber + "','" + country + "','" + city +
+                            "','" + std::to_string(accountType) + "');";
+    db.execute(userExec);
   }
   server::send(clientFD, ok);
-  if(ok==1)
-  {
-  const string sql2 ="SELECT id FROM users WHERE email = '" + email + "';";
-  vector<vector<string>> ans2 = db.query(sql2);
-  int userId=std::stoi(ans2[0][0]);
-  server::send(clientFD,userId);
+  if (ok == 1) {
+    const string sql2 = "SELECT id FROM users WHERE email = '" + email + "';";
+    vector<vector<string>> ans2 = db.query(sql2);
+    int userId = std::stoi(ans2[0][0]);
+    server::send(clientFD, userId);
   }
 }
-void addCustomer(int clientFD)
-{
+void addCustomer(int clientFD) {
   string deliveryAddress = server::recvString(clientFD);
   int userId = server::recvInt(clientFD);
-  const string customerExec = "INSERT INTO customer (deliveryAddress,userId) VALUES ('" + deliveryAddress + "','" + std::to_string(userId) +"');";
-      db.execute(customerExec);
-      const int ok = 1;
-      server::send(clientFD,ok);
+  const string customerExec =
+      "INSERT INTO customer (deliveryAddress,userId) VALUES ('" +
+      deliveryAddress + "','" + std::to_string(userId) + "');";
+  db.execute(customerExec);
+  const int ok = 1;
+  server::send(clientFD, ok);
 }
 
-void getMerchantData (int clientFD)
-{
+void getMerchantData(int clientFD) {
 
-     int userId = server::recvInt(clientFD);
+  int userId = server::recvInt(clientFD);
 
-     string sql = "SELECT merchant.* FROM users "
-                  "JOIN merchant ON users.id = merchant.merchantId "
-                  "WHERE users.id = '" + to_string(userId) + "';";
+  string sql = "SELECT merchant.* FROM users "
+               "JOIN merchant ON users.id = merchant.merchantId "
+               "WHERE users.id = '" +
+               to_string(userId) + "';";
 
-     vector <vector<string>> ans = db.query(sql);
+  vector<vector<string>> ans = db.query(sql);
 
-     string businessName = ans[0][3];
-     string type = ans[0][4];
-     string keywords = ans[0][5];
-     string pickupAddress = ans[0][6];
-     float rating = stof(ans[0][8]);
-     rating = round(rating * 10) / 10;
-     server::send(clientFD,businessName);
-     server::send(clientFD,type);
-     server::send(clientFD,keywords);
-     server::send(clientFD,pickupAddress);
-     server::send(clientFD,rating);
+  string businessName = ans[0][3];
+  string type = ans[0][4];
+  string keywords = ans[0][5];
+  string pickupAddress = ans[0][6];
+  float rating = stof(ans[0][8]);
+  rating = round(rating * 10) / 10;
+  server::send(clientFD, businessName);
+  server::send(clientFD, type);
+  server::send(clientFD, keywords);
+  server::send(clientFD, pickupAddress);
+  server::send(clientFD, rating);
 
-     int ok = 1;
+  int ok = 1;
 
-     server::send(clientFD,ok);
-    
+  server::send(clientFD, ok);
 }
 
-void changePickupAddress (int clientFD)
-{
-    int userId = server::recvInt(clientFD);
-    string pickupAddress = server::recvString(clientFD);
-    
+void changePickupAddress(int clientFD) {
+  int userId = server::recvInt(clientFD);
+  string pickupAddress = server::recvString(clientFD);
 
-    const string sql = "UPDATE merchant "
-                       "SET pickupAddress = '" + pickupAddress + "' "
-                       "WHERE userId = " + to_string(userId);
+  const string sql = "UPDATE merchant "
+                     "SET pickupAddress = '" +
+                     pickupAddress +
+                     "' "
+                     "WHERE userId = " +
+                     to_string(userId) + " ;";
 
-    db.execute(sql);
-    int ok = 1;
-    server::send(clientFD,ok);
-                    
-
+  db.execute(sql);
+  int ok = 1;
+  server::send(clientFD, ok);
 }
 
-void checkAccountType(int clientFD)
-{
-    enum {CUSTOMER = 51 , MERCHANT = 52 , COURIER = 53};
-    int userId = server::recvInt(clientFD);
-    const string sql = "SELECT accountType FROM users WHERE id = " + to_string(userId);
-    vector <vector<string>> ans = db.query(sql);
-    int accountType = stoi(ans[0][0]);
-    switch (accountType)
-    {
-        case 1:
-            accountType = CUSTOMER;
-            break;
-        case 2:
-            accountType = MERCHANT;
-            break;
-        case 3:
-            accountType = COURIER;
-            break;
-    }
-    server::send(clientFD,accountType);
-    
+void checkAccountType(int clientFD) {
+  enum { CUSTOMER = 51, MERCHANT = 52, COURIER = 53 };
+  int userId = server::recvInt(clientFD);
+  const string sql =
+      "SELECT accountType FROM users WHERE id = " + to_string(userId) + ";";
+  vector<vector<string>> ans = db.query(sql);
+  int accountType = stoi(ans[0][0]);
+  switch (accountType) {
+  case 1:
+    accountType = CUSTOMER;
+    break;
+  case 2:
+    accountType = MERCHANT;
+    break;
+  case 3:
+    accountType = COURIER;
+    break;
+  }
+  server::send(clientFD, accountType);
 }
