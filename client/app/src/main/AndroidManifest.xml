@@ -58,6 +58,12 @@
             android:name=".UserRegistrationActivity"
             android:exported="true" />
         <activity
+            android:name=".ChangePickupAddressActivity"
+            android:exported="true" />
+        <activity
+            android:name=".MerchantActivity"
+            android:exported="true" />
+        <activity
             android:name=".ItemActivity"
             android:exported="true" />
         <activity
