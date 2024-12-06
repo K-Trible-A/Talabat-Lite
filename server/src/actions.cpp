@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
+#include <cmath>
 
 using namespace std;
 
@@ -47,8 +48,6 @@ void addMerchant(int clientFD) {
   string CVV = server::recvString(clientFD);
 
 
-  
-
   switch (businessType) {
   case 1:
     type = "grocery";
@@ -75,7 +74,7 @@ void addMerchant(int clientFD) {
                            "pickupAddress,nationalID,rating) VALUES (" + to_string(userId) + ",'" + 
                            cardId + "','" + businessName + "','" + type +
                            "','" + keywords + "','" + pickupAddress + "','" +
-                           nationaID + ",0" +")";
+                           nationaID + "',0" +")";
   db.execute(merchExec);
   const int ok = 1;
   server::send(clientFD, ok);
@@ -262,11 +261,14 @@ void getMerchantData (int clientFD)
      string businessName = ans[0][3];
      string type = ans[0][4];
      string keywords = ans[0][5];
-     string pickupAddress = ans[0][6];    
+     string pickupAddress = ans[0][6];
+     float rating = stof(ans[0][8]);
+     rating = round(rating * 10) / 10;
      server::send(clientFD,businessName);
      server::send(clientFD,type);
      server::send(clientFD,keywords);
      server::send(clientFD,pickupAddress);
+     server::send(clientFD,rating);
 
      int ok = 1;
 
@@ -294,12 +296,24 @@ void changePickupAddress (int clientFD)
 
 void checkAccountType(int clientFD)
 {
-    
+    enum {CUSTOMER = 51 , MERCHANT = 52 , COURIER = 53};
     int userId = server::recvInt(clientFD);
+    cout << "user id = " << endl;
     const string sql = "SELECT accountType FROM users WHERE id = " + to_string(userId);
     vector <vector<string>> ans = db.query(sql);
     int accountType = stoi(ans[0][0]);
-    accountType+=50;
+    switch (accountType)
+    {
+        case 1:
+            accountType = CUSTOMER;
+            break;
+        case 2:
+            accountType = MERCHANT;
+            break;
+        case 3:
+            accountType = COURIER;
+            break;
+    }
     server::send(clientFD,accountType);
     
 }
