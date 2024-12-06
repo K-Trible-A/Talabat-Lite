@@ -279,9 +279,8 @@ void getMerchantData (int clientFD)
 void changePickupAddress (int clientFD)
 {
     int userId = server::recvInt(clientFD);
-    cout << "userID = " << userId << endl;
     string pickupAddress = server::recvString(clientFD);
-    cout << "New address is: " << pickupAddress << endl;
+    
 
     const string sql = "UPDATE merchant "
                        "SET pickupAddress = '" + pickupAddress + "' "
@@ -298,7 +297,6 @@ void checkAccountType(int clientFD)
 {
     enum {CUSTOMER = 51 , MERCHANT = 52 , COURIER = 53};
     int userId = server::recvInt(clientFD);
-    cout << "user id = " << endl;
     const string sql = "SELECT accountType FROM users WHERE id = " + to_string(userId);
     vector <vector<string>> ans = db.query(sql);
     int accountType = stoi(ans[0][0]);
