@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <string name="app_name">Talabat Lite</string>
     <string name="server_ip_address_label">Server IP Address:</string>
     <string name="enter_ip_address_hint">Enter IP Address</string>
@@ -22,4 +22,7 @@
     <string name="keywords_field">Keywords</string>
     <string name="pickup_address_field">Pickup address</string>
     <string name="business_type">Business type</string>
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="serif">serif</string>
 </resources>

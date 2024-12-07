@@ -19,7 +19,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="150dp"
-                android:id="@+id/profile_icon"
+                android:id="@+id/Merchant1"
                 android:layout_centerHorizontal="true"
                 android:contentDescription="@string/todo"
                 android:src="@drawable/profile_icon" />
@@ -28,7 +28,7 @@
                 android:id="@+id/profileBusinessName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/profile_icon"
+                android:layout_below="@id/Merchant1"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:text="@string/business_name"

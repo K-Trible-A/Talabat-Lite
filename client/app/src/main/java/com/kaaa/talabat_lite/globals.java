@@ -12,6 +12,7 @@ public class globals {
     public static final int GET_MERCHANT_DATA = 1031;
     public static final int CHANGE_PICKUP_ADDRESS = 1032;
     public static final int CHECK_ACCOUNT_TYPE = 1033;
+    public static final int GET_TOP_RATED_MERCHANTS=1022;
     public static final int CUSTOMER = 51;
     public static final int MERCHANT = 52;
     public static final int COURIER = 53;

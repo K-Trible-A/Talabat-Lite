@@ -42,7 +42,6 @@ public class MerchantProfileFragment extends Fragment {
         setupListeners();
         return rootView;
     }
-
     protected void initUI(View rootView)
     {
       profileBusinessName = rootView.findViewById(R.id.profileBusinessName);
@@ -52,12 +51,10 @@ public class MerchantProfileFragment extends Fragment {
       changeAddressButton = rootView.findViewById(R.id.changeAddressButton);
       profileRating = rootView.findViewById(R.id.profileRating);
     }
-
     protected void setupListeners()
     {
         fetchMerchantData();
         changeAddressButton.setOnClickListener(view -> new Thread(this::changePickupAddress).start());
-
     }
     private void changePickupAddress()
     {
@@ -65,7 +62,6 @@ public class MerchantProfileFragment extends Fragment {
           changePickupAddressIntent.putExtra("currentAddress",pickupAddress);
           startActivity(changePickupAddressIntent);
     }
-
     private void getMerchantData ()
     {
         try
