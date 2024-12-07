@@ -312,11 +312,36 @@ void checkAccountType(int clientFD) {
 void getTopRatedMerchants(int clientFD)
 {
     int userId = server::recvInt(clientFD);
-    const string sql="SELECT m.businessName,m.rating FROM merchant m  JOIN users u ON m.userId = u.userId WHERE  u.city = ( SELECT city  ROM users WHERE userId              = :"+to_string(userId)+"ORDER BY m.rating DESC  LIMIT 3 ;";
+    const string sql =
+         "SELECT "
+       "merchant.businessName, "
+       "merchant.rating "
+      "FROM "
+        "merchant "
+      "JOIN "
+        "users "
+        "ON merchant.userId = users.id "
+      "WHERE "
+         "users.city = (SELECT city FROM users WHERE id = "+std::to_string(userId)+") ORDER BY "
+          "merchant.rating DESC ;";
     vector <vector<string>> ans =db.query(sql);
-     string merch_1_Name=ans[0][0],merch_1_Rate=ans[0][1];
-     string merch_2_Name=ans[1][0],merch_2_Rate=ans[1][1];
-     string merch_3_Name=ans[2][0],merch_3_Rate=ans[2][1];
+     string merch_1_Name="there is no other merchants",merch_1_Rate="",merch_2_Name="there is no other Merchants",merch_2_Rate="";
+     string merch_3_Name="there is no other merchants",merch_3_Rate="";
+     if(ans.size()>=1)
+     {
+     merch_1_Name=ans[0][0];
+     merch_1_Rate=ans[0][1];
+     }
+     if(ans.size()>=2)
+     {
+     merch_2_Name=ans[1][0];
+     merch_2_Rate=ans[1][1];
+     }
+     if(ans.size()>=3)
+     {
+     merch_3_Name=ans[2][0];
+     merch_3_Rate=ans[2][1];
+     }
      server::send(clientFD,merch_1_Name);
      server::send(clientFD,merch_1_Rate);
      server::send(clientFD,merch_2_Name);
