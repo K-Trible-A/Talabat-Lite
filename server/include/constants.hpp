@@ -16,6 +16,7 @@ const int RETRIEVE_ITEM = 1013;
 // 102XXX
 const int ADD_USER=1020;
 const int ADD_CUSTOMER=1021;
+const int GET_TOP_RATED_MERCHANTS=1022;
 //103XXX
 
 const int ADD_MERCHANT = 1030;

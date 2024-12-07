@@ -317,3 +317,20 @@ void checkAccountType(int clientFD)
     server::send(clientFD,accountType);
     
 }
+void getTopRatedMerchants(int clientFD)
+{
+    int userId = server::recvInt(clientFD);
+    const string sql="SELECT m.businessName,m.rating FROM merchant m  JOIN users u ON m.userId = u.userId WHERE  u.city = ( SELECT city  ROM users WHERE userId              = :"+to_string(userId)+"ORDER BY m.rating DESC  LIMIT 3 ;";
+    vector <vector<string>> ans =db.query(sql);
+     string merch_1_Name=ans[0][0],merch_1_Rate=ans[0][1];
+     string merch_2_Name=ans[1][0],merch_2_Rate=ans[1][1];
+     string merch_3_Name=ans[2][0],merch_3_Rate=ans[2][1];
+     server::send(clientFD,merch_1_Name);
+     server::send(clientFD,merch_1_Rate);
+     server::send(clientFD,merch_2_Name);
+     server::send(clientFD,merch_2_Rate);
+     server::send(clientFD,merch_3_Name);
+     server::send(clientFD,merch_3_Rate);
+     int ok = 1;
+     server::send(clientFD,ok);
+}
