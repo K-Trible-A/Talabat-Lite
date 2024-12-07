@@ -84,9 +84,146 @@ vector<vector<string>> Database::query(const string &sql) {
   sqlite3_finalize(stmt);
   return result;
 }
+std::string Database::escapeSpecialChars(const std::string &input) {
+  std::string sanitized = "";
+  for (size_t i = 0; i < input.size(); ++i) {
+    char c = input[i];
+    // Escape single quotes by replacing them with two single quotes
+    if (c == '\'') {
+      sanitized += "''";
+    }
+    // Escape backslashes by replacing them with two backslashes
+    else if (c == '\\') {
+      sanitized += "\\\\";
+    }
+    // Skip null characters (not allowed in SQL)
+    else if (c == '\0') {
+      continue;
+    }
+    // Escape double quotes by adding a backslash
+    else if (c == '\"') {
+      sanitized += "\\\"";
+    }
+    // Escape newlines and carriage returns
+    else if (c == '\n') {
+      sanitized += "\\n";
+    } else if (c == '\r') {
+      sanitized += "\\r";
+    }
+    // Escape semicolons
+    else if (c == ';') {
+      sanitized += "\\;";
+    }
+    // Escape comment starters '--' and '/*'
+    else if (c == '-') {
+      if (i + 1 < input.size() && input[i + 1] == '-') {
+        sanitized += "\\-\\-"; // Escape comment start "--"
+        i++;                   // Skip the next character
+      } else {
+        sanitized += c;
+      }
+    } else if (c == '/') {
+      if (i + 1 < input.size() && input[i + 1] == '*') {
+        sanitized += "\\/\\*"; // Escape comment start "/*"
+        i++;                   // Skip the next character
+      } else {
+        sanitized += c;
+      }
+    } else {
+      sanitized += c; // Append all other characters unchanged
+    }
+  }
+  return sanitized;
+}
+bool Database::insertData(const std::string &table,
+                          const std::vector<std::string> &columns,
+                          const std::vector<std::string> &values) {
+  if (columns.size() != values.size()) {
+    std::cerr << "Columns and values size mismatch!" << std::endl;
+    return false;
+  }
+
+  // Construct the SQL INSERT statement
+  std::string sql = "INSERT INTO " + table + " (";
+  for (size_t i = 0; i < columns.size(); ++i) {
+    sql += columns[i];
+    if (i < columns.size() - 1)
+      sql += ", ";
+  }
+  sql += ") VALUES (";
+
+  for (size_t i = 0; i < values.size(); ++i) {
+    std::string value =
+        escapeSpecialChars(values[i]); // Escape any special characters
+    sql += "'" + value + "'";
+    if (i < values.size() - 1)
+      sql += ", ";
+  }
+  sql += ");";
+
+  // Execute the SQL statement
+  char *errMsg = nullptr;
+  int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
+  if (rc != SQLITE_OK) {
+    std::cerr << "SQL error: " << errMsg << std::endl;
+    sqlite3_free(errMsg);
+    return false;
+  }
+  return true;
+}
+
+bool Database::updateData(const string &table, const vector<string> &columns,
+                          const vector<string> &values,
+                          const string &condition) {
+  if (columns.size() != values.size()) {
+    std::cerr << "Columns and values size mismatch!" << std::endl;
+    return false;
+  }
+  // Construct the SQL UPDATE statement
+  std::string sql = "UPDATE " + table + " SET ";
+  // Add columns and values to the SET clause
+  for (size_t i = 0; i < columns.size(); ++i) {
+    sql += columns[i] + " = ?";
+    if (i < columns.size() - 1)
+      sql += ", ";
+  }
+  // Add WHERE condition (if provided)
+  if (!condition.empty()) {
+    sql += " WHERE " + condition;
+  }
+  // Prepare the SQL statement
+  sqlite3_stmt *stmt;
+  int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+  if (rc != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return false;
+  }
+  // Bind the values to the prepared statement
+  for (size_t i = 0; i < values.size(); ++i) {
+    std::string escapedValue =
+        escapeSpecialChars(values[i]); // Escape special characters
+    rc =
+        sqlite3_bind_text(stmt, i + 1, escapedValue.c_str(), -1, SQLITE_STATIC);
+    if (rc != SQLITE_OK) {
+      std::cerr << "Failed to bind value: " << sqlite3_errmsg(db) << std::endl;
+      sqlite3_finalize(stmt);
+      return false;
+    }
+  }
+  // Execute the statement
+  rc = sqlite3_step(stmt);
+  if (rc != SQLITE_DONE) {
+    std::cerr << "Execution failed: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_finalize(stmt);
+    return false;
+  }
+  sqlite3_finalize(stmt);
+  return true;
+}
 
 void Database::createSchema() {
-  //Enable foreign keys support
+  // Enable foreign keys support
   this->execute("PRAGMA foreign_keys = ON;");
   this->execute( // user information
       "CREATE TABLE IF NOT EXISTS users ("
@@ -112,11 +249,13 @@ void Database::createSchema() {
       "rating REAL NOT NULL,"
       "FOREIGN KEY(cardId) REFERENCES card(cardId),"
       "FOREIGN KEY(userId) REFERENCES users(id));");
-  this->execute(  // Courier information
-      "CREATE TABLE IF NOT EXISTS courier (courierId INTEGER PRIMARY KEY AUTOINCREMENT ,cardId INTEGER NULL ,"
+  this->execute( // Courier information
+      "CREATE TABLE IF NOT EXISTS courier (courierId INTEGER PRIMARY KEY "
+      "AUTOINCREMENT ,cardId INTEGER NULL ,"
       "vehicleType TEXT NOT NULL ,"
       "nationalID TEXT NOT NULL,"
-      "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN KEY(courierId) REFERENCES users(id));");
+      "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN KEY(courierId) "
+      "REFERENCES users(id));");
   this->execute( // Card information
       "CREATE TABLE IF NOT EXISTS card ("
       "cardId INTEGER PRIMARY KEY AUTOINCREMENT,"
