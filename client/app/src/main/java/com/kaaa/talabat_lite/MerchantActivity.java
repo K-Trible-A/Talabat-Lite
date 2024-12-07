@@ -1,15 +1,11 @@
 package com.kaaa.talabat_lite;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
 public class MerchantActivity extends AppCompatActivity {
 
@@ -17,6 +13,7 @@ public class MerchantActivity extends AppCompatActivity {
     MerchantHomeFragment merchantHomeFragment = new MerchantHomeFragment();
     MerchantItemsFragment merchantItemsFragment;
     MerchantProfileFragment merchantProfileFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +21,21 @@ public class MerchantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_merchant);
         initUI();
         setupListeners();
+        String fragmentName = getIntent().getStringExtra("fragment");
+        if (fragmentName != null)
+        {
+            switch (fragmentName)
+            {
+                case "home":
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
+                    break;
+                case "items":
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantItemsFragment).commit();
+                    break;
+                case "profile":
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+            }
+        }
     }
     protected void initUI()
     {
@@ -36,26 +48,23 @@ public class MerchantActivity extends AppCompatActivity {
     protected void setupListeners ()
     {
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.home)
-                {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
-                    return true;
-                }
-                if (item.getItemId() == R.id.items)
-                {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantItemsFragment).commit();
-                    return true;
-                }
-                if (item.getItemId() == R.id.profile)
-                {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
-                    return true;
-                }
-                return false;
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.home)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
+                return true;
             }
+            if (item.getItemId() == R.id.items)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantItemsFragment).commit();
+                return true;
+            }
+            if (item.getItemId() == R.id.profile)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+                return true;
+            }
+            return false;
         });
 
     }
