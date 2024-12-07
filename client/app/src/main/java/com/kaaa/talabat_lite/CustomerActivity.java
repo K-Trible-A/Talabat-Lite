@@ -4,25 +4,32 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class CustomerActivity extends AppCompatActivity  {
     private Button Phar,Groc,Rest;
-    TopRated_Merchants_Fragment fragment = new TopRated_Merchants_Fragment();
+    public TopRated_Merchants_Fragment fragment = new TopRated_Merchants_Fragment();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer); // Link to your XML layout
-        getSupportFragmentManager().beginTransaction().replace(R.id.container,fragment).commit();
+        if (getSupportFragmentManager().findFragmentById(R.id.container) == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null) // Enables back navigation
+                    .commit();
+        }
         initiUi();
         setupListeners();
     }
     private void setupListeners(){
-        Phar.setOnClickListener(view -> new Thread(this::goto_Pharmacy).start());
-        Rest.setOnClickListener(view -> new Thread(this::goto_Restaurant).start());
-        Groc.setOnClickListener(view -> new Thread(this::goto_Grocery).start());
+        Phar.setOnClickListener(view -> goto_Pharmacy());
+        Rest.setOnClickListener(view -> goto_Restaurant());
+        Groc.setOnClickListener(view -> goto_Grocery());
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         // Set a listener for item selection
