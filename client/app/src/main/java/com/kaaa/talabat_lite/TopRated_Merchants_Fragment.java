@@ -8,34 +8,41 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
 public class TopRated_Merchants_Fragment extends Fragment {
-    TextView Merch_1_Name,Merch_2_Name,Merch_3_Name;
-    TextView Merch_1_Rate,Merch_2_Rate,Merch_3_Rate;
+    TextView Merch_1_Name, Merch_2_Name, Merch_3_Name;
+    TextView Merch_1_Rate, Merch_2_Rate, Merch_3_Rate;
+    ImageView merch1, merch2, merch3;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View ratedMerchants=inflater.inflate(R.layout.fragment_top_rated__merchants_, container, false);
+        View ratedMerchants = inflater.inflate(R.layout.fragment_top_rated__merchants_, container, false);
         initUi(ratedMerchants);
         getTopRated();
         return ratedMerchants;
     }
-    private void initUi(View ratedMerchants)
-    {
+
+    private void initUi(View ratedMerchants) {
         Merch_1_Name = ratedMerchants.findViewById(R.id.merchant1Name);
         Merch_2_Name = ratedMerchants.findViewById(R.id.merchant2Name);
         Merch_3_Name = ratedMerchants.findViewById(R.id.merchant3Name);
         Merch_1_Rate = ratedMerchants.findViewById(R.id.merchant1Rate);
         Merch_2_Rate = ratedMerchants.findViewById(R.id.merchant2Rate);
         Merch_3_Rate = ratedMerchants.findViewById(R.id.merchant3Rate);
+        merch1 = ratedMerchants.findViewById(R.id.merchant1Icon);
+        merch2 = ratedMerchants.findViewById(R.id.merchant2Icon);
+        merch3 = ratedMerchants.findViewById(R.id.merchant3Icon);
     }
-    private void getTopRated()
-    {
+
+    private void getTopRated() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
@@ -51,20 +58,51 @@ public class TopRated_Merchants_Fragment extends Fragment {
                 int ok = socketHelper.getInstance().recvInt();
                 socketHelper.getInstance().close();
 
-                // Update the UI on the main thread
+                // Update UI only on the main thread
                 requireActivity().runOnUiThread(() -> {
+                    DecimalFormat decimalFormat = new DecimalFormat("#.#");
+
+                    Merch_1_Name.setText(" ");
+                    Merch_1_Rate.setText(" ");
+                    Merch_2_Name.setText(" ");
+                    Merch_2_Rate.setText(" ");
+                    Merch_3_Name.setText(" ");
+                    Merch_3_Rate.setText(" ");
+                    merch1.setVisibility(View.INVISIBLE);
+                    merch2.setVisibility(View.INVISIBLE);
+                    merch3.setVisibility(View.INVISIBLE);
+
                     if (ok == 1) {
-                        Merch_1_Name.setText(Name1);
-                        Merch_1_Rate.setText(Rate1);
-                        Merch_2_Name.setText(Name2);
-                        Merch_2_Rate.setText(Rate2);
-                        Merch_3_Name.setText(Name3);
-                        Merch_3_Rate.setText(Rate3);
+                        if (!Name1.equals("there is no other merchants")) {
+                            Merch_1_Name.setText(Name1);
+                            Merch_1_Rate.setText(formatRate(Rate1, decimalFormat));
+                            merch1.setVisibility(View.VISIBLE);
+                        }
+                        if (!Name2.equals("there is no other merchants")) {
+                            Merch_2_Name.setText(Name2);
+                            Merch_2_Rate.setText(formatRate(Rate2, decimalFormat));
+                            merch2.setVisibility(View.VISIBLE);
+                        }
+                        if (!Name3.equals("there is no other merchants")) {
+                            Merch_3_Name.setText(Name3);
+                            Merch_3_Rate.setText(formatRate(Rate3, decimalFormat));
+                            merch3.setVisibility(View.VISIBLE);
+                        }
                     }
                 });
             } catch (IOException e) {
                 Log.e("TopRated_Merchants_Fragment", "Connection Error", e);
             }
         });
+    }
+
+    private String formatRate(String rate, DecimalFormat decimalFormat) {
+        try {
+            float rateValue = Float.parseFloat(rate);
+            return decimalFormat.format(rateValue);
+        } catch (NumberFormatException e) {
+            Log.e("TopRated_Merchants_Fragment", "Invalid rate format", e);
+            return rate; // Return the original value if parsing fails
+        }
     }
 }

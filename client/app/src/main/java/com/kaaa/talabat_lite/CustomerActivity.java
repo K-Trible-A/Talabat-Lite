@@ -20,10 +20,9 @@ public class CustomerActivity extends AppCompatActivity  {
         if (getSupportFragmentManager().findFragmentById(R.id.container) == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, fragment)
-                    .addToBackStack(null) // Enables back navigation
                     .commit();
         }
-        initiUi();
+    initiUi();
         setupListeners();
     }
     private void setupListeners(){
@@ -46,6 +45,11 @@ public class CustomerActivity extends AppCompatActivity  {
             {
                     Toast.makeText(this, "Profile Selected", Toast.LENGTH_SHORT).show();
                     return true;
+            }
+            else if(item.getItemId()==R.id.nav_Orders)
+            {
+                Toast.makeText(this, "Profile Selected", Toast.LENGTH_SHORT).show();
+                return true;
             }
             return false;
         });
