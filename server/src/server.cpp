@@ -246,4 +246,8 @@ void server::appendFuncs() {
   actions[GET_MERCHANT_DATA] = getMerchantData;
   actions[CHANGE_PICKUP_ADDRESS] = changePickupAddress;
   actions[CHECK_ACCOUNT_TYPE] = checkAccountType;
+  actions[GET_ITEMS] = getItems;
+  actions[GET_IMAGE] = getImage;
+  actions[DELETE_ITEM] = deleteItem;
+  actions[GET_MERCHANT_INFO_HOME] = getMerchantInfoHome;  
 }

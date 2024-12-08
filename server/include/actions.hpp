@@ -25,3 +25,13 @@ void getMerchantData(int);
 void changePickupAddress(int);
 // Check account type after login
 void checkAccountType(int);
+// Get items data from database 
+void getItems(int);
+// Get an image with a specific ID
+void getImage(int);
+// Delete an item from database
+void deleteItem(int);
+// Get the merchant info to the home UI
+void getMerchantInfoHome(int);
+
+

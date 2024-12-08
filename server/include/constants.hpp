@@ -22,3 +22,8 @@ const int ADD_MERCHANT = 1030;
 const int GET_MERCHANT_DATA = 1031;
 const int CHANGE_PICKUP_ADDRESS = 1032;
 const int CHECK_ACCOUNT_TYPE = 1033;
+const int GET_ITEMS = 1034;
+const int GET_IMAGE = 1035;
+const int DELETE_ITEM = 1036;
+const int GET_MERCHANT_INFO_HOME = 1037;
+
