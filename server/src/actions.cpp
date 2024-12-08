@@ -309,3 +309,76 @@ void checkAccountType(int clientFD) {
   }
   server::send(clientFD, accountType);
 }
+
+void getItems(int clientFD)
+{
+
+  int id = server::recvInt(clientFD);
+  const string sql1 = "SELECT COUNT (*) FROM item WHERE merchantId = " + to_string(id) + ";";
+  vector <vector<string>> ans = db.query(sql1);
+  int itemCount = stoi(ans[0][0]);
+  server::send(clientFD,itemCount);
+  const string sql2 = "SELECT itemId, itemName , itemPrice, itemDescription ,itemImg FROM item "
+                      "WHERE merchantId = " + to_string(id) + ";";
+  vector <vector<string>> res = db.query(sql2);
+  string itemName, itemDescription;
+  float itemPrice;
+  int itemId;
+  for (auto& it : res)
+  {
+      itemId = stoi(it[0]);
+      
+      server::send(clientFD,itemId);
+      itemName = it[1];
+      
+      server::send(clientFD,itemName);
+      itemPrice = round( stof(it[2]) * 10) / 10;
+      
+      server::send(clientFD,itemPrice);
+      itemDescription = it[3];
+      
+      server::send(clientFD,itemDescription);
+      server::sendImg(clientFD,it[4]);
+  }
+
+}
+
+void getImage (int clientFD)
+{
+   int itemId = server::recvInt(clientFD);
+  vector<vector<string>> res =
+      db.query("SELECT itemImg FROM item "
+               "WHERE itemId = " +
+               to_string(itemId) + " ;");
+
+
+  server::sendImg(clientFD, res[0][0]);
+
+}
+
+void deleteItem (int clientFD)
+{
+
+  int itemId = server::recvInt(clientFD);
+  const string sql = "DELETE FROM item WHERE itemId = " + to_string(itemId) + ";";
+  db.execute(sql);
+  const int ok = 1;
+  server::send(clientFD,ok);
+}
+
+void getMerchantInfoHome (int clientFD)
+{
+
+  int id = server::recvInt(clientFD);
+
+  const string sql = "SELECT businessName, keywords, rating FROM merchant "
+                     "WHERE userId = " + to_string(id) + ";";
+  vector <vector<string>> ans = db.query(sql);
+  string name = ans[0][0];
+  string keywords = ans[0][1];
+  float rating = stof(ans[0][2]);
+  rating = round(rating * 10) / 10; // 0.1 percision
+  server::send(clientFD,name);
+  server::send(clientFD,keywords);
+  server::send(clientFD,rating);
+}
