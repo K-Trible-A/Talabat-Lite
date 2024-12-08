@@ -323,9 +323,9 @@ void getTopRatedMerchants(int clientFD)
         "ON merchant.userId = users.id "
       "WHERE "
          "users.city = (SELECT city FROM users WHERE id = "+std::to_string(userId)+") ORDER BY "
-          "merchant.rating DESC ;";
+          "merchant.rating DESC LIMIT 3;";
     vector <vector<string>> ans =db.query(sql);
-     string merch_1_Name="there is no other merchants",merch_1_Rate="",merch_2_Name="there is no other Merchants",merch_2_Rate="";
+     string merch_1_Name="there is no other merchants",merch_1_Rate="",merch_2_Name="there is no other merchants",merch_2_Rate="";
      string merch_3_Name="there is no other merchants",merch_3_Rate="";
      if(ans.size()>=1)
      {
