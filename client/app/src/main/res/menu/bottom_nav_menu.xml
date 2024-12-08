@@ -7,7 +7,7 @@
     android:icon="@drawable/baseline_home_24"
     tools:ignore="HardcodedText" />
 
-    <item android:id="@+id/items"
+    <item android:id="@+id/nav_Orders"
         android:title="Items"
         android:icon="@drawable/baseline_items_24"
         tools:ignore="HardcodedText" />
