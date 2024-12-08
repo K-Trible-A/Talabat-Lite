@@ -10,9 +10,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MerchantActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
-    MerchantHomeFragment merchantHomeFragment = new MerchantHomeFragment();
-    MerchantItemsFragment merchantItemsFragment;
+    MerchantHomeFragment merchantHomeFragment;
+    MerchantOrdersFragment merchantOrdersFragment;
     MerchantProfileFragment merchantProfileFragment;
+    MerchantSearchFragment merchantSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,19 +30,24 @@ public class MerchantActivity extends AppCompatActivity {
                 case "home":
                     getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
                     break;
-                case "items":
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantItemsFragment).commit();
+                case "orders":
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantOrdersFragment).commit();
                     break;
                 case "profile":
                     getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+                    break;
+                case "search":
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantSearchFragment).commit();
             }
         }
     }
     protected void initUI()
     {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        merchantItemsFragment = new MerchantItemsFragment();
+        merchantHomeFragment = new MerchantHomeFragment();
+        merchantOrdersFragment = new MerchantOrdersFragment();
         merchantProfileFragment = new MerchantProfileFragment();
+        merchantSearchFragment = new MerchantSearchFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
 
     }
@@ -54,14 +60,19 @@ public class MerchantActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
                 return true;
             }
-            if (item.getItemId() == R.id.items)
+            if (item.getItemId() == R.id.orders)
             {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantItemsFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantOrdersFragment).commit();
                 return true;
             }
             if (item.getItemId() == R.id.profile)
             {
                 getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+                return true;
+            }
+            if (item.getItemId() == R.id.search)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantSearchFragment).commit();
                 return true;
             }
             return false;

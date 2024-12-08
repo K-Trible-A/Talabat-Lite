@@ -21,7 +21,7 @@ public class AddItemActivity extends AppCompatActivity {
     private EditText etItemName, etItemDescription, etItemPrice;
     private ImageView imgPreview;
     private Bitmap selectedImage;
-
+    Intent outIntent;
     // ActivityResultLauncher for picking an image
     private final ActivityResultLauncher<Intent> imagePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -84,7 +84,7 @@ public class AddItemActivity extends AppCompatActivity {
             socketHelper.getInstance().sendFloat(Float.parseFloat(price));
             socketHelper.getInstance().sendImg(selectedImage);
 
-            socketHelper.getInstance().close();
+
 
             runOnUiThread(() -> {
                 Toast.makeText(this, "Item saved successfully!", Toast.LENGTH_SHORT).show();
@@ -95,7 +95,10 @@ public class AddItemActivity extends AppCompatActivity {
                 imgPreview.setImageBitmap(null);
                 imgPreview.setVisibility(ImageView.GONE);
                 selectedImage = null;
+                outIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
+                startActivity(outIntent);
             });
+            socketHelper.getInstance().close();
         }
         catch (IOException e){
             runOnUiThread(() -> Toast.makeText(this, "Error saving the item", Toast.LENGTH_SHORT).show());
