@@ -10,9 +10,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MerchantActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
-    MerchantHomeFragment merchantHomeFragment = new MerchantHomeFragment();
+    MerchantHomeFragment merchantHomeFragment;
     MerchantItemsFragment merchantItemsFragment;
     MerchantProfileFragment merchantProfileFragment;
+    MerchantSearchFragment merchantSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +35,19 @@ public class MerchantActivity extends AppCompatActivity {
                     break;
                 case "profile":
                     getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+                    break;
+                case "search":
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantSearchFragment).commit();
             }
         }
     }
     protected void initUI()
     {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+        merchantHomeFragment = new MerchantHomeFragment();
         merchantItemsFragment = new MerchantItemsFragment();
         merchantProfileFragment = new MerchantProfileFragment();
+        merchantSearchFragment = new MerchantSearchFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
 
     }
@@ -62,6 +68,11 @@ public class MerchantActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.profile)
             {
                 getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+                return true;
+            }
+            if (item.getItemId() == R.id.search)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantSearchFragment).commit();
                 return true;
             }
             return false;
