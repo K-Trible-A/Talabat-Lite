@@ -87,9 +87,7 @@ public class ItemManagementActivity extends AppCompatActivity {
          socketHelper.getInstance().connect();
          socketHelper.getInstance().sendInt(globals.DELETE_ITEM);
          socketHelper.getInstance().sendInt(itemId);
-        Log.d("Itmes", "Sent " + itemId);
          int ok = socketHelper.getInstance().recvInt();
-         Log.d("Itmes", "Recieved " + ok);
          return ok == 1;
     }
     protected void setupListeners ()
