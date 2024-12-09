@@ -5,11 +5,11 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +21,6 @@ public class AddItemActivity extends AppCompatActivity {
     private EditText etItemName, etItemDescription, etItemPrice;
     private ImageView imgPreview;
     private Bitmap selectedImage;
-    Intent outIntent;
     // ActivityResultLauncher for picking an image
     private final ActivityResultLauncher<Intent> imagePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -32,7 +31,7 @@ public class AddItemActivity extends AppCompatActivity {
                         imgPreview.setImageBitmap(selectedImage);
                         imgPreview.setVisibility(ImageView.VISIBLE);
                     } catch (IOException e) {
-                        runOnUiThread(()->Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show());
                     }
                 }
             });
@@ -69,7 +68,7 @@ public class AddItemActivity extends AppCompatActivity {
         String price = etItemPrice.getText().toString().trim();
 
         if (name.isEmpty() || description.isEmpty() || price.isEmpty() || selectedImage == null) {
-            runOnUiThread(()->Toast.makeText(this, "Please fill all fields and upload an image", Toast.LENGTH_SHORT).show());
+            runOnUiThread(() -> Toast.makeText(this, "Please fill all fields and upload an image", Toast.LENGTH_SHORT).show());
             return;
         }
 
@@ -77,31 +76,22 @@ public class AddItemActivity extends AppCompatActivity {
         try {
             socketHelper.getInstance().connect();
             socketHelper.getInstance().sendInt(globals.ADD_ITEM);
-            Log.i("USERID", String.valueOf(globals.userId));
             socketHelper.getInstance().sendInt(globals.userId);
             socketHelper.getInstance().sendString(name);
             socketHelper.getInstance().sendString(description);
             socketHelper.getInstance().sendFloat(Float.parseFloat(price));
             socketHelper.getInstance().sendImg(selectedImage);
-
-
-
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Item saved successfully!", Toast.LENGTH_SHORT).show();
-                // Clear the form
-                etItemName.setText("");
-                etItemDescription.setText("");
-                etItemPrice.setText("");
-                imgPreview.setImageBitmap(null);
-                imgPreview.setVisibility(ImageView.GONE);
-                selectedImage = null;
-                outIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
-                startActivity(outIntent);
-            });
             socketHelper.getInstance().close();
-        }
-        catch (IOException e){
+
+            // Send result back to MerchantHomeFragment
+            Intent resultIntent = new Intent();
+            setResult(RESULT_OK, resultIntent); // Indicating success
+            runOnUiThread(() -> Toast.makeText(this, "Item saved successfully!", Toast.LENGTH_SHORT).show());
+            finish(); // Finish the activity after saving
+        } catch (IOException e) {
             runOnUiThread(() -> Toast.makeText(this, "Error saving the item", Toast.LENGTH_SHORT).show());
+            setResult(RESULT_CANCELED); // Indicate failure to the caller
+            finish();
         }
     }
 }
