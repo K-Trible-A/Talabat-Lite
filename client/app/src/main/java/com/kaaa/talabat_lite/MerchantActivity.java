@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -11,7 +12,7 @@ public class MerchantActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
     MerchantHomeFragment merchantHomeFragment;
-    MerchantItemsFragment merchantItemsFragment;
+    MerchantOrdersFragment merchantOrdersFragment;
     MerchantProfileFragment merchantProfileFragment;
     MerchantSearchFragment merchantSearchFragment;
 
@@ -22,57 +23,74 @@ public class MerchantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_merchant);
         initUI();
         setupListeners();
+
+        // Check the passed fragment name and display the correct fragment
         String fragmentName = getIntent().getStringExtra("fragment");
-        if (fragmentName != null)
-        {
-            switch (fragmentName)
-            {
+        if (fragmentName != null) {
+            switch (fragmentName) {
                 case "home":
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
+                    loadFragment(merchantHomeFragment);
+                    bottomNavigationView.setSelectedItemId(R.id.home);
                     break;
-                case "items":
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantItemsFragment).commit();
+                case "orders":
+                    loadFragment(merchantOrdersFragment);
+                    bottomNavigationView.setSelectedItemId(R.id.orders);
                     break;
                 case "profile":
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+                    loadFragment(merchantProfileFragment);
+                    bottomNavigationView.setSelectedItemId(R.id.profile);
                     break;
                 case "search":
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantSearchFragment).commit();
+                    loadFragment(merchantSearchFragment);
+                    bottomNavigationView.setSelectedItemId(R.id.search);
+                    break;
+                default:
+                    loadFragment(merchantHomeFragment);
+                    bottomNavigationView.setSelectedItemId(R.id.home);
+                    break;
             }
         }
     }
-    protected void initUI()
-    {
+
+
+
+    protected void initUI() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         merchantHomeFragment = new MerchantHomeFragment();
-        merchantItemsFragment = new MerchantItemsFragment();
+        merchantOrdersFragment = new MerchantOrdersFragment();
         merchantProfileFragment = new MerchantProfileFragment();
         merchantSearchFragment = new MerchantSearchFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
 
+        // Load home fragment initially
+        loadFragment(merchantHomeFragment);
     }
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+    }
+
     protected void setupListeners ()
     {
-
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.home)
             {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
+                loadFragment(merchantHomeFragment);
                 return true;
             }
-            if (item.getItemId() == R.id.items)
+            if (item.getItemId() == R.id.orders)
             {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantItemsFragment).commit();
+                loadFragment(merchantOrdersFragment);
                 return true;
             }
             if (item.getItemId() == R.id.profile)
             {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+                loadFragment(merchantProfileFragment);
                 return true;
             }
             if (item.getItemId() == R.id.search)
             {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantSearchFragment).commit();
+                loadFragment(merchantSearchFragment);
                 return true;
             }
             return false;
