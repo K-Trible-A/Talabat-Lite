@@ -13,7 +13,7 @@
 using namespace std;
 
 extern funcPtr actions[MAX_ACTIONS];
-
+const size_t CHUNK_SIZE = 51200; // 50 kb
 void server::setAddr(const std::string &IP, int portNum, int queueSize) {
   serverFD = socket(AF_INET, SOCK_STREAM, 0);
   if (serverFD == 0) {
@@ -86,12 +86,11 @@ void server::send(int clientFD, const std::string &s) {
   // First, send the size of the string
   server::send(clientFD, sz);
   // Allocate a buffer large enough for a chunk
-  size_t chunkSize = 1024; // You can adjust this chunk size as needed
   size_t bytesSent = 0;
   while (bytesSent < sz) {
     // Calculate the remaining data to be sent
     size_t remaining = sz - bytesSent;
-    size_t currentChunkSize = std::min(chunkSize, remaining);
+    size_t currentChunkSize = std::min(CHUNK_SIZE, remaining);
     // Create a buffer for the current chunk
     std::vector<char> buff(currentChunkSize);
     // Copy the appropriate portion of the string into the buffer
@@ -117,7 +116,6 @@ void server::sendImg(int clientFD, const std::string &image_data) {
   server::send(clientFD, image_size);
   // Now send the image in chunks
   size_t bytes_sent = 0;
-  size_t CHUNK_SIZE = 1024;
   while (bytes_sent < image_size) {
     // Calculate the remaining bytes to send
     size_t remaining_bytes = image_size - bytes_sent;
@@ -165,7 +163,6 @@ std::string server::recvString(int clientFD) {
   received_data.resize(string_size); // Resize the string to hold the data
   // Step 3: Receive the actual string data in chunks
   size_t total_received = 0;
-  size_t CHUNK_SIZE = 1024;
   while (total_received < string_size) {
     size_t chunk_size = std::min(CHUNK_SIZE, string_size - total_received);
     bytes_received =
@@ -241,13 +238,13 @@ void server::appendFuncs() {
   actions[ADD_ITEM] = addItem;
   actions[RETRIEVE_ITEM] = retrieveItem;
   actions[ADD_COURIER] = addCourier;
-  actions[ADD_USER]=addUser;
-  actions[ADD_CUSTOMER]=addCustomer;
+  actions[ADD_USER] = addUser;
+  actions[ADD_CUSTOMER] = addCustomer;
   actions[GET_MERCHANT_DATA] = getMerchantData;
   actions[CHANGE_PICKUP_ADDRESS] = changePickupAddress;
   actions[CHECK_ACCOUNT_TYPE] = checkAccountType;
   actions[GET_ITEMS] = getItems;
   actions[GET_IMAGE] = getImage;
   actions[DELETE_ITEM] = deleteItem;
-  actions[GET_MERCHANT_INFO_HOME] = getMerchantInfoHome;  
+  actions[GET_MERCHANT_INFO_HOME] = getMerchantInfoHome;
 }

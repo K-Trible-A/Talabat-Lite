@@ -2,6 +2,7 @@ package com.kaaa.talabat_lite;
 
 public class globals {
     public static int userId = -1;
+    public static int CHUNCK_SIZE = 51200; //50 Kb
     public static final int FIRST_CONNECTION = 1010;
     public static final int AUTHENTICATE_CLIENT = 1011;
     public static final int ADD_ITEM = 1012;
