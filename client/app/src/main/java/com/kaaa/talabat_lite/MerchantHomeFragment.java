@@ -4,6 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -12,15 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,83 +29,52 @@ public class MerchantHomeFragment extends Fragment {
 
     private ItemAdapter itemAdapter;
     private List<ItemAdapter.itemData> itemList;
-    private ExecutorService executor;
+    private  ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private TextView merchantName, merchantRating, merchantKeywords;
-    private String merchantNameStr, merchantKeywordsStr;
-    private Button addItemButton;
-    private float rating;
-
-    // Register ActivityResultLauncher for AddItemActivity
-    private final ActivityResultLauncher<Intent> addItemLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                    // Success, refresh the item list
-                    loadItemsFromServer();
-                    Toast.makeText(getContext(), "Item added successfully", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Failed to add item", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        executor = Executors.newSingleThreadExecutor(); // Initialize executor here
-    }
-
+    TextView merchantName, merchantRating, merchantKeywords;
+    String merchantNameStr, merchantKeywordsStr;
+    Button addItemButton;
+    float rating;
+    Intent addItemIntent;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_merchant_home, container, false);
 
-        // Initialize RecyclerView and adapter
+        if (executor.isShutdown()) {
+            executor = Executors.newSingleThreadExecutor();
+        }
+        View view = inflater.inflate(R.layout.fragment_merchant_home, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.itemRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         itemList = new ArrayList<>();
         itemAdapter = new ItemAdapter(getContext(), itemList);
         recyclerView.setAdapter(itemAdapter);
-
-        // Initialize UI elements
         initUI(view);
-
-        // Fetch merchant info and items
-        fetchMerchantInfo();
-
-        // Setup listeners
         setupListeners();
-
+        fetchMerchantInfo();
         return view;
     }
-
-    private void fetchMerchantInfo() {
-        executor.execute(() -> {
-            getMerchantInfo();
-            mainHandler.post(this::updateUI);
-        });
-    }
-
-    private void getMerchantInfo() {
-        try {
-            Log.d("MerchantHomeFragment", "Before calling the server");
+    private void getMerchantInfo ()
+    {
+        try
+        {
+            Log.d("Test1","Before calling the server");
             socketHelper.getInstance().connect();
             socketHelper.getInstance().sendInt(globals.GET_MERCHANT_HOME_INFO);
+            Log.d("Test1.123","sending code " + globals.GET_MERCHANT_HOME_INFO);
             socketHelper.getInstance().sendInt(globals.userId);
-
+            Log.d("Test2","sending " + globals.userId);
             merchantNameStr = socketHelper.getInstance().recvString();
             merchantKeywordsStr = socketHelper.getInstance().recvString();
             rating = socketHelper.getInstance().recvFloat();
             socketHelper.getInstance().close();
-
-            loadItemsFromServer();
-            Log.d("MerchantHomeFragment", "Data fetched successfully");
+            Log.d("Cls","sendin " + "Closed 1");
 
         } catch (IOException e) {
-            Log.e("MerchantHomeFragment", "Error fetching merchant info", e);
-            showToast("Error fetching merchant info");
+
+            Log.e("MerchantHomeFragment", "Fatal!!",e);
         }
     }
-
     @SuppressLint("NotifyDataSetChanged")
     private void loadItemsFromServer() {
         new Thread(() -> {
@@ -117,70 +83,80 @@ public class MerchantHomeFragment extends Fragment {
                 socketHelper.getInstance().sendInt(globals.GET_ITEMS);
                 socketHelper.getInstance().sendInt(globals.userId);
                 int itemCount = socketHelper.getInstance().recvInt();
-                Log.d("MerchantHomeFragment", "Received " + itemCount + " items");
+                Log.d("MerchantHome", "RECIEVED " + itemCount);
 
-                List<ItemAdapter.itemData> tempItemList = new ArrayList<>();
+                List<ItemAdapter.itemData> tempItemList = new ArrayList<>();  // Temporary list to hold items
 
                 for (int i = 0; i < itemCount; i++) {
                     int itemId = socketHelper.getInstance().recvInt();
                     String itemName = socketHelper.getInstance().recvString();
+                    Log.d("Item Name", "RECIEVED " + itemName);
                     float itemPrice = socketHelper.getInstance().recvFloat();
                     String itemDescription = socketHelper.getInstance().recvString();
                     Bitmap img = socketHelper.getInstance().recvImg();
 
                     tempItemList.add(new ItemAdapter.itemData(itemId, itemName, itemDescription, itemPrice, img));
                 }
-
-                // Update UI with new items on the main thread
-                mainHandler.post(() -> {
-                    itemList.clear();
-                    itemList.addAll(tempItemList);
-                    itemAdapter.notifyDataSetChanged();
+                // Update the main itemList and notify the adapter in the UI thread
+                requireActivity().runOnUiThread(() -> {
+                    itemList.clear();  // Clear existing data
+                    itemList.addAll(tempItemList);  // Add the new items
+                    itemAdapter.notifyDataSetChanged();  // Notify the adapter that data has changed
                 });
+
+                //fetchMerchantInfo();
 
             } catch (IOException e) {
                 Log.e("MerchantHomeFragment", "Error loading items from server", e);
-                showToast("Error loading items from server");
             }
-        }).start();
+        }).start(); // Run in a background thread
     }
 
-    protected void initUI(View view) {
+
+    private void fetchMerchantInfo() {
+        executor.execute(() -> {
+            getMerchantInfo();
+            mainHandler.post(() -> {
+                loadItemsFromServer();
+                updateUI();
+                  // Load items only after merchant info is fetched
+            });
+        });
+    }
+    protected void initUI(View view)
+    {
         merchantName = view.findViewById(R.id.merchantName);
         merchantKeywords = view.findViewById(R.id.merchantKeywords);
         merchantRating = view.findViewById(R.id.merchantRating);
         addItemButton = view.findViewById(R.id.addItemButton);
     }
-
-    protected void setupListeners() {
-        addItemButton.setOnClickListener(view -> {
-            Intent addItemIntent = new Intent(requireContext(), AddItemActivity.class);
-            addItemLauncher.launch(addItemIntent);  // Launch activity with result callback
-        });
+    protected void setupListeners()
+    {
+        addItemButton.setOnClickListener(view -> new Thread(this::addItem).start());
     }
-
+    private void addItem ()
+    {
+        addItemIntent = new Intent(requireContext(),AddItemActivity.class);
+        startActivity(addItemIntent);
+    }
     @SuppressLint("DefaultLocale")
-    private void updateUI() {
+    private void updateUI()
+    {
         merchantName.setText(merchantNameStr);
         merchantRating.setText(String.format("Rating: %.1f", rating));
         merchantKeywords.setText(merchantKeywordsStr);
     }
-
-    private void showToast(String message) {
-        mainHandler.post(() -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        try {
-            socketHelper.getInstance().close();
-        } catch (IOException e) {
-            Log.e("MerchantHomeFragment", "Error closing socket", e);
-        }
-
         if (!executor.isShutdown()) {
             executor.shutdownNow();
+        }
+        try
+        {
+            socketHelper.getInstance().close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
