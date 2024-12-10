@@ -30,17 +30,28 @@ public class MerchantProfileFragment extends Fragment {
     float rating;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    // Register ActivityResultLauncher to receive the updated pickup address from ChangePickupAddressActivity
-    private final ActivityResultLauncher<Intent> changeAddressLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    String newPickupAddress = result.getData().getStringExtra("updatedPickupAddress");
-                    if (newPickupAddress != null) {
-                        pickupAddress = newPickupAddress;
-                        profilePickupAddress.setText(newPickupAddress);  // Refresh the address in the UI
+    private ActivityResultLauncher<Intent> changeAddressLauncher;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Register the ActivityResultLauncher
+        changeAddressLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        String newPickupAddress = result.getData().getStringExtra("updatedPickupAddress");
+                        if (newPickupAddress != null) {
+                            pickupAddress = newPickupAddress;
+                            if (profilePickupAddress != null) {
+                                profilePickupAddress.setText(newPickupAddress); // Update the address in the UI
+                            }
+                        }
                     }
                 }
-            });
+        );
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
