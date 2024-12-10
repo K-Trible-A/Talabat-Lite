@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.IOException;
+
 public class MerchantActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
@@ -21,38 +23,12 @@ public class MerchantActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_merchant);
+
         initUI();
         setupListeners();
 
-        // Check the passed fragment name and display the correct fragment
-        String fragmentName = getIntent().getStringExtra("fragment");
-        if (fragmentName != null) {
-            switch (fragmentName) {
-                case "home":
-                    loadFragment(merchantHomeFragment);
-                    bottomNavigationView.setSelectedItemId(R.id.home);
-                    break;
-                case "orders":
-                    loadFragment(merchantOrdersFragment);
-                    bottomNavigationView.setSelectedItemId(R.id.orders);
-                    break;
-                case "profile":
-                    loadFragment(merchantProfileFragment);
-                    bottomNavigationView.setSelectedItemId(R.id.profile);
-                    break;
-                case "search":
-                    loadFragment(merchantSearchFragment);
-                    bottomNavigationView.setSelectedItemId(R.id.search);
-                    break;
-                default:
-                    loadFragment(merchantHomeFragment);
-                    bottomNavigationView.setSelectedItemId(R.id.home);
-                    break;
-            }
-        }
     }
-
-
+    
 
     protected void initUI() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -61,36 +37,35 @@ public class MerchantActivity extends AppCompatActivity {
         merchantProfileFragment = new MerchantProfileFragment();
         merchantSearchFragment = new MerchantSearchFragment();
 
-        // Load home fragment initially
-        loadFragment(merchantHomeFragment);
-    }
-    private void loadFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
+        if (merchantHomeFragment != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, merchantHomeFragment)
+                    .commit();
+        }
     }
 
     protected void setupListeners ()
     {
+
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.home)
             {
-                loadFragment(merchantHomeFragment);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
                 return true;
             }
             if (item.getItemId() == R.id.orders)
             {
-                loadFragment(merchantOrdersFragment);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantOrdersFragment).commit();
                 return true;
             }
             if (item.getItemId() == R.id.profile)
             {
-                loadFragment(merchantProfileFragment);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
                 return true;
             }
             if (item.getItemId() == R.id.search)
             {
-                loadFragment(merchantSearchFragment);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantSearchFragment).commit();
                 return true;
             }
             return false;
