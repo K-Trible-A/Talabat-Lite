@@ -97,6 +97,7 @@ public class MerchantHomeFragment extends Fragment {
 
                     tempItemList.add(new ItemAdapter.itemData(itemId, itemName, itemDescription, itemPrice, img));
                 }
+                socketHelper.getInstance().close();
                 // Update the main itemList and notify the adapter in the UI thread
                 requireActivity().runOnUiThread(() -> {
                     itemList.clear();  // Clear existing data

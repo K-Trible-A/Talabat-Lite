@@ -72,6 +72,7 @@ public class ItemManagementActivity extends AppCompatActivity {
         socketHelper.getInstance().sendInt(globals.GET_IMAGE); // only the image is needed, we have the other data
         socketHelper.getInstance().sendInt(itemId);
         temp = socketHelper.getInstance().recvImg();
+        socketHelper.getInstance().close();
         return temp;
     }
     protected void initUI ()
@@ -88,6 +89,7 @@ public class ItemManagementActivity extends AppCompatActivity {
          socketHelper.getInstance().sendInt(globals.DELETE_ITEM);
          socketHelper.getInstance().sendInt(itemId);
          int ok = socketHelper.getInstance().recvInt();
+         socketHelper.getInstance().close();
          return ok == 1;
     }
     protected void setupListeners ()
