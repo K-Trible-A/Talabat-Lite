@@ -22,6 +22,7 @@ public class ItemActivity extends AppCompatActivity {
     private Button btnDecrease, btnIncrease, btnAddToCart;
     private int cnt = 1;
 
+
     public static class itemData {
         public String name, description;
         public float price;
@@ -69,7 +70,6 @@ public class ItemActivity extends AppCompatActivity {
         socketHelper.getInstance().connect();
         socketHelper.getInstance().sendInt(globals.RETRIEVE_ITEM);
         socketHelper.getInstance().sendInt(itemId);
-
         temp.name = socketHelper.getInstance().recvString();
         temp.img = socketHelper.getInstance().recvImg();
         temp.description = socketHelper.getInstance().recvString();

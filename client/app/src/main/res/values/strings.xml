@@ -12,7 +12,7 @@
     <string name="don_t_have_an_account">Don\'t have an account?</string>
     <string name="profile">profile</string>
     <string name="home_fragment">Home fragment</string>
-    <string name="items_fragment">Items fragment</string>
+    <string name="orders_fragment">Orders fragment</string>
     <string name="ScrollView">ScrollView</string>
     <string name="todo">TODO</string>
     <string name="business_name">Business name</string>
@@ -22,4 +22,18 @@
     <string name="keywords_field">Keywords</string>
     <string name="pickup_address_field">Pickup address</string>
     <string name="business_type">Business type</string>
+    <string name="delete">delete</string>
+    <string name="item_image">Item image</string>
+    <string name="Profile">Profile\n</string>
+    <string name="search_fragment">Search fragment</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="delete_item">Delete</string>
+    <string name="item_description">Item Description</string>
+    <string name="todo_o">TODO</string>
+    <string name="item_name">Item Name</string>
+    <string name="price_0_00">Price: $0.00</string>
+    <string name="merchant_name">Merchant Name</string>
+    <string name="merchant_profile_picture">Merchant profile picture</string>
+    <string name="rating_4_5">Rating: 4.5</string>
 </resources>

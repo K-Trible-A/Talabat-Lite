@@ -59,10 +59,9 @@ public class socketHelper {
         byte[] data = str.getBytes(StandardCharsets.UTF_8);
         // Send the byte array in chunks to handle large data
         int offset = 0;
-        int chunkSize = 1024; // 1KB chunks (you can adjust the chunk size as needed)
         while (offset < data.length) {
             int remaining = data.length - offset;
-            int bytesToSend = Math.min(chunkSize, remaining);
+            int bytesToSend = Math.min(globals.CHUNCK_SIZE, remaining);
             outputStream.write(data, offset, bytesToSend);
             offset += bytesToSend;
         }
@@ -71,7 +70,7 @@ public class socketHelper {
     }
     public void sendImg(Bitmap selectedImage) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        selectedImage.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        selectedImage.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
         // Send the length of the image first
         int length = imageBytes.length;
@@ -79,7 +78,7 @@ public class socketHelper {
         // Send the image data
         int bytesSent = 0;
         while (bytesSent < length) {
-            int chunkSize = Math.min(4096, length - bytesSent); // Send in chunks of up to 4096 bytes
+            int chunkSize = Math.min(globals.CHUNCK_SIZE, length - bytesSent); // Send in chunks of up to 4096 bytes
             outputStream.write(imageBytes, bytesSent, chunkSize);
             bytesSent += chunkSize;
         }
@@ -103,7 +102,7 @@ public class socketHelper {
     public String recvString() throws IOException {
         int size = recvInt();
         // Step 2: Prepare to receive the string in chunks
-        byte[] buffer = new byte[1024]; // Set chunk size (adjustable)
+        byte[] buffer = new byte[globals.CHUNCK_SIZE]; // Set chunk size (adjustable)
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         int totalBytesReceived = 0;
         // Step 3: Receive the string in chunks
@@ -135,7 +134,7 @@ public class socketHelper {
         int imageSize = recvInt();
         // Step 2: Read the image data in chunks
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[globals.CHUNCK_SIZE];
         int totalBytesReceived = 0;
         while (totalBytesReceived < imageSize) {
             int remaining = imageSize - totalBytesReceived;

@@ -3,15 +3,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="120dp"
     tools:context=".MerchantHomeFragment">
 
-    <TextView
+    <!-- Merchant Info Section -->
+    <LinearLayout
+        android:id="@+id/merchantInfoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="24dp">
+
+        <!-- Merchant Profile Picture -->
+        <ImageView
+            android:id="@+id/merchantProfilePicture"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/profile_icon"
+            android:contentDescription="@string/merchant_profile_picture"
+            android:scaleType="centerCrop"
+            android:elevation="4dp" />
+
+        <!-- Merchant Name and Rating -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/merchantName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/merchant_name"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/merchantRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/rating_4_5"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="16sp"
+                tools:ignore="TextContrastCheck" />
+
+            <!-- Merchant keywords -->
+            <TextView
+                android:id="@+id/merchantKeywords"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="burger, chicken, pasta"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Button to Add Item -->
+    <Button
+        android:id="@+id/addItemButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/home_fragment"
-        android:textSize="25sp"
-        tools:ignore="TextSizeCheck" />
+        android:text="Add Item"
+        android:textSize="18sp"
+        android:layout_below="@id/merchantInfoLayout"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:background="@color/colorAccent"
+        android:textColor="@android:color/white"
+        android:padding="10dp"
+        tools:ignore="HardcodedText" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/itemRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/addItemButton"
+        android:layout_marginTop="16dp"
+        tools:listitem="@layout/item_row" />
 
 </RelativeLayout>

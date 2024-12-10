@@ -176,48 +176,42 @@ bool Database::updateData(const string &table, const vector<string> &columns,
                           const vector<string> &values,
                           const string &condition) {
   if (columns.size() != values.size()) {
-    std::cerr << "Columns and values size mismatch!" << std::endl;
+    std::cerr << "Error: Columns and values size mismatch." << std::endl;
     return false;
   }
-  // Construct the SQL UPDATE statement
+  // Construct the SQL UPDATE query dynamically
   std::string sql = "UPDATE " + table + " SET ";
-  // Add columns and values to the SET clause
+  // Add the column-value assignments to the SET clause
   for (size_t i = 0; i < columns.size(); ++i) {
     sql += columns[i] + " = ?";
-    if (i < columns.size() - 1)
-      sql += ", ";
+    if (i < columns.size() - 1) {
+      sql += ", "; // Add a comma for all but the last column
+    }
   }
-  // Add WHERE condition (if provided)
+  // Add the condition (WHERE clause) if provided
   if (!condition.empty()) {
     sql += " WHERE " + condition;
   }
-  // Prepare the SQL statement
   sqlite3_stmt *stmt;
-  int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
-  if (rc != SQLITE_OK) {
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
               << std::endl;
     return false;
   }
   // Bind the values to the prepared statement
   for (size_t i = 0; i < values.size(); ++i) {
-    std::string escapedValue =
-        escapeSpecialChars(values[i]); // Escape special characters
-    rc =
-        sqlite3_bind_text(stmt, i + 1, escapedValue.c_str(), -1, SQLITE_STATIC);
-    if (rc != SQLITE_OK) {
-      std::cerr << "Failed to bind value: " << sqlite3_errmsg(db) << std::endl;
-      sqlite3_finalize(stmt);
-      return false;
-    }
+    sqlite3_bind_text(stmt, static_cast<int>(i + 1), values[i].c_str(), -1,
+                      SQLITE_STATIC);
   }
   // Execute the statement
-  rc = sqlite3_step(stmt);
+  int rc = sqlite3_step(stmt);
   if (rc != SQLITE_DONE) {
-    std::cerr << "Execution failed: " << sqlite3_errmsg(db) << std::endl;
+    std::cerr << "Failed to execute statement: " << sqlite3_errmsg(db)
+              << std::endl;
     sqlite3_finalize(stmt);
     return false;
   }
+  // Finalize the statement
   sqlite3_finalize(stmt);
   return true;
 }

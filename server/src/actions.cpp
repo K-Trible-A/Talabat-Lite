@@ -256,28 +256,21 @@ void getMerchantData(int clientFD) {
 
   int userId = server::recvInt(clientFD);
 
-  string sql = "SELECT merchant.* FROM users "
-               "JOIN merchant ON users.id = merchant.merchantId "
-               "WHERE users.id = '" +
-               to_string(userId) + "';";
-
+  string sql = "SELECT businessName, businessType, keywords, pickupAddress, "
+               "rating FROM merchant WHERE userId = " +
+               to_string(userId) + " ;";
   vector<vector<string>> ans = db.query(sql);
-
-  string businessName = ans[0][3];
-  string type = ans[0][4];
-  string keywords = ans[0][5];
-  string pickupAddress = ans[0][6];
-  float rating = stof(ans[0][8]);
+  string businessName = ans[0][0];
+  string type = ans[0][1];
+  string keywords = ans[0][2];
+  string pickupAddress = ans[0][3];
+  float rating = stof(ans[0][4]);
   rating = round(rating * 10) / 10;
   server::send(clientFD, businessName);
   server::send(clientFD, type);
   server::send(clientFD, keywords);
   server::send(clientFD, pickupAddress);
   server::send(clientFD, rating);
-
-  int ok = 1;
-
-  server::send(clientFD, ok);
 }
 
 void changePickupAddress(int clientFD) {
@@ -308,4 +301,74 @@ void checkAccountType(int clientFD) {
     break;
   }
   server::send(clientFD, accountType);
+}
+
+void getItems(int clientFD) {
+
+  int id = server::recvInt(clientFD);
+  vector<vector<string>> merchantId_query =
+      db.query("SELECT userId FROM merchant WHERE " + to_string(id) +
+               " = merchant.userId;");
+  string merchantId = merchantId_query[0][0];
+  const string sql1 =
+      "SELECT COUNT (*) FROM item WHERE merchantId = " + merchantId + ";";
+  vector<vector<string>> ans = db.query(sql1);
+  int itemCount = stoi(ans[0][0]);
+  server::send(clientFD, itemCount);
+  const string sql2 =
+      "SELECT itemId, itemName , itemPrice, itemDescription ,itemImg FROM item "
+      "WHERE merchantId = " +
+      merchantId + " ;";
+  vector<vector<string>> res = db.query(sql2);
+  string itemName, itemDescription;
+  float itemPrice;
+  int itemId;
+  for (auto &it : res) {
+    itemId = stoi(it[0]);
+    server::send(clientFD, itemId);
+    itemName = it[1];
+    server::send(clientFD, itemName);
+    itemPrice = round(stof(it[2]) * 10) / 10;
+    server::send(clientFD, itemPrice);
+    itemDescription = it[3];
+    server::send(clientFD, itemDescription);
+    server::sendImg(clientFD, it[4]);
+  }
+}
+
+void getImage(int clientFD) {
+  int itemId = server::recvInt(clientFD);
+  vector<vector<string>> res = db.query("SELECT itemImg FROM item "
+                                        "WHERE itemId = " +
+                                        to_string(itemId) + " ;");
+  cout << "Recieved id = " << itemId << endl;
+
+  server::sendImg(clientFD, res[0][0]);
+}
+
+void deleteItem(int clientFD) {
+
+  int itemId = server::recvInt(clientFD);
+  const string sql =
+      "DELETE FROM item WHERE itemId = " + to_string(itemId) + ";";
+  db.execute(sql);
+  cout << "Deleted item with id = " << itemId << endl;
+  const int ok = 1;
+  server::send(clientFD, ok);
+}
+
+void getMerchantInfoHome(int clientFD) {
+
+  int id = server::recvInt(clientFD);
+  const string sql = "SELECT businessName, keywords, rating FROM merchant "
+                     "WHERE userId = " +
+                     to_string(id) + ";";
+  vector<vector<string>> ans = db.query(sql);
+  string name = ans[0][0];
+  string keywords = ans[0][1];
+  float rating = stof(ans[0][2]);
+  rating = round(rating * 10) / 10; // 0.1 percision
+  server::send(clientFD, name);
+  server::send(clientFD, keywords);
+  server::send(clientFD, rating);
 }
