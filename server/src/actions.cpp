@@ -149,7 +149,8 @@ void retrieveItem(int clientFD) {
       db.query("SELECT itemName, itemPrice, itemDescription, itemImg FROM item "
                "WHERE itemId = " +
                to_string(itemId) + " ;");
-
+  if (res.empty())
+    return;
   string name = res[0][0];
   float price = stof(res[0][1]);
   string desc = res[0][2];
@@ -197,6 +198,8 @@ void addCourier(int clientFD) {
       "SELECT cardId FROM card WHERE cardNumber = '" + cardNumber + "';";
   vector<vector<string>> ans = db.query(sql);
   if (ans.empty())
+    return;
+  if (ans.empty())
     cardId = "NULL";
   else
     cardId = ans[0][0];
@@ -237,6 +240,8 @@ void addUser(int clientFD) {
   if (ok == 1) {
     const string sql2 = "SELECT id FROM users WHERE email = '" + email + "';";
     vector<vector<string>> ans2 = db.query(sql2);
+    if (ans2.empty())
+      return;
     int userId = std::stoi(ans2[0][0]);
     server::send(clientFD, userId);
   }
@@ -260,17 +265,19 @@ void getMerchantData(int clientFD) {
                "rating FROM merchant WHERE userId = " +
                to_string(userId) + " ;";
   vector<vector<string>> ans = db.query(sql);
-  string businessName = ans[0][0];
-  string type = ans[0][1];
-  string keywords = ans[0][2];
-  string pickupAddress = ans[0][3];
-  float rating = stof(ans[0][4]);
-  rating = round(rating * 10) / 10;
-  server::send(clientFD, businessName);
-  server::send(clientFD, type);
-  server::send(clientFD, keywords);
-  server::send(clientFD, pickupAddress);
-  server::send(clientFD, rating);
+  if (!ans.empty()) {
+    string businessName = ans[0][0];
+    server::send(clientFD, businessName);
+    string type = ans[0][1];
+    server::send(clientFD, type);
+    string keywords = ans[0][2];
+    server::send(clientFD, keywords);
+    string pickupAddress = ans[0][3];
+    server::send(clientFD, pickupAddress);
+    float rating = stof(ans[0][4]);
+    rating = round(rating * 10) / 10;
+    server::send(clientFD, rating);
+  }
 }
 
 void changePickupAddress(int clientFD) {
@@ -288,6 +295,8 @@ void checkAccountType(int clientFD) {
   const string sql =
       "SELECT accountType FROM users WHERE id = " + to_string(userId) + ";";
   vector<vector<string>> ans = db.query(sql);
+  if (ans.empty())
+    return;
   int accountType = stoi(ans[0][0]);
   switch (accountType) {
   case 1:
@@ -304,15 +313,20 @@ void checkAccountType(int clientFD) {
 }
 
 void getItems(int clientFD) {
-
   int id = server::recvInt(clientFD);
   vector<vector<string>> merchantId_query =
       db.query("SELECT userId FROM merchant WHERE " + to_string(id) +
                " = merchant.userId;");
+  if (merchantId_query.empty())
+    return;
   string merchantId = merchantId_query[0][0];
+  if (merchantId_query.empty())
+    return;
   const string sql1 =
       "SELECT COUNT (*) FROM item WHERE merchantId = " + merchantId + ";";
   vector<vector<string>> ans = db.query(sql1);
+  if (ans.empty())
+    return;
   int itemCount = stoi(ans[0][0]);
   server::send(clientFD, itemCount);
   const string sql2 =
@@ -320,6 +334,7 @@ void getItems(int clientFD) {
       "WHERE merchantId = " +
       merchantId + " ;";
   vector<vector<string>> res = db.query(sql2);
+  if(res.empty()) return;
   string itemName, itemDescription;
   float itemPrice;
   int itemId;
@@ -342,12 +357,11 @@ void getImage(int clientFD) {
                                         "WHERE itemId = " +
                                         to_string(itemId) + " ;");
   cout << "Recieved id = " << itemId << endl;
-
-  server::sendImg(clientFD, res[0][0]);
+  if (!res.empty())
+    server::sendImg(clientFD, res[0][0]);
 }
 
 void deleteItem(int clientFD) {
-
   int itemId = server::recvInt(clientFD);
   const string sql =
       "DELETE FROM item WHERE itemId = " + to_string(itemId) + ";";
@@ -358,17 +372,18 @@ void deleteItem(int clientFD) {
 }
 
 void getMerchantInfoHome(int clientFD) {
-
   int id = server::recvInt(clientFD);
   const string sql = "SELECT businessName, keywords, rating FROM merchant "
                      "WHERE userId = " +
                      to_string(id) + ";";
   vector<vector<string>> ans = db.query(sql);
-  string name = ans[0][0];
-  string keywords = ans[0][1];
-  float rating = stof(ans[0][2]);
-  rating = round(rating * 10) / 10; // 0.1 percision
-  server::send(clientFD, name);
-  server::send(clientFD, keywords);
-  server::send(clientFD, rating);
+  if (!ans.empty()) {
+    string name = ans[0][0];
+    string keywords = ans[0][1];
+    float rating = stof(ans[0][2]);
+    rating = round(rating * 10) / 10; // 0.1 percision
+    server::send(clientFD, name);
+    server::send(clientFD, keywords);
+    server::send(clientFD, rating);
+  }
 }
