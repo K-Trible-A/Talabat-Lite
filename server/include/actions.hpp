@@ -19,6 +19,8 @@ void addCourier(int);
 void addUser(int);
 // Insert Customer data into database
 void addCustomer(int);
+// get three top rated merchants form customer city
+void getTopRatedMerchants(int);
 // Get merchant data from database
 void getMerchantData(int);
 // Change merchant's pickup address

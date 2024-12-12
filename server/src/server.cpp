@@ -247,4 +247,5 @@ void server::appendFuncs() {
   actions[GET_IMAGE] = getImage;
   actions[DELETE_ITEM] = deleteItem;
   actions[GET_MERCHANT_INFO_HOME] = getMerchantInfoHome;
+  actions[GET_TOP_RATED_MERCHANTS] = getTopRatedMerchants;
 }
