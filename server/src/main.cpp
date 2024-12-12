@@ -10,7 +10,8 @@ funcPtr actions[MAX_ACTIONS];
 
 void server::handleClient(int clientFD) {
   int code = server::recvInt(clientFD);
-  actions[code](clientFD);
+  if(code >= 1000)
+    actions[code](clientFD);
   close(clientFD);
 }
 
