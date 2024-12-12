@@ -58,39 +58,36 @@ public class MerchantHomeFragment extends Fragment {
     {
         try
         {
-            Log.d("Test1","Before calling the server");
             socketHelper.getInstance().connect();
             socketHelper.getInstance().sendInt(globals.GET_MERCHANT_HOME_INFO);
-            Log.d("Test1.123","sending code " + globals.GET_MERCHANT_HOME_INFO);
             socketHelper.getInstance().sendInt(globals.userId);
-            Log.d("Test2","sending " + globals.userId);
             merchantNameStr = socketHelper.getInstance().recvString();
             merchantKeywordsStr = socketHelper.getInstance().recvString();
             rating = socketHelper.getInstance().recvFloat();
             socketHelper.getInstance().close();
-            Log.d("Cls","sendin " + "Closed 1");
 
         } catch (IOException e) {
 
-            Log.e("MerchantHomeFragment", "Fatal!!",e);
         }
     }
     @SuppressLint("NotifyDataSetChanged")
     private void loadItemsFromServer() {
-        new Thread(() -> {
+        if (executor.isShutdown()) {
+            executor = Executors.newSingleThreadExecutor(); // Recreate the executor if it's shut down
+        }
+
+        executor.execute(() -> {
             try {
                 socketHelper.getInstance().connect();
                 socketHelper.getInstance().sendInt(globals.GET_ITEMS);
                 socketHelper.getInstance().sendInt(globals.userId);
                 int itemCount = socketHelper.getInstance().recvInt();
-                Log.d("MerchantHome", "RECIEVED " + itemCount);
 
-                List<ItemAdapter.itemData> tempItemList = new ArrayList<>();  // Temporary list to hold items
+                List<ItemAdapter.itemData> tempItemList = new ArrayList<>();
 
                 for (int i = 0; i < itemCount; i++) {
                     int itemId = socketHelper.getInstance().recvInt();
                     String itemName = socketHelper.getInstance().recvString();
-                    Log.d("Item Name", "RECIEVED " + itemName);
                     float itemPrice = socketHelper.getInstance().recvFloat();
                     String itemDescription = socketHelper.getInstance().recvString();
                     Bitmap img = socketHelper.getInstance().recvImg();
@@ -98,33 +95,39 @@ public class MerchantHomeFragment extends Fragment {
                     tempItemList.add(new ItemAdapter.itemData(itemId, itemName, itemDescription, itemPrice, img));
                 }
                 socketHelper.getInstance().close();
-                // Update the main itemList and notify the adapter in the UI thread
-                requireActivity().runOnUiThread(() -> {
-                    itemList.clear();  // Clear existing data
-                    itemList.addAll(tempItemList);  // Add the new items
-                    itemAdapter.notifyDataSetChanged();  // Notify the adapter that data has changed
-                });
 
-                //fetchMerchantInfo();
+                // Update the main itemList and notify the adapter in the UI thread
+                mainHandler.post(() -> {
+                    if (isAdded()) { // Check if fragment is still attached
+                        itemList.clear();
+                        itemList.addAll(tempItemList);
+                        itemAdapter.notifyDataSetChanged();
+                    }
+                });
 
             } catch (IOException e) {
                 Log.e("MerchantHomeFragment", "Error loading items from server", e);
             }
-        }).start(); // Run in a background thread
+        });
     }
 
-
     private void fetchMerchantInfo() {
+        if (executor.isShutdown()) {
+            executor = Executors.newSingleThreadExecutor(); // Recreate executor if it was shut down
+        }
+
         executor.execute(() -> {
             getMerchantInfo();
             mainHandler.post(() -> {
-                loadItemsFromServer();
-                updateUI();
-                  // Load items only after merchant info is fetched
+                if (isAdded()) { // Check if fragment is still attached
+                    updateUI(); // Update UI after fetching merchant info
+                    loadItemsFromServer(); // Load items only after merchant info is fetched
+                }
             });
         });
     }
-    protected void initUI(View view)
+
+protected void initUI(View view)
     {
         merchantName = view.findViewById(R.id.merchantName);
         merchantKeywords = view.findViewById(R.id.merchantKeywords);
@@ -152,12 +155,6 @@ public class MerchantHomeFragment extends Fragment {
         super.onDestroyView();
         if (!executor.isShutdown()) {
             executor.shutdownNow();
-        }
-        try
-        {
-            socketHelper.getInstance().close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
