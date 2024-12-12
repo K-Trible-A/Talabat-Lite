@@ -12,13 +12,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
-// singleton class
+// Singleton class
 public class socketHelper {
     private static socketHelper instance;
+    private Socket serverFD;
+    private OutputStream outputStream;
+    private InputStream inputStream;
+
     private socketHelper() {}
 
-    public static socketHelper getInstance() {
-        if(instance == null){
+    public static synchronized socketHelper getInstance() {
+        if (instance == null) {
             instance = new socketHelper();
         }
         return instance;
@@ -26,48 +30,59 @@ public class socketHelper {
 
     public String IP;
     public int portNum;
-    private Socket serverFD;
-    private OutputStream outputStream;
-    private InputStream inputStream;
 
     public void connect() throws IOException {
-        serverFD = new Socket(IP, portNum);
-        outputStream = serverFD.getOutputStream();
-        inputStream = serverFD.getInputStream();
+        try {
+            serverFD = new Socket(IP, portNum);
+            outputStream = serverFD.getOutputStream();
+            inputStream = serverFD.getInputStream();
+        } catch (IOException e) {
+            throw new IOException("Failed to connect to server: " + e.getMessage(), e);
+        }
     }
+
     public void close() throws IOException {
-        serverFD.close();
-        outputStream.close();
-        inputStream.close();
+        try {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (outputStream != null) {
+                outputStream.close();
+            }
+            if (serverFD != null && !serverFD.isClosed()) {
+                serverFD.close();
+            }
+        } catch (IOException e) {
+            throw new IOException("Error closing resources: " + e.getMessage(), e);
+        }
     }
 
     public void sendInt(int num) throws IOException {
-        byte[] Data = ByteBuffer.allocate(Integer.BYTES).putInt(num).array();
-        outputStream.write(Data);
-        outputStream.flush();
+        byte[] data = ByteBuffer.allocate(Integer.BYTES).putInt(num).array();
+        sendData(data);
     }
+
     public void sendFloat(float num) throws IOException {
-        byte[] Data = ByteBuffer.allocate(Float.BYTES).putFloat(num).array();
-        outputStream.write(Data);
-        outputStream.flush();
+        byte[] data = ByteBuffer.allocate(Float.BYTES).putFloat(num).array();
+        sendData(data);
     }
-    public void sendString(String str) throws IOException{
-        // Sending string size first (to be handled as a 4-byte integer)
-        int sz = str.length();
-        sendInt(sz);
-        // Convert string to byte array using UTF-8 encoding
+
+    public void sendString(String str) throws IOException {
         byte[] data = str.getBytes(StandardCharsets.UTF_8);
-        // Send the byte array in chunks to handle large data
+        sendInt(data.length); // Send string length
+        sendData(data); // Send string data
+    }
+
+    private void sendData(byte[] data) throws IOException {
         int offset = 0;
         while (offset < data.length) {
-            int remaining = data.length - offset;
-            int bytesToSend = Math.min(globals.CHUNCK_SIZE, remaining);
+            int bytesToSend = Math.min(globals.CHUNCK_SIZE, data.length - offset);
             outputStream.write(data, offset, bytesToSend);
             offset += bytesToSend;
         }
-        // Ensure all data is sent
-        outputStream.flush();
+        outputStream.flush(); // Ensure all data is sent
     }
+
     public void sendImg(Bitmap selectedImage) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         selectedImage.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
@@ -85,72 +100,77 @@ public class socketHelper {
         outputStream.flush();
     }
 
-    public int recvInt() throws IOException{
-        byte [] revd = new byte[Integer.BYTES];
-        inputStream.read(revd);
-        ByteBuffer byteBuffer = ByteBuffer.wrap(revd);
-        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+
+    public int recvInt() throws IOException {
+        byte[] revd = new byte[Integer.BYTES];
+        readFully(revd);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(revd).order(ByteOrder.LITTLE_ENDIAN);
         return byteBuffer.getInt();
     }
-    public float recvFloat() throws IOException{
+
+    public float recvFloat() throws IOException {
         byte[] revd = new byte[Float.BYTES];
-        inputStream.read(revd);
-        ByteBuffer byteBuffer = ByteBuffer.wrap(revd);
-        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        readFully(revd);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(revd).order(ByteOrder.LITTLE_ENDIAN);
         return byteBuffer.getFloat();
     }
+
     public String recvString() throws IOException {
-        int size = recvInt();
-        // Step 2: Prepare to receive the string in chunks
-        byte[] buffer = new byte[globals.CHUNCK_SIZE]; // Set chunk size (adjustable)
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int totalBytesReceived = 0;
-        // Step 3: Receive the string in chunks
-        while (totalBytesReceived < size) {
-            // Calculate how much data is remaining to be received
-            int remaining = size - totalBytesReceived;
-            int currentChunkSize = Math.min(buffer.length, remaining);
-
-            // Read data into the buffer
-            int bytesRead = inputStream.read(buffer, 0, currentChunkSize);
-            if (bytesRead == -1) {
-                throw new IOException("End of stream reached before receiving full data.");
-            }
-            // Write the received chunk to the byte array output stream
-            byteArrayOutputStream.write(buffer, 0, size);
-
-            // Update total bytes received
-            totalBytesReceived += size;
-        }
-        // Step 4: Convert the received byte array to a string
-        String receivedString = byteArrayOutputStream.toString("UTF-8");
-
-        // Close resources
-        byteArrayOutputStream.close();
-        return receivedString.trim();
-    }
-    public Bitmap recvImg() throws IOException {
-        // Convert the byte array to an integer (image size)
-        int imageSize = recvInt();
-        // Step 2: Read the image data in chunks
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int size = recvInt(); // Receive string size
         byte[] buffer = new byte[globals.CHUNCK_SIZE];
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         int totalBytesReceived = 0;
-        while (totalBytesReceived < imageSize) {
-            int remaining = imageSize - totalBytesReceived;
-            int currentChunkSize = Math.min(buffer.length, remaining);
-            // Read the chunk of image data
-            int bytesRead = inputStream.read(buffer, 0, currentChunkSize);
-            if (bytesRead == -1) {
-                throw new IOException("End of stream reached before receiving full data.");
-            }
-            // Write the chunk to the ByteArrayOutputStream
+
+        while (totalBytesReceived < size) {
+            int bytesRead = inputStream.read(buffer, 0, Math.min(buffer.length, size - totalBytesReceived));
+            if (bytesRead == -1) throw new IOException("End of stream reached before receiving full data.");
             byteArrayOutputStream.write(buffer, 0, bytesRead);
             totalBytesReceived += bytesRead;
         }
 
-        // Step 3: Convert the byte array to a Bitmap
+        return byteArrayOutputStream.toString(StandardCharsets.UTF_8.name()).trim(); // Convert to string and trim
+    }
+
+    public Bitmap recvImg() throws IOException {
+        int imageSize = recvInt(); // Receive image size
+        if (imageSize <= 0) {
+            throw new IOException("Received invalid image size: " + imageSize);
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[globals.CHUNCK_SIZE];
+        int totalBytesReceived = 0;
+
+        while (totalBytesReceived < imageSize) {
+            int bytesRead = inputStream.read(buffer, 0, Math.min(buffer.length, imageSize - totalBytesReceived));
+            if (bytesRead == -1) {
+                throw new IOException("End of stream reached before receiving full image.");
+            }
+            byteArrayOutputStream.write(buffer, 0, bytesRead);
+            totalBytesReceived += bytesRead;
+        }
+
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
-        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+        if (bitmap == null) {
+            throw new IOException("Failed to decode received image.");
+        }
+
+        return bitmap;
+    }
+
+
+
+
+    private void readFully(byte[] buffer) throws IOException {
+        int bytesReadTotal = 0;
+
+        while (bytesReadTotal < buffer.length) {
+            int bytesRead = inputStream.read(buffer, bytesReadTotal, buffer.length - bytesReadTotal);
+            if (bytesRead == -1) throw new IOException("End of stream reached before reading full data.");
+            bytesReadTotal += bytesRead;
+        }
     }
 }
