@@ -81,6 +81,11 @@ public class LoginActivity extends AppCompatActivity {
                     afterLoginIntent = new Intent(LoginActivity.this,MerchantActivity.class);
                     startActivity(afterLoginIntent);
                 }
+                else if(accountType == globals.CUSTOMER)
+                {
+                    afterLoginIntent = new Intent(LoginActivity.this,CustomerActivity.class);
+                    startActivity(afterLoginIntent);
+                }
 
             }
             else{
