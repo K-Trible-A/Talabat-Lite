@@ -5,7 +5,6 @@ import static com.kaaa.talabat_lite.globals.ADD_USER;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -179,6 +178,7 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
                 if (ok == 1) {
                     runOnUiThread(() -> Toast.makeText(MerchantRegistrationActivity.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
                     loginIntent = new Intent(MerchantRegistrationActivity.this,LoginActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(loginIntent);
                 }
                 socketHelper.getInstance().close();

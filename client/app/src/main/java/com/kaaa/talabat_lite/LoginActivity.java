@@ -79,6 +79,8 @@ public class LoginActivity extends AppCompatActivity {
                 if (accountType == globals.MERCHANT)
                 {
                     afterLoginIntent = new Intent(LoginActivity.this,MerchantActivity.class);
+                    // remove the activity from the stack
+                    afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(afterLoginIntent);
                 }
 

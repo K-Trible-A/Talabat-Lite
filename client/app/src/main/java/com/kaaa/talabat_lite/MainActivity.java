@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 Toast.makeText(MainActivity.this, "Connected to server", Toast.LENGTH_SHORT).show();
                 outIntent = new Intent(MainActivity.this, LoginActivity.class);
+                outIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(outIntent);
             });
 

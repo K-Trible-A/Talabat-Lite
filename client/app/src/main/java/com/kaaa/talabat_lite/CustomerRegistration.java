@@ -66,6 +66,7 @@ public class CustomerRegistration extends AppCompatActivity {
                 if (ok2 == 1) {
                     runOnUiThread(() -> Toast.makeText(CustomerRegistration.this, "Data added successfully!", Toast.LENGTH_SHORT).show());
                     Intent outIntent = new Intent(CustomerRegistration.this, LoginActivity.class);
+                    outIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(outIntent);
                 }
             }

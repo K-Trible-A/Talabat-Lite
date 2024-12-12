@@ -105,6 +105,7 @@ public class ItemManagementActivity extends AppCompatActivity {
                     {
                         Toast.makeText(ItemManagementActivity.this,"Item deleted successfully!",Toast.LENGTH_SHORT).show();
                         outIntent = new Intent(ItemManagementActivity.this,MerchantActivity.class);
+                        outIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(outIntent);
                     }
                     else
