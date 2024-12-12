@@ -5,6 +5,9 @@ import static com.kaaa.talabat_lite.globals.GET_MERCHANT_DATA;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +32,7 @@ public class MerchantProfileFragment extends Fragment {
     String businessName, type, keywords, pickupAddress;
     float rating;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private ActivityResultLauncher<Intent> changeAddressLauncher;
 
@@ -36,7 +40,6 @@ public class MerchantProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Register the ActivityResultLauncher
         changeAddressLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -45,7 +48,7 @@ public class MerchantProfileFragment extends Fragment {
                         if (newPickupAddress != null) {
                             pickupAddress = newPickupAddress;
                             if (profilePickupAddress != null) {
-                                profilePickupAddress.setText(newPickupAddress); // Update the address in the UI
+                                profilePickupAddress.setText(newPickupAddress);
                             }
                         }
                     }
@@ -80,7 +83,6 @@ public class MerchantProfileFragment extends Fragment {
         if (pickupAddress == null) {
             pickupAddress = "";  // Prevent null address from causing issues
         }
-        // Launch ChangePickupAddressActivity for result
         Intent changePickupAddressIntent = new Intent(requireContext(), ChangePickupAddressActivity.class);
         changePickupAddressIntent.putExtra("currentAddress", pickupAddress);
         changeAddressLauncher.launch(changePickupAddressIntent);
@@ -88,33 +90,41 @@ public class MerchantProfileFragment extends Fragment {
 
     private void getMerchantData() {
         try {
+            // Check if the fragment is added before accessing context
+            if (!isAdded()) {
+                Log.e("MerchantProfileFragment", "Fragment not attached to activity.");
+                return;
+            }
+
             socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(GET_MERCHANT_DATA);
+            socketHelper.getInstance().sendInt(globals.GET_MERCHANT_DATA);
             socketHelper.getInstance().sendInt(globals.userId);
             businessName = socketHelper.getInstance().recvString();
             type = socketHelper.getInstance().recvString();
             keywords = socketHelper.getInstance().recvString();
-            pickupAddress = socketHelper.getInstance().recvString(); // Fetch pickup address
+            pickupAddress = socketHelper.getInstance().recvString();
             rating = socketHelper.getInstance().recvFloat();
             socketHelper.getInstance().close();
+
+            // Update UI safely on the main thread
+            mainHandler.post(this::updateUI);
         } catch (IOException e) {
-            requireActivity().runOnUiThread(() ->
-                    Toast.makeText(requireContext(), "Error fetching data, please try again.", Toast.LENGTH_SHORT).show());
+            Log.e("MerchantProfileFragment", "Error fetching merchant data", e);
         }
     }
 
     private void fetchMerchantData() {
-        executor.execute(() -> {
-            getMerchantData();  // Execute data fetch in background
-            requireActivity().runOnUiThread(this::updateUI);
-        });
+        // Execute data fetch in background
+        executor.execute(this::getMerchantDatصa);
     }
 
     private void updateUI() {
-        profileBusinessName.setText(businessName);
-        profileBusinessType.setText(type);
-        profileKeywords.setText(keywords);
-        profilePickupAddress.setText(pickupAddress != null ? pickupAddress : "No address set");
-        profileRating.setText(String.valueOf(rating));
+        if (isAdded()) {
+            profileBusinessName.setText(businessName != null ? businessName : "No name set");
+            profileBusinessType.setText(type != null ? type : "No type set");
+            profileKeywords.setText(keywords != null ? keywords : "No keywords set");
+            profilePickupAddress.setText(pickupAddress != null ? pickupAddress : "No address set");
+            profileRating.setText(String.valueOf(rating));
+        }
     }
 }
