@@ -88,12 +88,14 @@ public class AddItemActivity extends AppCompatActivity {
             setResult(RESULT_OK, resultIntent); // Indicating success
             runOnUiThread(() -> Toast.makeText(this, "Item saved successfully!", Toast.LENGTH_SHORT).show());
             Intent backIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
+            backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(backIntent);
             finish(); // Finish the activity after saving
         } catch (IOException e) {
             runOnUiThread(() -> Toast.makeText(this, "Error saving the item", Toast.LENGTH_SHORT).show());
             setResult(RESULT_CANCELED); // Indicate failure to the caller
             Intent backIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
+            backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(backIntent);
             finish();
         }
