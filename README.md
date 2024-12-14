@@ -4,3 +4,8 @@ At client/app/src/main/java/com/kaaa/talabat_lite/globals.java You need to set t
 ```java
 public static String serverURL = "http://192.168.1.11:8080";
 ```
+### Dependencies
+```
+sqlite
+crow
+```
