@@ -72,7 +72,7 @@ void addMerchant(int clientFD) {
   tableName = "merchant";
   columns = {"userId",   "cardId",        "businessName", "businessType",
              "keywords", "pickupAddress", "nationalID",   "rating"};
-  values = {to_string(userId), cardId,        businessName, type,
+  values = {to_string(userId), cardId,        businessName, to_string(businessType),
             keywords,          pickupAddress, nationaID,    "0"};
   ok &= db.insertData(tableName, columns, values);
   server::send(clientFD, ok);
@@ -385,5 +385,138 @@ void getMerchantInfoHome(int clientFD) {
     server::send(clientFD, name);
     server::send(clientFD, keywords);
     server::send(clientFD, rating);
+  }
+}
+void getTopRatedMerchants(int clientFD)
+{
+    int userId = server::recvInt(clientFD);
+    const string sql =
+         "SELECT "
+       "merchant.businessName, "
+       "merchant.rating, "
+       "merchant.userId "
+      "FROM "
+        "merchant "
+      "JOIN "
+        "users "
+        "ON merchant.userId = users.id "
+      "WHERE "
+         "users.city = (SELECT city FROM users WHERE id = "+std::to_string(userId)+") ORDER BY "
+          "merchant.rating DESC LIMIT 3;";
+    vector <vector<string>> ans =db.query(sql);
+     string merch_1_Name="there is no other merchants",merch_1_Rate="0",merch_2_Name="there is no other merchants",merch_2_Rate="0";
+     string merch_3_Name="there is no other merchants",merch_3_Rate="0";
+     int merch1_id=0,merch2_id=0,merch3_id=0;
+     if(ans.size()>=1)
+     {
+     merch_1_Name=ans[0][0];
+     merch_1_Rate=ans[0][1];
+     merch1_id=stoi(ans[0][2]);
+     }
+     if(ans.size()>=2)
+     {
+     merch_2_Name=ans[1][0];
+     merch_2_Rate=ans[1][1];
+     merch2_id=stoi(ans[1][2]);
+     }
+     if(ans.size()>=3)
+     {
+     merch_3_Name=ans[2][0];
+     merch_3_Rate=ans[2][1];
+     merch3_id=stoi(ans[2][2]);
+     }
+     server::send(clientFD,merch_1_Name);
+     server::send(clientFD,merch_1_Rate);
+     server::send(clientFD,merch_2_Name);
+     server::send(clientFD,merch_2_Rate);
+     server::send(clientFD,merch_3_Name);
+     server::send(clientFD,merch_3_Rate);
+     server::send(clientFD,merch1_id);
+     server::send(clientFD,merch2_id);
+     server::send(clientFD,merch3_id);
+     int ok = 1;
+     server::send(clientFD,ok);
+}
+void getCustomerData(int clientFD)
+{
+    int userId = server::recvInt(clientFD);
+    const string sql1 = "SELECT deliveryAddress FROM customer where userId = "+ std::to_string(userId) +" ;" ;
+    vector<vector<string>> ans1 = db.query(sql1);
+    string customerAddress = ans1[0][0];
+    const string sql2 = "SELECT name , password , country , city FROM users where id = "+ std::to_string(userId) +" ;" ;
+    vector<vector<string>> ans2 = db.query(sql2);
+    string name = ans2[0][0];
+    string password = ans2[0][1];
+    string country = ans2[0][2];
+    string city = ans2[0][3];
+    server::send(clientFD,name);
+    server::send(clientFD,password);
+    server::send(clientFD,country);
+    server::send(clientFD,city);
+    server::send(clientFD,customerAddress);
+    int ok=1;
+    server::send(clientFD,ok);
+}
+void editCustomerData(int clientFD)
+{
+  int userId = server::recvInt(clientFD);
+  string name = server::recvString(clientFD);
+  string password = server::recvString(clientFD);
+  string country = server::recvString(clientFD);
+  string city = server::recvString(clientFD);
+  string deliveryAddress = server::recvString(clientFD);
+  const string condition1 = "userId = " + to_string(userId);
+  const string condition2 = "id = "+ to_string(userId);
+  if(deliveryAddress.size()>0)
+  db.updateData("customer", {"deliveryAddress"}, {deliveryAddress}, condition1);
+  if(name.size()>0)
+  db.updateData("users",{"name"},{name},condition2);
+  if(password.size()>0)
+  db.updateData("users",{"password"},{password},condition2);
+  if(country.size()>0)
+  db.updateData("users",{"country"},{country},condition2);
+  if(city.size()>0)
+  db.updateData("users",{"city"},{city},condition2);
+  int ok=1;
+  server::send(clientFD,ok);
+}
+void addCustomerCard(int clientFD)
+{
+     int userId = server::recvInt(clientFD);
+     string cardNumber = server::recvString(clientFD);
+     string expiryDate = server::recvString(clientFD);
+     string CVV = server::recvString(clientFD);
+     string tableName = "card";
+     vector<string> columns = {"userId", "cardNumber", "CVV", "expiryDate"};
+     vector<string> values = {to_string(userId), cardNumber, CVV, expiryDate};
+     db.insertData(tableName, columns, values);
+     int ok=1;
+     server::send(clientFD,ok);
+}
+void getCategorie(int clientFD)
+{
+  enum { grocery = 1, restaurant = 2, pharmacy = 3 };
+  int businessType = server::recvInt(clientFD);
+  const string sql1 =
+      "SELECT COUNT (*) FROM merchant WHERE businessType = " + std::to_string(businessType) + ";";
+  vector<vector<string>> ans = db.query(sql1);
+  if (ans.empty())
+    return;
+  int merchantCount = stoi(ans[0][0]);
+  server::send(clientFD, merchantCount);
+  const string sql2 =
+      "SELECT userId, businessName , rating FROM merchant WHERE businessType = " + std::to_string(businessType) + ";";
+  vector<vector<string>> res = db.query(sql2);
+  if(res.empty()) return;
+  string merchName;
+  float merchRate;
+  int merchId;
+  for (auto &it : res) {
+    merchId = stoi(it[0]);
+    server::send(clientFD, merchId);
+    merchName = it[1];
+    server::send(clientFD, merchName);
+    merchRate = round(stof(it[2]) * 10) / 10;
+    server::send(clientFD, merchRate);
   }
 }
