@@ -1,5 +1,6 @@
 package com.kaaa.talabat_lite;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,7 +50,9 @@ public class ItemActivity extends AppCompatActivity {
     private void loadItemData(int itemId) {
         executorService.execute(() -> {
             try {
-                itemData item = getItemData(itemId);
+                Intent intent = getIntent();
+                int itemId_final = intent.getIntExtra("id",itemId);
+                itemData item = getItemData(itemId_final);
                 // After background task, update UI on the main thread
                 mainHandler.post(() -> {
                     itemName.setText(item.name);

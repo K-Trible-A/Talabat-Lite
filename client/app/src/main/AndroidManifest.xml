@@ -18,6 +18,15 @@
         android:theme="@style/Theme.TalabatLite"
         tools:targetApi="31">
         <activity
+            android:name=".CategorieActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerViewofMerchant"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ItemManagementActivity"
             android:exported="false" />
         <activity
