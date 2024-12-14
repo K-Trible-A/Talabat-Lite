@@ -10,4 +10,4 @@ clean: server
 
 server: $(SRC) $(INC) Makefile
 	@echo "Compiling source files.."
-	$(CC) $(SRC) -o server -lsqlite3
+	$(CC) $(SRC) -o server -lsqlite3 -lpthread

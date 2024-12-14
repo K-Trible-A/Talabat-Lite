@@ -1,17 +1,23 @@
 package com.kaaa.talabat_lite;
 
-import static com.kaaa.talabat_lite.globals.CHANGE_PICKUP_ADDRESS;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class ChangePickupAddressActivity extends AppCompatActivity {
 
@@ -37,7 +43,9 @@ public class ChangePickupAddressActivity extends AppCompatActivity {
     protected void setupListeners() {
         submitAddressButton.setOnClickListener(view -> new Thread(this::changePickupAddress).start());
     }
-
+    private void showToast(String message) {
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
+    }
     private void changePickupAddress() {
         pickupAddress = pickupAddressField.getText().toString().trim();
         if (pickupAddress.isEmpty()) {
@@ -45,31 +53,41 @@ public class ChangePickupAddressActivity extends AppCompatActivity {
                     Toast.makeText(ChangePickupAddressActivity.this, "Pickup address field is empty!", Toast.LENGTH_SHORT).show());
             return;
         }
-
         try {
-            socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(CHANGE_PICKUP_ADDRESS);
-            socketHelper.getInstance().sendInt(globals.userId);
-            socketHelper.getInstance().sendString(pickupAddress);
-            int ok = socketHelper.getInstance().recvInt();
-            socketHelper.getInstance().close();
+            // Prepare the URL for the endpoint
+            URL server = new URL(globals.serverURL + "/changePickupAddress/" + globals.userId);
+            // Create the JSON payload
+            JSONObject jsonPayload = new JSONObject();
+            jsonPayload.put("pickupAddress", pickupAddress);
+            // Open a connection to the server
+            HttpURLConnection conn = (HttpURLConnection) server.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true); // To send a body
+            // Send the request
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonPayload.toString().getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+            // Get the response code
+            int responseCode = conn.getResponseCode();
 
-            if (ok == 1) {
-                runOnUiThread(() ->
-                        Toast.makeText(ChangePickupAddressActivity.this, "Address changed successfully!", Toast.LENGTH_SHORT).show());
-            } else {
-                runOnUiThread(() ->
-                        Toast.makeText(ChangePickupAddressActivity.this, "Failed to change address.", Toast.LENGTH_SHORT).show());
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                conn.disconnect();
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("updatedPickupAddress", pickupAddress);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
             }
-
-            // Return the updated pickup address back to MerchantProfileFragment
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("updatedPickupAddress", pickupAddress);
-            setResult(Activity.RESULT_OK, resultIntent);
-            finish();
+            else {
+                showToast("Changing error");
+                Log.i("ChangePickupAddress", conn.getResponseMessage());
+            }
+            conn.disconnect();
         } catch (IOException e) {
-            runOnUiThread(() ->
-                    Toast.makeText(ChangePickupAddressActivity.this, "Error updating address.", Toast.LENGTH_SHORT).show());
+            showToast("Failed to read response");
+        } catch (JSONException e) {
+            Log.e("ChangePickupAddress", "Json error");
         }
     }
 }

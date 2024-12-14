@@ -1,10 +1,10 @@
 package com.kaaa.talabat_lite;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -14,7 +14,16 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class AddItemActivity extends AppCompatActivity {
 
@@ -60,7 +69,36 @@ public class AddItemActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         imagePickerLauncher.launch(intent);
     }
+    private void showToast(String message) {
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
+    }
+    // Prepare the multipart request body
 
+    public void uploadImage(Bitmap bitmap) {
+        try {
+            // URL of the server endpoint
+            URL url = new URL(globals.serverURL + "/uploadImage/" + globals.userId);
+            // Encode the Bitmap to a byte array
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, byteArrayOutputStream);
+            byte[] bitmapData = byteArrayOutputStream.toByteArray();
+            // Open a connection to the server
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/octet-stream");
+            connection.setFixedLengthStreamingMode(bitmapData.length);
+            // Write the data
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(bitmapData);
+            outputStream.close();
+            // Get response code (for debugging)
+            int responseCode = connection.getResponseCode();
+            Log.i("ImageUPload", String.valueOf(responseCode));
+        } catch (Exception e) {
+            Log.e("ImageUploader", "Error uploading image");
+        }
+    }
     // Save item
     private void saveItem() {
         String name = etItemName.getText().toString().trim();
@@ -68,34 +106,58 @@ public class AddItemActivity extends AppCompatActivity {
         String price = etItemPrice.getText().toString().trim();
 
         if (name.isEmpty() || description.isEmpty() || price.isEmpty() || selectedImage == null) {
-            runOnUiThread(() -> Toast.makeText(this, "Please fill all fields and upload an image", Toast.LENGTH_SHORT).show());
+            showToast("Please fill all fields and upload an image");
             return;
         }
 
-        // Save the item to a database or send it to the server
-        try {
-            socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(globals.ADD_ITEM);
-            socketHelper.getInstance().sendInt(globals.userId);
-            socketHelper.getInstance().sendString(name);
-            socketHelper.getInstance().sendString(description);
-            socketHelper.getInstance().sendFloat(Float.parseFloat(price));
-            socketHelper.getInstance().sendImg(selectedImage);
-            socketHelper.getInstance().close();
+        uploadImage(selectedImage);
 
-            // Send result back to MerchantHomeFragment
-            Intent resultIntent = new Intent();
-            setResult(RESULT_OK, resultIntent); // Indicating success
-            runOnUiThread(() -> Toast.makeText(this, "Item saved successfully!", Toast.LENGTH_SHORT).show());
-            Intent backIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
-            startActivity(backIntent);
-            finish(); // Finish the activity after saving
+        try{
+            URL server = new URL(globals.serverURL + "/add_item/" + globals.userId);
+            // Create the JSON payload
+            JSONObject jsonPayload = new JSONObject();
+            jsonPayload.put("itemName", name);
+            jsonPayload.put("itemDescription", description);
+            jsonPayload.put("itemPrice", price);
+
+            // Open a connection to the server
+            HttpURLConnection conn = (HttpURLConnection) server.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true); // To send a body
+            // Send the request
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonPayload.toString().getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+            // Get the response code
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                showToast("Item added successfully");
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+                Intent outIntent = new Intent(this, MerchantActivity.class);
+                finish();
+                startActivity(outIntent);
+            }
+            else {
+                showToast("Uploading error");
+                Log.i("AddItem", conn.getResponseMessage());
+            }
+            conn.disconnect();
         } catch (IOException e) {
-            runOnUiThread(() -> Toast.makeText(this, "Error saving the item", Toast.LENGTH_SHORT).show());
             setResult(RESULT_CANCELED); // Indicate failure to the caller
             Intent backIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
-            startActivity(backIntent);
             finish();
+            startActivity(backIntent);
+            showToast("Error saving the item");
+        } catch (JSONException e) {
+            Log.e("AddItem", "Json error");
+            setResult(RESULT_CANCELED); // Indicate failure to the caller
+            Intent backIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
+            finish();
+            startActivity(backIntent);
+            showToast("Error saving the item");
         }
     }
 }

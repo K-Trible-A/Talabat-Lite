@@ -16,8 +16,8 @@ public:
   ~Database();              // close database if opened
 
   // Specify database tables and relationships
-  void createSchema();
   sqlite3 *getDB();
+  bool createSchema();
   bool execute(const string &); // executes sql
   // insert data into a table
   bool insertData(const string &table, const vector<string> &columns,

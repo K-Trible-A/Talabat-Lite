@@ -3,9 +3,11 @@ package com.kaaa.talabat_lite;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,19 +17,27 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ItemManagementActivity extends AppCompatActivity {
 
-    ImageView itemImage;
-    TextView itemName, itemDescription, itemPrice;
-    String itemNameStr, itemDescriptionStr;
-    int itemId;
-    float itemPriceF;
-    Button deleteButton;
-    Intent outIntent;
+    private ImageView itemImage;
+    private TextView itemName, itemDescription, itemPrice;
+    private String itemNameStr, itemDescriptionStr;
+    private int itemId;
+    private float itemPriceF;
+    private Button deleteButton;
     private ExecutorService executorService;
     private Handler mainHandler;
 
@@ -38,7 +48,7 @@ public class ItemManagementActivity extends AppCompatActivity {
         setContentView(R.layout.activity_item_management);
         executorService = Executors.newSingleThreadExecutor();
         mainHandler = new Handler(Looper.getMainLooper());
-        outIntent = getIntent();
+        Intent outIntent = getIntent();
         itemNameStr = outIntent.getStringExtra("name");
         itemDescriptionStr= outIntent.getStringExtra("description");
         itemPriceF = outIntent.getFloatExtra("price",0);
@@ -47,10 +57,13 @@ public class ItemManagementActivity extends AppCompatActivity {
         setupListeners();
         loadItemData();
     }
+    private void showToast(String message) {
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
+    }
     private void loadItemData() {
         executorService.execute(() -> {
             try {
-                Bitmap itemImg = getItemData();
+                Bitmap itemImg = getItemImage();
                 // After background task, update UI on the main thread
                 mainHandler.post(() -> {
                     itemName.setText(itemNameStr);
@@ -59,20 +72,36 @@ public class ItemManagementActivity extends AppCompatActivity {
                     itemPrice.setText(formattedPrice);
                     itemDescription.setText(itemDescriptionStr);
                     itemImage.setImageBitmap(itemImg);
-
                 });
             } catch (IOException e) {
                 Log.e("ItemActivity", "Error loading item data", e);
             }
         });
     }
-    private Bitmap getItemData() throws IOException {
+
+    private Bitmap getItemImage() throws IOException {
         Bitmap temp;
-        socketHelper.getInstance().connect();
-        socketHelper.getInstance().sendInt(globals.GET_IMAGE); // only the image is needed, we have the other data
-        socketHelper.getInstance().sendInt(itemId);
-        temp = socketHelper.getInstance().recvImg();
-        socketHelper.getInstance().close();
+        try {
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/get_item_image/" + itemId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                showToast("Error retrieving item's data");
+                return null;
+            }
+            // Read the response
+            InputStream inputStream = conn.getInputStream();
+            temp = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            showToast("Failed to read response");
+            return null;
+        }
         return temp;
     }
     protected void initUI ()
@@ -85,12 +114,11 @@ public class ItemManagementActivity extends AppCompatActivity {
     }
     private boolean deleteItem() throws IOException
     {
-         socketHelper.getInstance().connect();
-         socketHelper.getInstance().sendInt(globals.DELETE_ITEM);
-         socketHelper.getInstance().sendInt(itemId);
-         int ok = socketHelper.getInstance().recvInt();
-         socketHelper.getInstance().close();
-         return ok == 1;
+        URL url = new URL(globals.serverURL + "/delete_item/" + itemId);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        int responseCode = conn.getResponseCode();
+        return responseCode == HttpURLConnection.HTTP_OK;
     }
     protected void setupListeners ()
     {
@@ -104,7 +132,7 @@ public class ItemManagementActivity extends AppCompatActivity {
                     if (isDeleted)
                     {
                         Toast.makeText(ItemManagementActivity.this,"Item deleted successfully!",Toast.LENGTH_SHORT).show();
-                        outIntent = new Intent(ItemManagementActivity.this,MerchantActivity.class);
+                        Intent outIntent = new Intent(ItemManagementActivity.this,MerchantActivity.class);
                         startActivity(outIntent);
                     }
                     else

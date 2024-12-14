@@ -4,11 +4,8 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.io.IOException;
 
 public class MerchantActivity extends AppCompatActivity {
 
