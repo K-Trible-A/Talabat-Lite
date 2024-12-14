@@ -4,13 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,7 +32,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             this.id = id;
         }
     }
-
     private List<itemData> itemList;
     private Context context;
 
@@ -58,15 +55,22 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         holder.itemPrice.setText(String.format("%.1f",item.price) + "$");
         holder.itemDescription.setText(item.description);
         holder.itemImage.setImageBitmap(item.img);
-
         holder.itemView.setOnClickListener(v -> {
-
-            Intent itemManagementActivity = new Intent(context,ItemManagementActivity.class);
-            itemManagementActivity.putExtra("id",item.id);
-            itemManagementActivity.putExtra("name",item.name);
-            itemManagementActivity.putExtra("price",item.price);
-            itemManagementActivity.putExtra("description",item.description);
-            context.startActivity(itemManagementActivity);
+            if (!globals.isCustomer)
+            {
+                Intent itemManagementActivity = new Intent(context, ItemManagementActivity.class);
+                itemManagementActivity.putExtra("id", item.id);
+                itemManagementActivity.putExtra("name", item.name);
+                itemManagementActivity.putExtra("price", item.price);
+                itemManagementActivity.putExtra("description", item.description);
+                context.startActivity(itemManagementActivity);
+            }
+            else
+            {
+                Intent itemActivity = new Intent(context, ItemActivity.class);
+                itemActivity.putExtra("id", item.id);
+                context.startActivity(itemActivity);
+            }
         });
     }
 
@@ -80,9 +84,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         ImageView itemImage;
         public ViewHolder(View itemView) {
             super(itemView);
-            itemName = itemView.findViewById(R.id.itemName);
+            itemName = itemView.findViewById(R.id.merchName);
             itemImage = itemView.findViewById(R.id.itemImage);
-            itemPrice = itemView.findViewById(R.id.itemPrice);
+            itemPrice = itemView.findViewById(R.id.merchRate);
             itemDescription = itemView.findViewById(R.id.itemDescription);
         }
     }

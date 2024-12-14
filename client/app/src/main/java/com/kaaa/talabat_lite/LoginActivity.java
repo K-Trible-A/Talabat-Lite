@@ -78,10 +78,16 @@ public class LoginActivity extends AppCompatActivity {
                 int accountType = socketHelper.getInstance().recvInt();
                 if (accountType == globals.MERCHANT)
                 {
+                    globals.isCustomer=false;
                     afterLoginIntent = new Intent(LoginActivity.this,MerchantActivity.class);
                     startActivity(afterLoginIntent);
                 }
-
+                else if(accountType==globals.CUSTOMER)
+                {
+                    globals.isCustomer=true;
+                    afterLoginIntent = new Intent(LoginActivity.this,CustomerActivity.class);
+                    startActivity(afterLoginIntent);
+                }
             }
             else{
                 runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login failed!", Toast.LENGTH_SHORT).show());

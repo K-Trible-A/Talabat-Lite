@@ -115,7 +115,7 @@ public class MerchantProfileFragment extends Fragment {
 
     private void fetchMerchantData() {
         // Execute data fetch in background
-        executor.execute(this::getMerchantDatصa);
+        executor.execute(this::getMerchantData);
     }
 
     private void updateUI() {

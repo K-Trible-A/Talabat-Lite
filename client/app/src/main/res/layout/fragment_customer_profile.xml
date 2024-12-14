@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".CustomerProfileFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="100dp"> <!-- Increased marginTop to move the content lower -->
+
+        <!-- Name Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/tvCurrentName"
+                android:layout_width="132dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical"
+                android:text="Current Name: John Doe"
+                android:textColor="#333333"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText,TextSizeCheck" />
+
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="0dp"
+                android:layout_height="59dp"
+                android:layout_weight="1"
+                android:hint="edit Your Name"
+                android:inputType="textPersonName"
+                tools:ignore="Autofill,HardcodedText" /> <!-- Current Name displayed here -->
+        </LinearLayout>
+
+        <!-- Country Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/tvCurrentCountry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current Country: USA"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical"
+                tools:ignore="HardcodedText" />
+
+            <EditText
+                android:id="@+id/etCountry"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_weight="1"
+                android:hint="edit Your Country"
+                tools:ignore="Autofill,HardcodedText,TextFields" /> <!-- Current Country displayed here -->
+        </LinearLayout>
+
+        <!-- Password Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/tvCurrentPassword"
+                android:layout_width="132dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical"
+                android:text="Current Password: ********"
+                android:textColor="#333333"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText,TextSizeCheck" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:hint="edit your password"
+                android:inputType="textPassword"
+                tools:ignore="Autofill,HardcodedText" /> <!-- Current Password displayed here -->
+        </LinearLayout>
+
+        <!-- City Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/tvCurrentCity"
+                android:layout_width="129dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical"
+                android:text="Current City: New York"
+                android:textColor="#333333"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText,TextSizeCheck" />
+
+            <EditText
+                android:id="@+id/etCity"
+                android:layout_width="0dp"
+                android:layout_height="58dp"
+                android:layout_weight="1"
+                android:hint="edit Your City"
+                tools:ignore="Autofill,HardcodedText,TextFields" /> <!-- Current City displayed here -->
+        </LinearLayout>
+
+        <!-- Delivery Address Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/tvCurrentDeliveryAddress"
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical"
+                android:text="Current Delivery Address: 123 Main St"
+                android:textColor="#333333"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText,TextSizeCheck" />
+
+            <EditText
+                android:id="@+id/etAddress"
+                android:layout_width="0dp"
+                android:layout_height="61dp"
+                android:layout_weight="1"
+                android:hint="edit Your Delivery Address"
+                tools:ignore="Autofill,HardcodedText,TextFields" /> <!-- Current Delivery Address displayed here -->
+        </LinearLayout>
+
+        <!-- Set Payment Method Button -->
+        <Button
+            android:id="@+id/btnSetPaymentMethod"
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#009688"
+            android:text="Set Payment Method"
+            android:textColor="@android:color/white"
+            tools:ignore="HardcodedText,TextContrastCheck" />
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#009688"
+            android:text="Save"
+            android:textColor="@android:color/white"
+            tools:ignore="HardcodedText,TextContrastCheck" />
+
+    </LinearLayout>
+</ScrollView>
