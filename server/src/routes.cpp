@@ -460,16 +460,17 @@ void retrieveItemImage() {
         if (itemId <= 0) {
           return crow::response(400, "Invalid item ID");
         }
-        // Query the database for the item
-        vector<vector<string>> itemData = db.query("SELECT imageId "
-                                                   "FROM item WHERE itemId = " +
-                                                   to_string(itemId) + ";");
+        // Query the database for the imageId
+        vector<vector<string>> queryImageId =
+            db.query("SELECT imageId "
+                     "FROM item WHERE itemId = " +
+                     to_string(itemId) + ";");
         // Check if the item exists
-        if (itemData.empty()) {
+        if (queryImageId.empty()) {
           return crow::response(404, "Item not found");
         }
         // Retrieve item details
-        int imageId = stoi(itemData[0][0]);
+        int imageId = stoi(queryImageId[0][0]);
         vector<vector<string>> itemImage =
             db.query("SELECT itemImg FROM itemImages WHERE imageId = " +
                      to_string(imageId) + " ;");
@@ -490,10 +491,26 @@ void deleteItem() {
         if (itemId <= 0) {
           return crow::response(400, "Invalid item ID");
         }
-        const string sql =
+        // Query the database for the imageId
+        vector<vector<string>> queryImageId = db.query(
+            "SELECT imageId FROM item WHERE itemId = " + to_string(itemId) +
+            ";");
+        // Check if the item exists
+        if (queryImageId.empty()) {
+          return crow::response(404, "Item not found");
+        }
+        int imageId = stoi(queryImageId[0][0]);
+        // Delete the item first (to avoid foreign key violation)
+        string sql =
             "DELETE FROM item WHERE itemId = " + to_string(itemId) + ";";
         if (!db.execute(sql)) {
           return crow::response(500, "Error deleting item");
+        }
+        // Delete the associated image from itemImages
+        sql = "DELETE FROM itemImages WHERE imageId = " + to_string(imageId) +
+              ";";
+        if (!db.execute(sql)) {
+          return crow::response(500, "Error deleting item image");
         }
         return crow::response(200, "success");
       });
