@@ -29,6 +29,10 @@ void editCustomerData(int);
 void addCustomerCard(int);
 // get categorie of merchants to be viewed for customer
 void getCategorie(int);
+// add Customer image to CustomerImage Table in Database
+void addCustomerImage(int);
+// get Customer image to be viewed in Customer_profile
+void getCustomerImage(int);
 // Get merchant data from database
 void getMerchantData(int);
 // Change merchant's pickup address

@@ -520,3 +520,89 @@ void getCategorie(int clientFD)
     server::send(clientFD, merchRate);
   }
 }
+bool customerhasImage(int clientFD,int customerId)
+{
+  vector<vector<string>> res = db.query("SELECT customerImage FROM customerImage "
+                                        "WHERE customerId = " +
+                                        to_string(customerId) + " ;");
+                                    
+  if (!res.empty())
+    return true;
+  else
+    return false;
+}
+void deleteCustomerImage(int clientFD,int customerId)
+{
+  const string sql =
+      "DELETE FROM customerImage WHERE customerId = " + to_string(customerId) + ";";
+  db.execute(sql);
+}
+void addCustomerImage(int clientFD) {
+  int userId = server::recvInt(clientFD);
+  pair<unsigned char *, uint32_t> rvd = server::recvImg(clientFD);
+  unsigned char *customerImage = rvd.first;
+  uint32_t customerImageSize = rvd.second;
+  vector<vector<string>> temp = db.query(
+      "SELECT customerId FROM customer WHERE userId = " + to_string(userId) +
+      ";");
+  int customerId = stoi(temp[0][0]);
+  string sql ="INSERT INTO customerImage (customerId, "
+               " customerImage ) "
+               "VALUES (?1, ?2);";
+  if(customerhasImage(clientFD,customerId))
+  {
+      deleteCustomerImage(clientFD,customerId);
+  }
+  sqlite3_stmt *stmt = nullptr;
+  // Prepare the SQL statement
+  if (sqlite3_prepare_v2(db.getDB(), sql.c_str(), -1, &stmt, nullptr) !=
+      SQLITE_OK) {
+    std::cerr << "SQL prepare error: " << sqlite3_errmsg(db.getDB())
+              << std::endl;
+    return;
+  }
+
+  // Bind values to the placeholders
+  if (sqlite3_bind_int(stmt, 1, customerId) != SQLITE_OK ||
+      sqlite3_bind_blob(stmt, 2, customerImage, customerImageSize, SQLITE_STATIC) !=
+          SQLITE_OK) {
+    std::cerr << "SQL bind error: " << sqlite3_errmsg(db.getDB()) << std::endl;
+    sqlite3_finalize(stmt);
+    return;
+  }
+
+  // Execute the statement
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    std::cerr << "SQL step error: " << sqlite3_errmsg(db.getDB()) << std::endl;
+    sqlite3_finalize(stmt);
+    return;
+  }
+  // Clean up
+  sqlite3_finalize(stmt);
+
+  // Testing save the received image to a file
+  /* vector<vector<string>> myblob = db.query(
+      "SELECT itemImg FROM item WHERE merchantId = " + to_string(merchantId) +
+      " ;");
+  ofstream outFile("revdImage.jpg", std::ios::binary);
+  outFile.write(myblob[0][0].c_str(), myblob[0][0].size());
+  outFile.close();
+
+  //Testing query the inserted image from database and save to a file
+  cout << "Testing query for the image -> string : " << endl;
+  myblob = db.query("SELECT itemImg FROM item WHERE itemId = 1");
+  ofstream outFile2("queriedImage.jpg", std::ios::binary);
+  outFile2.write(myblob[0][0].c_str(), myblob[0][0].size());
+  outFile2.close(); */
+}
+void getCustomerImage(int clientFD) {
+  int customerId = server::recvInt(clientFD);
+  vector<vector<string>> res = db.query("SELECT customerImage FROM customerImage "
+                                        "WHERE customerId = " +
+                                        to_string(customerId) + " ;");
+  cout << "Recieved image of customerId = " << customerId << endl;
+  int ok=!res.empty();
+  server::send(clientFD, ok);
+  if (!res.empty())
+    server::sendImg(clientFD, res[0][0]);
+}

@@ -279,6 +279,11 @@ void Database::createSchema() {
       "itemImg BLOB NOT NULL,"
       "FOREIGN KEY(merchantId) REFERENCES merchant(merchantId)"
       ");");
-
+  this->execute( // customerImage information
+      "CREATE TABLE IF NOT EXISTS customerImage ("
+      "customerId INTEGER NOT NULL,"
+      "customerImage BLOB NOT NULL,"
+      "FOREIGN KEY(customerId) REFERENCES customer(customerId)"
+      ");");
   // Other tables
 }

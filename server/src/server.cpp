@@ -282,4 +282,6 @@ void server::appendFuncs() {
    actions[EDIT_CUSTOMER_DATA] = editCustomerData;
    actions[ADD_CUSTOMER_CARD] = addCustomerCard;
    actions[GET_CATEGORIE] = getCategorie;
+   actions[ADD_CUSTOMER_IMAGE] = addCustomerImage;
+   actions[GET_CUSTOMER_IMAGE] = getCustomerImage;
 }
