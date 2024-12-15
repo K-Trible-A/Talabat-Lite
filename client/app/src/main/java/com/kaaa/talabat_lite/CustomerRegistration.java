@@ -88,6 +88,7 @@ public class CustomerRegistration extends AppCompatActivity {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 showToast("Registration success");
                 Intent outIntent = new Intent(this, LoginActivity.class);
+                outIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 finish();
                 startActivity(outIntent);
             }

@@ -137,8 +137,9 @@ public class AddItemActivity extends AppCompatActivity {
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 Intent outIntent = new Intent(this, MerchantActivity.class);
-                finish();
+                outIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(outIntent);
+                finish();
             }
             else {
                 showToast("Uploading error");
@@ -148,15 +149,17 @@ public class AddItemActivity extends AppCompatActivity {
         } catch (IOException e) {
             setResult(RESULT_CANCELED); // Indicate failure to the caller
             Intent backIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
-            finish();
+            backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(backIntent);
+            finish();
             showToast("Error saving the item");
         } catch (JSONException e) {
             Log.e("AddItem", "Json error");
             setResult(RESULT_CANCELED); // Indicate failure to the caller
             Intent backIntent = new Intent(AddItemActivity.this,MerchantActivity.class);
-            finish();
+            backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(backIntent);
+            finish();
             showToast("Error saving the item");
         }
     }

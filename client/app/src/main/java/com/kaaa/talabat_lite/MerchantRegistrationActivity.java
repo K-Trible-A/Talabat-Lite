@@ -173,6 +173,7 @@ public class MerchantRegistrationActivity extends AppCompatActivity {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 showToast("Registration success");
                 Intent loginIntent = new Intent(MerchantRegistrationActivity.this,LoginActivity.class);
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 finish();
                 startActivity(loginIntent);
             }

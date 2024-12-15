@@ -13,9 +13,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +46,20 @@ public class MerchantProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Navigate to the Home fragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.container, new MerchantHomeFragment()) // Replace with your Home fragment class
+                        .commit();
+                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
+                if (bottomNavigationView != null)
+                {
+                    bottomNavigationView.setSelectedItemId(R.id.home);
+                }
+            }
+        });
 
         changeAddressLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),

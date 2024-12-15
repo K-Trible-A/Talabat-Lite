@@ -105,10 +105,13 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 else if(accountType == 2){
                     Intent afterLoginIntent = new Intent(LoginActivity.this, MerchantActivity.class);
+                    // remove the activity from the stack
+                    afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(afterLoginIntent);
                 }
                 else if(accountType == 3){
 //                    Intent afterLoginIntent = new Intent(LoginActivity.this, MerchantActivity.class);
+//                    afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                    startActivity(afterLoginIntent);
                 }
             } else if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
