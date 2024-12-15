@@ -27,7 +27,7 @@ import java.util.Vector;
 public class MerchantsSearchFragment extends Fragment {
 
     private Vector<merchantView> merchants;
-    private Vector<merchantView> allMerchants; // This will hold the original list of merchants
+    private Vector<merchantView> allMerchants; // Holds the original list for filtering
     private ListView listMerchants;
     private merchantArrayAdapter adapter;
     private SearchView searchView;
@@ -39,15 +39,30 @@ public class MerchantsSearchFragment extends Fragment {
 
         // Initialize merchants list and UI handler
         merchants = new Vector<>();
-        allMerchants = new Vector<>(); // Initialize the original list
+        allMerchants = new Vector<>();
         uiHandler = new Handler(Looper.getMainLooper());
 
         // Initialize UI components
         initializeUI(view);
 
-        loadMerchantsFromServer();
-        // Load merchants from the server
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Ensure the lists are cleared before loading fresh data
+        merchants.clear();
+        //allMerchants.clear();
+
+        // Clear the adapter to reset the ListView
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+
+        // Load merchants data from the server
+        loadMerchantsFromServer();
     }
 
     private void initializeUI(View view) {
@@ -58,6 +73,7 @@ public class MerchantsSearchFragment extends Fragment {
         searchView = view.findViewById(R.id.search_view);
         searchView.clearFocus();
 
+        // Set the query listener to filter merchants on text change
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -71,31 +87,31 @@ public class MerchantsSearchFragment extends Fragment {
             }
         });
 
-        // Handle ListView item clicks
+        // Handle ListView item clicks to open the merchant details
         listMerchants.setOnItemClickListener((parent, view1, position, id) -> {
             // Get the selected merchant data
             merchantView selectedMerchant = merchants.get(position);
 
-            // Create an Intent to start the new Activity
+            // Create an Intent to start the new Activity for viewing merchant details
             Intent intent = new Intent(getActivity(), CustomerViewOfMerchant.class);
-
-            // Pass the merchant data to the new activity
             intent.putExtra("merchantName", selectedMerchant.getMerchantName());
             intent.putExtra("merchantKeywords", selectedMerchant.getMerchantKeywords());
             intent.putExtra("merchantRating", selectedMerchant.getMerchantRate());
+
             // Start the activity
-            startActivity(intent);
+            if (getActivity() != null) {
+                startActivity(intent);
+            }
         });
     }
-
 
     private void loadMerchantsFromServer() {
         new Thread(() -> {
             HttpURLConnection conn = null;
             BufferedReader reader = null;
             try {
-                // Connect to the server
-                URL url = new URL(globals.serverURL + "/getMerchantsSearchResults/" + "empty");
+                // Connect to the server and retrieve merchants data
+                URL url = new URL(globals.serverURL + "/getMerchantsSearchResults/empty");
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(10000);
@@ -104,7 +120,7 @@ public class MerchantsSearchFragment extends Fragment {
                 int responseCode = conn.getResponseCode();
                 if (responseCode != HttpURLConnection.HTTP_OK) {
                     Log.e("MerchantsSearchFragment", "Error retrieving merchant data, Response code: " + responseCode);
-                    uiHandler.post(() -> Toast.makeText(getContext(), "Server error: " + responseCode, Toast.LENGTH_SHORT).show());
+                    uiHandler.post(() -> showToast("Server error: " + responseCode));
                     return;
                 }
 
@@ -116,36 +132,43 @@ public class MerchantsSearchFragment extends Fragment {
                     response.append(line);
                 }
 
+                Log.d("MerchantsSearchFragment", "Response JSON: " + response);
+
                 // Parse the response JSON
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 int count = jsonResponse.getInt("count");
+                Log.d("MerchantsSearchFragment", "Count of items = " + count);
+
+                if (count == 0) {
+                    Log.d("MerchantsSearchFragment", "No merchants found.");
+                    uiHandler.post(() -> showToast("No merchants available."));
+                    return;
+                }
+
                 Vector<merchantView> retrievedMerchants = new Vector<>();
                 for (int i = 0; i < count; i++) {
                     String businessName = jsonResponse.getString("businessName" + i);
                     String keywords = jsonResponse.getString("keywords" + i);
                     float rating = (float) jsonResponse.getDouble("rating" + i);
                     String rate = String.format("%.1f", rating);
+                    Log.d("MerchantsSearchFragment", "Merchant: " + businessName + ", Rating: " + rate);
                     retrievedMerchants.add(new merchantView(businessName, keywords, rate, R.drawable.profile_icon));
                 }
 
                 // Update UI on the main thread
                 uiHandler.post(() -> {
-                    // Store the full merchant list
-                    allMerchants.clear();
-                    allMerchants.addAll(retrievedMerchants);
-
-                    // Update the displayed list
-                    updateMerchantList(retrievedMerchants);
+                    allMerchants.clear();   // Clear the original list
+                    allMerchants.addAll(retrievedMerchants);  // Add new merchants to original list
+                    updateMerchantList(retrievedMerchants);   // Update filtered list
                 });
 
             } catch (IOException e) {
                 Log.e("MerchantsSearchFragment", "Failed to read response", e);
-                uiHandler.post(() -> Toast.makeText(getContext(), "Network error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                uiHandler.post(() -> showToast("Network error: " + e.getMessage()));
             } catch (JSONException e) {
                 Log.e("MerchantsSearchFragment", "JSON parsing error", e);
-                uiHandler.post(() -> Toast.makeText(getContext(), "Data error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                uiHandler.post(() -> showToast("Data error: " + e.getMessage()));
             } finally {
-                // Clean up resources
                 if (reader != null) {
                     try {
                         reader.close();
@@ -161,7 +184,6 @@ public class MerchantsSearchFragment extends Fragment {
     }
 
     private void updateMerchantList(Vector<merchantView> retrievedMerchants) {
-        // Update the merchants list and notify the adapter
         merchants.clear();
         merchants.addAll(retrievedMerchants);
 
@@ -173,74 +195,30 @@ public class MerchantsSearchFragment extends Fragment {
                     merchants
             );
             listMerchants.setAdapter(adapter);
+            adapter = null;
         } else {
             adapter.notifyDataSetChanged();
+            Log.d("MerchantsSearchFragment", "Notifying adapter of data changes.");
         }
     }
 
+    // Function to filter the merchants list based on the search input
     private void filterList(String searchWord) {
-        new Thread(() -> {
-            HttpURLConnection conn = null;
-            BufferedReader reader = null;
-
-            try {
-                // Construct the server URL with the search query
-                URL url = new URL(globals.serverURL + "/getMerchantsSearchResults/" + searchWord);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(15000);
-
-                int responseCode = conn.getResponseCode();
-                if (responseCode != HttpURLConnection.HTTP_OK) {
-                    Log.e("MerchantsSearchFragment", "Error retrieving filtered data, Response code: " + responseCode);
-                    uiHandler.post(() -> Toast.makeText(getContext(), "Server error: " + responseCode, Toast.LENGTH_SHORT).show());
-                    return;
-                }
-
-                // Read response from the server
-                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-
-                // Parse the response JSON
-                JSONObject jsonResponse = new JSONObject(response.toString());
-                int count = jsonResponse.getInt("count");
-                Vector<merchantView> filteredMerchants = new Vector<>();
-                for (int i = 0; i < count; i++) {
-                    String businessName = jsonResponse.getString("businessName" + i);
-                    String keywords = jsonResponse.getString("keywords" + i);
-                    float rating = (float) jsonResponse.getDouble("rating" + i);
-                    String rate = String.format("%.1f", rating);
-                    filteredMerchants.add(new merchantView(businessName, keywords, rate, R.drawable.profile_icon));
-                }
-
-                // Update UI on the main thread
-                uiHandler.post(() -> updateMerchantList(filteredMerchants));
-
-            } catch (IOException e) {
-                Log.e("MerchantsSearchFragment", "Failed to read response", e);
-                uiHandler.post(() -> Toast.makeText(getContext(), "Network error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-            } catch (JSONException e) {
-                Log.e("MerchantsSearchFragment", "JSON parsing error", e);
-                uiHandler.post(() -> Toast.makeText(getContext(), "Data error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-            } finally {
-                // Clean up resources
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        Log.e("MerchantsSearchFragment", "Error closing reader", e);
-                    }
-                }
-                if (conn != null) {
-                    conn.disconnect();
-                }
+        Vector<merchantView> filteredMerchants = new Vector<>();
+        for (merchantView merchant : allMerchants) {
+            if (merchant.getMerchantName().toLowerCase().contains(searchWord.toLowerCase()) ||
+                    merchant.getMerchantKeywords().toLowerCase().contains(searchWord.toLowerCase())) {
+                filteredMerchants.add(merchant);
             }
-        }).start();
+        }
+
+        updateMerchantList(filteredMerchants);
     }
 
+    // Function to show Toast messages
+    private void showToast(String message) {
+        if (getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
 }
