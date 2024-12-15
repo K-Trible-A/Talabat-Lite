@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class CardActivity extends AppCompatActivity {
+public class CustomerAddCardActivty extends AppCompatActivity {
 
     EditText cardNumber, expiryDate, CVV;
     Button submitButton;
@@ -28,7 +28,7 @@ public class CardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_card);
+        setContentView(R.layout.activity_customer_add_card_activty);
         initUI();
         loadSavedData();
         setupListeners();
@@ -50,37 +50,27 @@ public class CardActivity extends AppCompatActivity {
             String CVVStr = CVV.getText().toString().trim();
             String expiryDateStr = expiryDate.getText().toString().trim();
             if (cardNumberStr.length() < 16) {
-                runOnUiThread(() -> Toast.makeText(CardActivity.this, "card number has 16 numbers!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "card number has 16 numbers!", Toast.LENGTH_SHORT).show());
                 return;
             }
             if (expiryDateStr.length() < 5) {
-                runOnUiThread(() -> Toast.makeText(CardActivity.this, "expiry date format is MM/YY", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "expiry date format is MM/YY", Toast.LENGTH_SHORT).show());
                 return;
             }
             if (expiryDateStr.charAt(0) < '0' || expiryDateStr.charAt(0) > '9' || expiryDateStr.charAt(1) < '0' || expiryDateStr.charAt(1) > '9' || expiryDateStr.charAt(3) < '0' || expiryDateStr.charAt(3) > '9' || expiryDateStr.charAt(4) < '0' || expiryDateStr.charAt(4) > '9' || expiryDateStr.charAt(2) != '/') {
-                runOnUiThread(() -> Toast.makeText(CardActivity.this, "expiry date format is MM/YY", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "expiry date format is MM/YY", Toast.LENGTH_SHORT).show());
                 return;
             }
             if ((expiryDateStr.charAt(0) >= '1' && expiryDateStr.charAt(1) >= '3') || (expiryDateStr.charAt(0) == '0' && expiryDateStr.charAt(1) == '0') || (expiryDateStr.charAt(3) == '0' && expiryDateStr.charAt(4) == '0') || (expiryDateStr.charAt(0) >= '2')) {
-                runOnUiThread(() -> Toast.makeText(CardActivity.this, "enter a valid date!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "enter a valid date!", Toast.LENGTH_SHORT).show());
                 return;
             }
             if (CVV.length() < 3) {
-                runOnUiThread(() -> Toast.makeText(CardActivity.this, "CVV has 3 numbers!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "CVV has 3 numbers!", Toast.LENGTH_SHORT).show());
                 return;
             }
-            saveData(cardNumberStr, expiryDateStr, CVVStr);
-                outIntent = new Intent(CardActivity.this, MerchantRegistrationActivity.class);
-                outIntent.putExtra("cardNumber", cardNumberStr);
-                outIntent.putExtra("expiryDate", expiryDateStr);
-                outIntent.putExtra("CVV", CVVStr);
-                setResult(RESULT_OK, outIntent);
-                finish();
-                /*
-            else
-            {
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-                executor.execute(() -> {
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.execute(() -> {
                     try {
                         socketHelper.getInstance().connect();
                         socketHelper.getInstance().sendInt(globals.ADD_CUSTOMER_CARD);
@@ -91,26 +81,17 @@ public class CardActivity extends AppCompatActivity {
                         int ok = socketHelper.getInstance().recvInt();
                         socketHelper.getInstance().close();
                         if (ok == 1) {
-                            runOnUiThread(() -> Toast.makeText(CardActivity.this, "Card is Successfully added", Toast.LENGTH_SHORT).show());
-                            outIntent = new Intent(CardActivity.this, CustomerActivity.class);
+                            runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "Card is Successfully added", Toast.LENGTH_SHORT).show());
+                            outIntent = new Intent(CustomerAddCardActivty.this, CustomerActivity.class);
                             startActivity(outIntent);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                });
-            }*/
+            });
         });
     }
 
-    private void saveData(String cardNumberStr, String expiryDateStr, String CVVStr) {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_CARD_NUMBER, cardNumberStr);
-        editor.putString(KEY_EXPIRY_DATE, expiryDateStr);
-        editor.putString(KEY_CVV, CVVStr);
-        editor.apply(); // Commit changes asynchronously
-    }
     private void loadSavedData() {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String savedCardNumber = sharedPreferences.getString(KEY_CARD_NUMBER, "");
@@ -121,16 +102,13 @@ public class CardActivity extends AppCompatActivity {
         cardNumber.setText(savedCardNumber);
         expiryDate.setText(savedExpiryDate);
         CVV.setText(savedCVV);
-
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // Clear saved data when the activity is destroyed
         clearSavedData();
     }
-
     private void clearSavedData() {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

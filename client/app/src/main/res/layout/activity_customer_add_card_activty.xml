@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="16dp"
+    tools:context=".CustomerAddCardActivty">
+
+    <!-- Card Number Field -->
+    <EditText
+        android:id="@+id/cardNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="10dp"
+        android:autofillHints=""
+        android:background="@drawable/rectangle_field"
+        android:ems="10"
+        android:hint="Card number"
+        android:inputType="number"
+        android:maxLength="16"
+        android:minHeight="48dp"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText,VisualLintTextFieldSize" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:importantForAutofill="no"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:gravity="center">
+
+
+        <EditText
+            android:id="@+id/expiryDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/rectangle_field"
+            android:hint="MM/YY"
+            android:inputType="text"
+            android:maxLength="5"
+            android:textSize="18sp"
+            tools:ignore="Autofill,HardcodedText,TextFields,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="match_parent" />
+
+
+        <EditText
+            android:id="@+id/CVV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/rectangle_field"
+            android:hint="CVV"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="3"
+            android:textSize="18sp"
+            tools:ignore="HardcodedText,TouchTargetSizeCheck,VisualLintTextFieldSize" /> <!-- Reduced text size -->
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/submitButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Add"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+</LinearLayout>

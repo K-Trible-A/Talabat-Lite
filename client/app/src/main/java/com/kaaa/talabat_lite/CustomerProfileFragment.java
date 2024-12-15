@@ -1,18 +1,23 @@
 package com.kaaa.talabat_lite;
 
+import static androidx.fragment.app.FragmentManager.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +34,11 @@ public class CustomerProfileFragment extends Fragment {
 
     TextView tvCurrentName ,tvCurrentCountry ,tvCurrentPassword ,tvCurrentCity ,tvCurrentDeliveryAddress ;
 
-    private Button btnPaymentMethod, btnSave;
+    private Button btnPaymentMethod, btnSave, btnChangePicture;
+
+    private ImageView imgCustomerPicture;
+
+    private Bitmap customerImage;
 
     @Nullable
     @Override
@@ -46,7 +55,13 @@ public class CustomerProfileFragment extends Fragment {
 
         btnPaymentMethod.setOnClickListener(v -> {
             Activity activity = requireActivity();
-            Intent intent = new Intent(activity, CardActivity.class);
+            Intent intent = new Intent(activity, CustomerAddCardActivty.class);
+            startActivity(intent);
+        });
+        btnChangePicture.setOnClickListener(v ->
+        {
+            Activity activity = requireActivity();
+            Intent intent = new Intent(activity, AddCustomerImageActivity.class);
             startActivity(intent);
         });
         return view;
@@ -66,7 +81,10 @@ public class CustomerProfileFragment extends Fragment {
         tvCurrentPassword = view.findViewById(R.id.tvCurrentPassword);
         tvCurrentCity = view.findViewById(R.id.tvCurrentCity);
         tvCurrentDeliveryAddress = view.findViewById(R.id.tvCurrentDeliveryAddress);
+        imgCustomerPicture = view.findViewById(R.id.imgCustomerPicture);
+        btnChangePicture = view.findViewById(R.id.btnChangePicture);
     }
+    @SuppressLint("RestrictedApi")
     private void getdataofcustomer()
     {
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -89,6 +107,20 @@ public class CustomerProfileFragment extends Fragment {
                     tvCurrentCity.setText(MessageFormat.format("Current City: {0}", currentCity));
                     tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", currentDeliveryAddress));
                 }
+                socketHelper.getInstance().connect();
+                socketHelper.getInstance().sendInt(globals.GET_CUSTOMER_IMAGE);
+                socketHelper.getInstance().sendInt(globals.userId);
+                int hasImage=socketHelper.getInstance().recvInt();
+                if (hasImage==1)
+                {
+                    customerImage = socketHelper.getInstance().recvImg();
+                    if (customerImage != null) {
+                        getActivity().runOnUiThread(() -> imgCustomerPicture.setImageBitmap(customerImage));
+                    } else {
+                        Log.e(TAG, "Error: Customer image is null.");
+                    }
+                }
+                socketHelper.getInstance().close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -111,7 +143,6 @@ public class CustomerProfileFragment extends Fragment {
                 socketHelper.getInstance().connect();
                 socketHelper.getInstance().sendInt(globals.EDIT_CUSTOMER_DATA);
                 socketHelper.getInstance().sendInt(globals.userId);
-
                 socketHelper.getInstance().sendString(name);
                 socketHelper.getInstance().sendString(password);
                 socketHelper.getInstance().sendString(country);
