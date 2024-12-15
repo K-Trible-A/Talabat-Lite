@@ -18,4 +18,4 @@ void getMerchantInfoHome();
 void getItems();
 void getMerchantData();
 void changePickupAddress();
-
+void getMerchantsSearchResults();

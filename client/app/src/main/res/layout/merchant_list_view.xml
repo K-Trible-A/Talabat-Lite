@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".merchantArrayAdapter">
+
+    <ImageView
+        android:id="@+id/merchantImage"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop = "15dp"
+        android:layout_marginBottom = "5dp"
+        android:layout_marginLeft = "25dp"
+        app:srcCompat="@drawable/profile_icon" />
+
+    <TextView
+        android:id="@+id/merchantName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/merchantImage"
+        android:layout_marginTop="17dp"
+        android:layout_marginStart="80dp"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:text="TextView" />
+    <TextView
+        android:id="@+id/merchantKeywords"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/merchantImage"
+        android:layout_marginTop="41dp"
+        android:layout_marginStart="80dp"
+        android:textColor="#000000"
+        android:textSize="12sp"
+
+        android:text="TextView" />
+
+    <ImageView
+        android:id="@+id/star"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_alignStart="@id/merchantImage"
+        android:layout_marginTop="58dp"
+        android:layout_marginStart="80dp"
+        app:srcCompat="@android:drawable/btn_star_big_on" />
+
+    <TextView
+        android:id="@+id/merchantRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/merchantImage"
+        android:layout_marginTop="58dp"
+        android:layout_marginStart="98dp"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        android:text="TextView" />
+
+</RelativeLayout>

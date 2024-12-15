@@ -1,4 +1,4 @@
-#include "../include/routes.hpp"
+  #include "../include/routes.hpp"
 #include "../include/database.hpp"
 
 #include <crow/common.h>
@@ -46,7 +46,6 @@ void authClient() {
         return crow::response(200, responseBody);
       });
 }
-
 void merchantRegistration() {
   CROW_ROUTE(server, "/registration/merchant")
       .methods("POST"_method)([](const crow::request &req) {
@@ -634,4 +633,33 @@ void changePickupAddress() {
           return crow::response(200, "Item added successfully");
         return crow::response(500, "Error getMerchantData");
       });
+}
+
+void getMerchantsSearchResults(){
+   CROW_ROUTE(server, "/getMerchantsSearchResults/<string>")
+      .methods("GET"_method)([](const crow::request &req, const string& searchWord) {
+        string sql;
+        if (searchWord == "empty"){
+          sql = "SELECT businessName, keywords, rating FROM merchant";
+        }else{
+          sql = "SELECT businessName, keywords, rating FROM merchant "
+          "WHERE businessName LIKE '%" + searchWord + "%' OR keywords LIKE '%" + searchWord + "%' "
+          "LIMIT 10;";
+        }
+        vector<vector<string>> ans = db.query(sql);
+        crow::json::wvalue responseBody;
+        responseBody["count"] = ans.size();
+        for(int i=0;i< ans.size();i++){
+             string businessName = ans[i][0];
+             string keywords = ans[i][1];
+             float rating = stof(ans[i][2]);
+             rating = round(rating * 10) / 10;
+             string rate = to_string(rating);
+             responseBody["businessName" + to_string(i)] = businessName;
+             responseBody["keywords" + to_string(i)] = keywords;
+             responseBody["rating" + to_string(i)] = rate;
+        }
+        return crow::response(200, responseBody);
+      });
+
 }

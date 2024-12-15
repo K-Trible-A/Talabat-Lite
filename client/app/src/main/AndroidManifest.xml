@@ -58,6 +58,9 @@
         <activity
             android:name=".AddItemActivity"
             android:exported="true" />
+        <activity
+            android:name=".CustomerViewOfMerchant"
+            android:exported="true" />
     </application>
 
 </manifest>
