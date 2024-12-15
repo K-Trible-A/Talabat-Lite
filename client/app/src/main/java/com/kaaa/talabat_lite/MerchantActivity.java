@@ -13,7 +13,7 @@ public class MerchantActivity extends AppCompatActivity {
     MerchantHomeFragment merchantHomeFragment;
     MerchantOrdersFragment merchantOrdersFragment;
     MerchantProfileFragment merchantProfileFragment;
-    MerchantsSearchFragment merchantsSearchFragment;
+    ItemsSearchFragment itemsSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class MerchantActivity extends AppCompatActivity {
         merchantHomeFragment = new MerchantHomeFragment();
         merchantOrdersFragment = new MerchantOrdersFragment();
         merchantProfileFragment = new MerchantProfileFragment();
-        merchantsSearchFragment = new MerchantsSearchFragment();
+        itemsSearchFragment = new ItemsSearchFragment();
 
         if (merchantHomeFragment != null) {
             getSupportFragmentManager().beginTransaction()
@@ -62,7 +62,7 @@ public class MerchantActivity extends AppCompatActivity {
             }
             if (item.getItemId() == R.id.search)
             {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantsSearchFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, itemsSearchFragment).commit();
                 return true;
             }
             return false;

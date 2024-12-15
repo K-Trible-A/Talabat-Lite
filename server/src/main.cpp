@@ -28,6 +28,7 @@ void registerRoutes() {
   getMerchantData();
   changePickupAddress();
   getMerchantsSearchResults();
+  getItemsSearchResults();
 }
 
 int main() {
