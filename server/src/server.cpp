@@ -284,4 +284,6 @@ void server::appendFuncs() {
    actions[GET_CATEGORIE] = getCategorie;
    actions[ADD_CUSTOMER_IMAGE] = addCustomerImage;
    actions[GET_CUSTOMER_IMAGE] = getCustomerImage;
+   actions[ADD_CARTITEM] = addCartItem;
+   actions[GET_CARTITEMS] = getCartItems;
 }

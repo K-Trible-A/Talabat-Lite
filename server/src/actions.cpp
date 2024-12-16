@@ -315,7 +315,7 @@ void checkAccountType(int clientFD) {
 void getItems(int clientFD) {
   int id = server::recvInt(clientFD);
   vector<vector<string>> merchantId_query =
-      db.query("SELECT userId FROM merchant WHERE " + to_string(id) +
+      db.query("SELECT merchantId FROM merchant WHERE " + to_string(id) +
                " = merchant.userId;");
   if (merchantId_query.empty())
     return;
@@ -596,7 +596,11 @@ void addCustomerImage(int clientFD) {
   outFile2.close(); */
 }
 void getCustomerImage(int clientFD) {
-  int customerId = server::recvInt(clientFD);
+  int userId = server::recvInt(clientFD);
+  vector<vector<string>> temp = db.query(
+      "SELECT customerId FROM customer WHERE userId = " + to_string(userId) +
+      ";");
+  int customerId = stoi(temp[0][0]);
   vector<vector<string>> res = db.query("SELECT customerImage FROM customerImage "
                                         "WHERE customerId = " +
                                         to_string(customerId) + " ;");
@@ -605,4 +609,118 @@ void getCustomerImage(int clientFD) {
   server::send(clientFD, ok);
   if (!res.empty())
     server::sendImg(clientFD, res[0][0]);
+}
+void addCartItem(int clientFD)
+{ 
+   int userId = server::recvInt(clientFD);
+   int itemId = server::recvInt(clientFD);
+   int itemQuantity = server::recvInt(clientFD);
+   // check if customer already has cart
+   vector<vector<string>> temp = db.query(
+      "SELECT cartId FROM cart WHERE userId = " + to_string(userId) +
+      ";");
+   int cartId;
+   if(temp.empty())
+   {
+   vector<string> columns = {"userId"};
+   string tableName = "cart";
+   vector<string> values = {to_string(userId)};
+   db.insertData(tableName, columns, values);
+   temp = db.query( "SELECT cartId FROM cart WHERE userId = " + to_string(userId) +";" );
+   cartId=stoi(temp[0][0]);
+   }
+   else
+   {
+   cartId = stoi(temp[0][0]);
+   }
+   // get merchant of this item
+    const string getMerch =
+         "SELECT "
+        "id "
+        "FROM "
+        "users "
+        "JOIN "
+        "merchant "
+        "ON merchant.userId = users.id "
+        "WHERE "
+        "merchant.merchantId = (SELECT merchantId FROM item WHERE itemId = "+std::to_string(itemId)+") ;";
+   vector<vector<string>> answer= db.query(getMerch);
+   int merchId=stoi(answer[0][0]);
+   server::send(clientFD, merchId);
+   // check if item is already in cart
+    vector<vector<string>> temp2 = db.query( "SELECT quantity FROM cartItems WHERE cartId = " + to_string(cartId) +" AND itemId = " + to_string(itemId) +";");
+    if(temp2.empty())
+    {
+          vector<string> columns = {"cartId","itemId","quantity"};
+          string tableName = "cartItems";
+          vector<string> values = {to_string(cartId),to_string(itemId),to_string(itemQuantity)};
+          db.insertData(tableName, columns, values);
+          server::send(clientFD, 1);
+    }
+    else
+    {
+       int itemCurrentQuantity=stoi(temp2[0][0]);
+       if(itemCurrentQuantity==itemQuantity)
+       server::send(clientFD, 0);
+       else
+       {
+       const string condition = "cartId = " + to_string(cartId) +" AND itemId = " + to_string(itemId) ;
+       db.updateData("cartItems",{"quantity"},{to_string(itemQuantity)},condition);
+       server::send(clientFD, 0);
+       }
+    }
+}
+void getCartItems(int clientFD)
+{
+  cout<<"cart is viewed";
+  int userid = server::recvInt(clientFD);
+  vector<vector<string>> cartId_query =
+      db.query("SELECT cartId FROM cart WHERE " + to_string(userid) +
+               " = userId;");
+  if (cartId_query.empty())
+  {
+    server::send(clientFD, 0);
+    return;
+  }
+  string cartId = cartId_query[0][0];
+  const string sql1 =
+      "SELECT COUNT (*) FROM cartItems WHERE cartId = " + cartId + ";";
+  vector<vector<string>> ans = db.query(sql1);
+  if (ans.empty())
+  { 
+    server::send(clientFD, 0);
+    return;
+  }
+  int cartitemCount = stoi(ans[0][0]);
+  cout<< "number of cart items is "<<cartitemCount;
+  server::send(clientFD, cartitemCount);
+  float totalcost=0;
+  const string sql_all= "SELECT i.itemName, ci.quantity, i.itemPrice, i.merchantId ,(ci.Quantity * i.itemPrice) AS TotalPrice ,i.itemImg ,ci.itemId "
+                        "FROM cartItems ci "
+                        "JOIN item i ON ci.itemId = i.itemId "
+                        "WHERE ci.cartId = " + cartId + "; ";
+  vector<vector<string>> ans_all = db.query(sql_all);
+  string itemName,merchName;
+  int itemCount,itemId;
+  float itemPrice,itemTotalPrice;
+  for (auto &it : ans_all) {
+    itemName = it[0]; 
+    server::send(clientFD, itemName);
+    itemCount = stoi(it[1]);
+    server::send(clientFD, itemCount);
+    itemPrice = round(stof(it[2]) * 10) / 10;
+    server::send(clientFD, itemPrice);
+    string merchantId = it[3];
+    const string sql_merch="SELECT businessName FROM merchant WHERE merchantId =" + merchantId + " ;" ;
+    vector<vector<string>>ans_merch= db.query(sql_merch);
+    merchName = ans_merch[0][0];
+    server::send(clientFD, merchName);
+    itemTotalPrice=round(stof(it[4]) * 10) / 10;
+    server::send(clientFD, itemTotalPrice);
+    server::sendImg(clientFD, it[5]);
+    itemId = stoi(it[6]);
+    server::send(clientFD,itemId);
+    cout<<"loop is done";
+    cout<<"\n";
+  }
 }

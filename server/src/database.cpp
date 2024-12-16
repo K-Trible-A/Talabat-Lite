@@ -285,5 +285,19 @@ void Database::createSchema() {
       "customerImage BLOB NOT NULL,"
       "FOREIGN KEY(customerId) REFERENCES customer(customerId)"
       ");");
+  this->execute( // cart information
+    " CREATE TABLE IF NOT EXISTS cart ( "
+    " cartId INTEGER PRIMARY KEY AUTOINCREMENT, "
+    " userId INTEGER NOT NULL " //  each cart belongs to a user
+    ");");
+  this->execute( // cartItems information
+    " CREATE TABLE IF NOT EXISTS cartItems ( "
+    " cartId INTEGER NOT NULL, "      // Foreign key to Cart table
+    " itemId INTEGER NOT NULL, "      // Foreign key to Items table
+    " quantity INTEGER NOT NULL, "    // Quantity of this item in the cart
+    " PRIMARY KEY (cartId, itemId), "   // Composite primary key
+    " FOREIGN KEY (cartId) REFERENCES cart(cartId) ON DELETE CASCADE, "
+    " FOREIGN KEY (itemId) REFERENCES item(itemId) ON DELETE CASCADE "
+    " );");
   // Other tables
 }

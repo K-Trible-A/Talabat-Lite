@@ -9,11 +9,13 @@ const int MAX_ACTIONS = 1e6;
 
 const int ADD_COURIER = 1000;
 // 101XXX
+
 const int FIRST_CONNECTION = 1010;
 const int AUTHENTICATE_CLIENT = 1011;
 const int ADD_ITEM = 1012;
 const int RETRIEVE_ITEM = 1013;
 // 102XXX
+
 const int ADD_USER=1020;
 const int ADD_CUSTOMER=1021;
 const int GET_TOP_RATED_MERCHANTS=1022;
@@ -23,6 +25,8 @@ const int ADD_CUSTOMER_CARD=1025;
 const int GET_CATEGORIE=1026;
 const int ADD_CUSTOMER_IMAGE=1027;
 const int GET_CUSTOMER_IMAGE=1028;
+const int ADD_CARTITEM=1029;
+const int GET_CARTITEMS=10210;
 //103XXX
 
 const int ADD_MERCHANT = 1030;

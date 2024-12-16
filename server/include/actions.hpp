@@ -33,6 +33,10 @@ void getCategorie(int);
 void addCustomerImage(int);
 // get Customer image to be viewed in Customer_profile
 void getCustomerImage(int);
+// add item to CustomerCart
+void addCartItem(int);
+// get cart items to be viewed for customer before make order
+void getCartItems(int);
 // Get merchant data from database
 void getMerchantData(int);
 // Change merchant's pickup address
