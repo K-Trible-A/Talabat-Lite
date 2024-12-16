@@ -81,7 +81,7 @@
         tools:ignore="HardcodedText" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/MerchantRecyclerView"
+        android:id="@+id/myCategorieRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/addItemButton"

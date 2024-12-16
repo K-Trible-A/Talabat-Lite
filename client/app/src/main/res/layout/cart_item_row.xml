@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:elevation="2dp"
+    android:layout_marginBottom="8dp">
+
+    <!-- ImageView for the photo -->
+    <ImageView
+        android:id="@+id/cartItemImage"
+        android:layout_width="100dp"
+        android:layout_height="118dp"
+        android:contentDescription="@string/item_image"
+        android:scaleType="centerCrop" />
+
+    <!-- Vertical layout for text details with flexible width -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- TextView for the name -->
+        <TextView
+            android:id="@+id/cartItemName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- TextView for the description -->
+        <TextView
+            android:id="@+id/cartItemMerch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16sp" />
+
+        <!-- TextView for the price -->
+        <TextView
+            android:id="@+id/cartItemPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="18sp" />
+
+        <!-- Horizontal layout for count and total -->
+
+        <!-- Button for removing the item -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- TextView for item count -->
+            <TextView
+                android:id="@+id/cartItemCount"
+                android:layout_width="95dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                android:text="Count: 1"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                tools:ignore="HardcodedText" />
+
+            <!-- TextView for total price -->
+            <TextView
+                android:id="@+id/cartItemTotalPrice"
+                android:layout_width="115dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                android:text="Total: $0.00"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                tools:ignore="HardcodedText,TextSizeCheck" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnRemoveCartItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:text="Remove"
+            android:textColor="@android:color/white"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+</LinearLayout>

@@ -84,10 +84,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         ImageView itemImage;
         public ViewHolder(View itemView) {
             super(itemView);
-            itemName = itemView.findViewById(R.id.merchName);
+            itemName = itemView.findViewById(R.id.itemName);
             itemImage = itemView.findViewById(R.id.itemImage);
-            itemPrice = itemView.findViewById(R.id.merchRate);
-            itemDescription = itemView.findViewById(R.id.itemDescription);
+            itemPrice = itemView.findViewById(R.id.itemPrice);
+            itemDescription = itemView.findViewById(R.id.item_description);
         }
     }
 }
