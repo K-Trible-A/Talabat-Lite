@@ -31,8 +31,8 @@ public class CategorieActivity extends AppCompatActivity {
         if (executor.isShutdown()) {
             executor = Executors.newSingleThreadExecutor();
         }
-        RecyclerView recyclerView = findViewById(R.id.MerchantRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+        RecyclerView recyclerView = findViewById(R.id.CategorieRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         merchList = new ArrayList<>();
         merchAdapter = new MerchantAdapter(getBaseContext(), merchList);
         recyclerView.setAdapter(merchAdapter);

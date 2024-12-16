@@ -106,10 +106,49 @@ public class ItemActivity extends AppCompatActivity {
                 itemCount.setText(String.valueOf(cnt));
             }
         });
-
         btnAddToCart.setOnClickListener(v -> {
-            String message = cnt + " item(s) added to cart!";
-            Toast.makeText(ItemActivity.this, message, Toast.LENGTH_SHORT).show();
+            executorService.execute(() -> {
+                Intent intent = getIntent();
+                int itemId_final = intent.getIntExtra("id", 0);
+                try {
+                    socketHelper.getInstance().connect();
+                    socketHelper.getInstance().sendInt(globals.ADD_CARTITEM);
+                    socketHelper.getInstance().sendInt(globals.userId);
+                    socketHelper.getInstance().sendInt(itemId_final);
+                    socketHelper.getInstance().sendInt(cnt);
+                    int merchId = socketHelper.getInstance().recvInt();
+                    int ok = socketHelper.getInstance().recvInt();
+                    socketHelper.getInstance().close();
+
+                if(ok==1)
+                {
+                    String message = cnt + " item(s) added to cart!";
+                    runOnUiThread(()->{
+                        Toast.makeText(ItemActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                        // Schedule the intent to start after the toast duration
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                            finish(); // Optional, if you want to close the current activity
+                        }, Toast.LENGTH_SHORT == Toast.LENGTH_SHORT ? 2000 : 3500); // Approximate Toast duration in milliseconds
+                    });
+                }
+                else if (ok==0)
+                {
+                    String message =" item(s) was in cart and update its quantity to "+cnt+" is successfully done !";
+                    runOnUiThread(()->{
+                            Toast.makeText(ItemActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                    // Schedule the intent to start after the toast duration
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        // Intent logic here
+                        finish(); // Optional, if you want to close the current activity
+                         }, Toast.LENGTH_SHORT == Toast.LENGTH_SHORT ? 2000 : 3500); // Approximate Toast duration in milliseconds
+                    });
+                }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         });
     }
 

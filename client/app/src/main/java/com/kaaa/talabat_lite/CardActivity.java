@@ -76,30 +76,6 @@ public class CardActivity extends AppCompatActivity {
                 outIntent.putExtra("CVV", CVVStr);
                 setResult(RESULT_OK, outIntent);
                 finish();
-                /*
-            else
-            {
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-                executor.execute(() -> {
-                    try {
-                        socketHelper.getInstance().connect();
-                        socketHelper.getInstance().sendInt(globals.ADD_CUSTOMER_CARD);
-                        socketHelper.getInstance().sendInt(globals.userId);
-                        socketHelper.getInstance().sendString(cardNumberStr);
-                        socketHelper.getInstance().sendString(expiryDateStr);
-                        socketHelper.getInstance().sendString(CVVStr);
-                        int ok = socketHelper.getInstance().recvInt();
-                        socketHelper.getInstance().close();
-                        if (ok == 1) {
-                            runOnUiThread(() -> Toast.makeText(CardActivity.this, "Card is Successfully added", Toast.LENGTH_SHORT).show());
-                            outIntent = new Intent(CardActivity.this, CustomerActivity.class);
-                            startActivity(outIntent);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }*/
         });
     }
 

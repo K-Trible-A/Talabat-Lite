@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -22,7 +21,7 @@ import java.util.concurrent.Executors;
 public class TopRated_Merchants_Fragment extends Fragment {
     TextView Merch_1_Name, Merch_2_Name, Merch_3_Name;
     TextView Merch_1_Rate, Merch_2_Rate, Merch_3_Rate;
-    Button Rest,phar,Groc;
+    Button Rest,phar,Groc,cartView;
     ImageView merch1, merch2, merch3;
 
     @Override
@@ -39,7 +38,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
             startActivity(intent);
         });
         phar.setOnClickListener(v -> {
-            // Handle Grocery button click
+            // Handle Pharmacy  button click
             Activity activity = requireActivity();
             Intent intent = new Intent(activity, CategorieActivity.class);
             intent.putExtra("businessType", 3); // pass businessType as int
@@ -47,11 +46,17 @@ public class TopRated_Merchants_Fragment extends Fragment {
         });
 
         Groc.setOnClickListener(v -> {
-            // Handle Pharmacy button click
+            // Handle Grocary button click
             Activity activity = requireActivity();
             Intent intent = new Intent(activity, CategorieActivity.class);
             intent.putExtra("businessType", 1); // pass businessType as int
             startActivity(intent);
+        });
+        cartView.setOnClickListener(v -> {
+            Activity activity = requireActivity();
+            Intent intent = new Intent(activity, CartActivity.class);
+            startActivity(intent);
+            // Handle ViewCart button click
         });
         getTopRated();
         return ratedMerchants;
@@ -69,6 +74,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
         Rest = ratedMerchants.findViewById(R.id.btnRestaurant);
         Groc = ratedMerchants.findViewById(R.id.btnGrocery);
         phar = ratedMerchants.findViewById(R.id.btnPharmacy);
+        cartView = ratedMerchants.findViewById(R.id.btnViewCart);
     }
     private void getTopRated() {
         ExecutorService executor = Executors.newSingleThreadExecutor();

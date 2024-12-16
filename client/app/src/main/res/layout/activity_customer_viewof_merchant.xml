@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MerchantHomeFragment">
+    tools:context=".CustomerViewofMerchant">
 
     <!-- Merchant Info Section -->
 
@@ -70,7 +70,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/MerchantRecyclerView"
+        android:id="@+id/merchantRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/merchantInfoLayout"

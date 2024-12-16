@@ -16,6 +16,8 @@ public class globals {
     public static  final  int GET_CATEGORIE=1026;
     public static  final int ADD_CUSTOMER_IMAGE=1027;
     public static  final int GET_CUSTOMER_IMAGE=1028;
+    public static  final int ADD_CARTITEM=1029;
+    public static  final int GET_CARTITEMS=10210;
     public static  boolean isCustomer=false;
     public static final int ADD_MERCHANT = 1030;
     public static final int GET_MERCHANT_DATA = 1031;

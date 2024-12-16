@@ -24,7 +24,7 @@
 
         <!-- TextView for the name -->
         <TextView
-            android:id="@+id/merchName"
+            android:id="@+id/itemName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="22sp"
@@ -33,7 +33,7 @@
 
         <!-- TextView for the description -->
         <TextView
-            android:id="@+id/itemDescription"
+            android:id="@+id/item_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -42,7 +42,7 @@
 
         <!-- TextView for the price -->
         <TextView
-            android:id="@+id/merchRate"
+            android:id="@+id/itemPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"

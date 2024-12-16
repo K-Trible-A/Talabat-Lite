@@ -44,7 +44,7 @@ public class MerchantHomeFragment extends Fragment {
             executor = Executors.newSingleThreadExecutor();
         }
         View view = inflater.inflate(R.layout.fragment_merchant_home, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.MerchantRecyclerView);
+        RecyclerView recyclerView = view.findViewById(R.id.myCategorieRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         itemList = new ArrayList<>();
         itemAdapter = new ItemAdapter(getContext(), itemList);
