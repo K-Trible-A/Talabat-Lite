@@ -1,4 +1,4 @@
-#include "../include/routes.hpp"
+  #include "../include/routes.hpp"
 #include "../include/database.hpp"
 
 #include <crow/common.h>
@@ -46,7 +46,6 @@ void authClient() {
         return crow::response(200, responseBody);
       });
 }
-
 void merchantRegistration() {
   CROW_ROUTE(server, "/registration/merchant")
       .methods("POST"_method)([](const crow::request &req) {
@@ -69,12 +68,9 @@ void merchantRegistration() {
         string phoneNumber = body["phone"].s();
         string email = body["email"].s();
         // Check account already exists
-        const string sql = "SELECT * FROM users WHERE email = '" + email + "';";
+        const string sql = "SELECT * FROM users WHERE email = '" + email + "' OR phoneNumber = '" + phoneNumber + "' ;";
         vector<vector<string>> ans = db.query(sql);
-        const string sql1 =
-            "SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
-        vector<vector<string>> ans1 = db.query(sql1);
-        if (!ans.empty() || !ans1.empty()) {
+        if (!ans.empty()) {
           return crow::response(409, "User is already registered");
         }
         // get other user data from json
@@ -159,12 +155,9 @@ void customerRegistration() {
         string phoneNumber = body["phone"].s();
         string email = body["email"].s();
         // Check account already exists
-        const string sql = "SELECT * FROM users WHERE email = '" + email + "';";
+        const string sql = "SELECT * FROM users WHERE email = '" + email + "' OR phoneNumber = '" + phoneNumber + "' ;";
         vector<vector<string>> ans = db.query(sql);
-        const string sql1 =
-            "SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
-        vector<vector<string>> ans1 = db.query(sql1);
-        if (!ans.empty() || !ans1.empty()) {
+        if (!ans.empty()) {
           return crow::response(409, "User is already registered");
         }
         // get other user data from json
@@ -221,12 +214,9 @@ void courierRegistration() {
         string phoneNumber = body["phone"].s();
         string email = body["email"].s();
         // Check account already exists
-        const string sql = "SELECT * FROM users WHERE email = '" + email + "';";
+        const string sql = "SELECT * FROM users WHERE email = '" + email + "' OR phoneNumber = '" + phoneNumber + "' ;";
         vector<vector<string>> ans = db.query(sql);
-        const string sql1 =
-            "SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
-        vector<vector<string>> ans1 = db.query(sql1);
-        if (!ans.empty() || !ans1.empty()) {
+        if (!ans.empty()) {
           return crow::response(409, "User is already registered");
         }
         // get other user data from json
@@ -553,7 +543,7 @@ void getItems() {
           return crow::response(400, "Invalid user ID");
         }
         vector<vector<string>> merchantId_query =
-            db.query("SELECT userId FROM merchant WHERE " + to_string(userId) +
+            db.query("SELECT merchantId FROM merchant WHERE " + to_string(userId) +
                      " = merchant.userId;");
         if (merchantId_query.empty())
           return crow::response(500, "Getting merchantId at getItems");
@@ -634,4 +624,71 @@ void changePickupAddress() {
           return crow::response(200, "Item added successfully");
         return crow::response(500, "Error getMerchantData");
       });
+}
+
+void getMerchantsSearchResults()
+{
+  CROW_ROUTE(server, "/getMerchantsSearchResults/<string>")
+     .methods("GET"_method)([](const crow::request &req, const string& searchWord) {
+       string sql;
+       if (searchWord == "empty"){
+         sql = "SELECT businessName, keywords, rating FROM merchant";
+       }else{
+         sql = "SELECT businessName, keywords, rating FROM merchant "
+         "WHERE businessName LIKE '%" + searchWord + "%' OR keywords LIKE '%" + searchWord + "%' "
+         "LIMIT 10;";
+       }
+       vector<vector<string>> ans = db.query(sql);
+       crow::json::wvalue responseBody;
+       responseBody["count"] = ans.size();
+       for(int i=0;i< ans.size();i++){
+            string businessName = ans[i][0];
+            string keywords = ans[i][1];
+            float rating = stof(ans[i][2]);
+            rating = round(rating * 10) / 10;
+            string rate = to_string(rating);
+            responseBody["businessName" + to_string(i)] = businessName;
+            responseBody["keywords" + to_string(i)] = keywords;
+            responseBody["rating" + to_string(i)] = rate;
+       }
+       return crow::response(200, responseBody);
+     });
+}
+void getItemsSearchResults(){
+  CROW_ROUTE(server, "/getItemsSearchResults/<int>")
+    .methods("GET"_method)([](const crow::request &req, int userId) {
+      // Validate the item ID
+      if (userId <= 0) {
+        return crow::response(400, "Invalid user ID");
+      }
+      vector<vector<string>> merchantId_query =
+          db.query("SELECT merchantId FROM merchant WHERE " + to_string(userId) +
+                   " = merchant.userId;");
+      if (merchantId_query.empty())
+        return crow::response(500, "Getting merchantId at getItemsSearchResults");
+      string merchantId = merchantId_query[0][0];
+      const string sql1 =
+          "SELECT COUNT (*) FROM item WHERE merchantId = " + merchantId + ";";
+      vector<vector<string>> ans = db.query(sql1);
+
+      crow::json::wvalue responseBody;
+      crow::json::wvalue::list items;
+
+      responseBody["itemsCount"] = ans[0][0];
+      const string sql2 = "SELECT itemId, itemName , itemPrice, "
+                          "itemDescription FROM item "
+                          "WHERE merchantId = " +
+                          merchantId + " ;";
+      vector<vector<string>> res = db.query(sql2);
+      for (auto &row : res) {
+        crow::json::wvalue item;
+        item["itemId"] = stoi(row[0]);
+        item["itemName"] = row[1];
+        item["itemPrice"] = stof(row[2]);
+        item["itemDescription"] = row[3];
+        items.push_back(std::move(item));
+      }
+      responseBody["items"] = std::move(items);
+      return crow::response(200, responseBody);
+    });
 }

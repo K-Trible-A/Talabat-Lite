@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="130dp"
+    tools:context=".MerchantsSearchFragment">
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:queryHint="Enter Restaurant Name or Keywords"
+        android:iconifiedByDefault="false" />
+
+    <ListView
+        android:id="@+id/merchantList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/search_view"
+        tools:listitem="@layout/merchant_list_view" />
+</RelativeLayout>
