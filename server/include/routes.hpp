@@ -20,3 +20,5 @@ void getMerchantData();
 void changePickupAddress();
 void getMerchantsSearchResults();
 void getItemsSearchResults();
+void uploadProfileImage();
+void getProfileImage();

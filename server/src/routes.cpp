@@ -692,3 +692,112 @@ void getItemsSearchResults(){
       return crow::response(200, responseBody);
     });
 }
+
+void uploadProfileImage() {
+  CROW_ROUTE(server, "/uploadProfileImage/<int>")
+      .methods(crow::HTTPMethod::POST)([](const crow::request &req,
+                                          const int &userId) {
+        try {
+          vector<vector<string>> getId =
+              db.query("SELECT merchantId FROM merchant WHERE userId = '" +
+                       to_string(userId) + "';");
+          if (getId.empty()) {
+            return crow::response(500, "Error getting merchantId");
+          }
+          int merchantId = stoi(getId[0][0]);
+         db.execute("DELETE FROM merchantImages WHERE merchantId = " + to_string(merchantId) + ";");
+          sqlite3_stmt *stmt;
+          // SQL query to insert the image
+          const char *sql =
+              "INSERT OR REPLACE INTO merchantImages (merchantId, profileImg) VALUES (?1, ?2);";
+          if (sqlite3_prepare_v2(db.getDB(), sql, -1, &stmt, nullptr) !=
+              SQLITE_OK) {
+            std::cerr << "Failed to prepare statement: "
+                      << sqlite3_errmsg(db.getDB()) << std::endl;
+            sqlite3_close(db.getDB());
+            return crow::response(500, "Error uploading image");
+          }
+          try {
+            // Bind the merchantId parameter
+            if (sqlite3_bind_int(stmt, 1, merchantId) != SQLITE_OK) {
+              std::cerr << "Failed to bind merchantId: "
+                        << sqlite3_errmsg(db.getDB()) << std::endl;
+              sqlite3_finalize(stmt);
+              sqlite3_close(db.getDB());
+              return crow::response(500, "Error uploading image");
+            }
+
+            // Bind the image data (BLOB)
+            if (sqlite3_bind_blob(stmt, 2, req.body.data(), req.body.size(),
+                                  SQLITE_STATIC) != SQLITE_OK) {
+              std::cerr << "Failed to bind image data: "
+                        << sqlite3_errmsg(db.getDB()) << std::endl;
+              sqlite3_finalize(stmt);
+              sqlite3_close(db.getDB());
+              return crow::response(500, "Error uploading image");
+            }
+            // Execute the statement
+            if (sqlite3_step(stmt) != SQLITE_DONE) {
+              std::cerr << "Failed to execute statement: "
+                        << sqlite3_errmsg(db.getDB()) << std::endl;
+              sqlite3_finalize(stmt);
+              sqlite3_close(db.getDB());
+              return crow::response(500, "Error uploading image");
+            }
+
+          } catch (const std::exception &ex) {
+            std::cerr << "Error: " << ex.what() << std::endl;
+          }
+          vector <vector<string>> getImgId = db.query("SELECT imageId FROM merchantImages WHERE merchantId = " + to_string(merchantId) + ";");
+          int imgId = stoi(getImgId[0][0]);
+          const string condition = "merchantId = " + to_string(merchantId);
+          int ok = db.updateData("merchant",{"profileImgId"},{to_string(imgId)},condition);
+
+          // Finalize and close
+          sqlite3_finalize(stmt);
+
+          // Save received binary data as an image file (optional for testing)
+          std::ofstream outFile("received_image.jpg", std::ios::binary);
+          outFile.write(req.body.c_str(), req.body.size());
+          outFile.close();
+
+          std::cout << "Image received and saved successfully." << std::endl;
+
+          return crow::response(200, "Image received successfully.");
+
+        } catch (const std::exception &e) {
+          return crow::response(500, std::string("Error: ") + e.what());
+        }
+      });
+}
+void getProfileImage() {
+  CROW_ROUTE(server, "/get_profile_image/<int>")
+      .methods("GET"_method)([](const crow::request &req, int userId) {
+        // Validate the item ID
+        if (userId <= 0) {
+          return crow::response(400, "Invalid item ID");
+        }
+        // Query the database for the imageId
+        vector<vector<string>> queryImageId =
+            db.query("SELECT profileImgId "
+                     "FROM merchant WHERE userId = " +
+                     to_string(userId) + ";");
+        // Check if the item exists
+        if (queryImageId.empty()) {
+          return crow::response(404, "Item not found");
+        }
+        // Retrieve item details
+        int imageId = stoi(queryImageId[0][0]);
+        vector<vector<string>> itemImage =
+            db.query("SELECT profileImg FROM merchantImages WHERE imageId = " +
+                     to_string(imageId) + " ;");
+        if (itemImage.empty()) {
+          return crow::response(404, "Image not found");
+        }
+        crow::response res;
+        res.set_header("Content-Type", "image/jpeg");
+        res.write(itemImage[0][0]);
+        return res;
+      });
+}
+

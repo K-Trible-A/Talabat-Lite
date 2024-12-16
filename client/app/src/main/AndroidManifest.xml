@@ -34,7 +34,10 @@
         </activity>
         <activity
             android:name=".CardActivity"
-            android:exported="true" />
+		android:exported="true" />
+		<activity
+            android:name=".AddProfilePicActivity"
+            android:exported="false" />
         <activity
             android:name=".MerchantRegistrationActivity"
             android:exported="true">

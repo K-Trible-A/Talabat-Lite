@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <!-- Upload Image Button -->
+        <Button
+            android:id="@+id/btn_upload_profile_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="TODO"
+            android:importantForAccessibility="no"
+            android:text="Upload Image"
+            android:layout_marginBottom="16dp"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+        <!-- Image Preview -->
+        <ImageView
+            android:id="@+id/profile_img_preview"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Save Item Button -->
+        <Button
+            android:id="@+id/btn_save_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Image"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+    </LinearLayout>
+</ScrollView>

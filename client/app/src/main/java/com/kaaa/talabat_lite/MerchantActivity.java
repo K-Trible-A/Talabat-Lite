@@ -13,8 +13,7 @@ public class MerchantActivity extends AppCompatActivity {
     MerchantHomeFragment merchantHomeFragment;
     MerchantOrdersFragment merchantOrdersFragment;
     MerchantProfileFragment merchantProfileFragment;
-    ItemsSearchFragment itemsSearchFragment;
-    // ItemSearchFragment itemSearchFragment;
+    ItemSearchFragment itemSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +23,26 @@ public class MerchantActivity extends AppCompatActivity {
 
         initUI();
         setupListeners();
+        boolean openProfile = getIntent().getBooleanExtra("profile", false);
+        if (openProfile) {
+            // Open the Profile Fragment instead of the default Home Fragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, merchantProfileFragment)
+                    .commit();
+            // Set the BottomNavigationView to "Profile"
+            bottomNavigationView.setSelectedItemId(R.id.profile);
+        }
+
     }
+    
 
     protected void initUI() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         merchantHomeFragment = new MerchantHomeFragment();
         merchantOrdersFragment = new MerchantOrdersFragment();
         merchantProfileFragment = new MerchantProfileFragment();
-        itemsSearchFragment = new ItemsSearchFragment();
-        // itemSearchFragment = new ItemSearchFragment();
+        itemSearchFragment = new ItemSearchFragment();
 
-        // Initially set the Home fragment
         if (merchantHomeFragment != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, merchantHomeFragment)
@@ -42,33 +50,32 @@ public class MerchantActivity extends AppCompatActivity {
         }
     }
 
-    protected void setupListeners() {
+    protected void setupListeners ()
+    {
+
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.home) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, merchantHomeFragment)
-                        .commit();
+            if (item.getItemId() == R.id.home)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
                 return true;
             }
-            if (item.getItemId() == R.id.orders) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, merchantOrdersFragment)
-                        .commit();
+            if (item.getItemId() == R.id.orders)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantOrdersFragment).commit();
                 return true;
             }
-            if (item.getItemId() == R.id.profile) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, merchantProfileFragment)
-                        .commit();
+            if (item.getItemId() == R.id.profile)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
                 return true;
             }
-            if (item.getItemId() == R.id.search) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, itemsSearchFragment)
-                        .commit();
+            if (item.getItemId() == R.id.search)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,itemSearchFragment).commit();
                 return true;
             }
             return false;
         });
+
     }
 }
