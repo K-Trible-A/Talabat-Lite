@@ -68,12 +68,9 @@ void merchantRegistration() {
         string phoneNumber = body["phone"].s();
         string email = body["email"].s();
         // Check account already exists
-        const string sql = "SELECT * FROM users WHERE email = '" + email + "';";
+        const string sql = "SELECT * FROM users WHERE email = '" + email + "' OR phoneNumber = '" + phoneNumber + "' ;";
         vector<vector<string>> ans = db.query(sql);
-        const string sql1 =
-            "SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
-        vector<vector<string>> ans1 = db.query(sql1);
-        if (!ans.empty() || !ans1.empty()) {
+        if (!ans.empty()) {
           return crow::response(409, "User is already registered");
         }
         // get other user data from json
@@ -158,12 +155,9 @@ void customerRegistration() {
         string phoneNumber = body["phone"].s();
         string email = body["email"].s();
         // Check account already exists
-        const string sql = "SELECT * FROM users WHERE email = '" + email + "';";
+        const string sql = "SELECT * FROM users WHERE email = '" + email + "' OR phoneNumber = '" + phoneNumber + "' ;";
         vector<vector<string>> ans = db.query(sql);
-        const string sql1 =
-            "SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
-        vector<vector<string>> ans1 = db.query(sql1);
-        if (!ans.empty() || !ans1.empty()) {
+        if (!ans.empty()) {
           return crow::response(409, "User is already registered");
         }
         // get other user data from json
@@ -220,12 +214,9 @@ void courierRegistration() {
         string phoneNumber = body["phone"].s();
         string email = body["email"].s();
         // Check account already exists
-        const string sql = "SELECT * FROM users WHERE email = '" + email + "';";
+        const string sql = "SELECT * FROM users WHERE email = '" + email + "' OR phoneNumber = '" + phoneNumber + "' ;";
         vector<vector<string>> ans = db.query(sql);
-        const string sql1 =
-            "SELECT * FROM users WHERE phoneNumber = '" + phoneNumber + "';";
-        vector<vector<string>> ans1 = db.query(sql1);
-        if (!ans.empty() || !ans1.empty()) {
+        if (!ans.empty()) {
           return crow::response(409, "User is already registered");
         }
         // get other user data from json
