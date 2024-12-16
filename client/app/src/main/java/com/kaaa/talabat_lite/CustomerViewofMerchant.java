@@ -37,7 +37,7 @@ public class CustomerViewofMerchant extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer_viewof_merchant); // Link to your XML layout
-        RecyclerView recyclerView = findViewById(R.id.merchantRecyclerView);
+        RecyclerView recyclerView = findViewById(R.id.customerRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         itemList = new ArrayList<>();
         itemAdapter = new ItemAdapter(this, itemList);
