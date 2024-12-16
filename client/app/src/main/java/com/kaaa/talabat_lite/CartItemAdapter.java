@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,13 +60,22 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
 
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if (cartItemList == null || position >= cartItemList.size()) {
             Log.e("CartItemAdapter", "Invalid position or null cart item list");
             return;
         }
 
         cartItemData cartItem = cartItemList.get(position);
+
+        // Ensure all holder views are initialized
+        if (holder.itemName == null || holder.itemMerch == null || holder.itemPrice == null ||
+                holder.itemCount == null || holder.totalPrice == null || holder.itemImage == null ||
+                holder.btnRemoveItem == null) {
+            Log.e("CartItemAdapter", "ViewHolder contains null views.");
+            return;
+        }
+
         // Set item details
         holder.itemName.setText(cartItem.itemName);
         holder.itemMerch.setText(cartItem.merchName);
@@ -121,12 +128,18 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
 
         public ViewHolder(View cartItemView) {
             super(cartItemView);
-            itemName = cartItemView.findViewById(R.id.cartItemName);
-            itemMerch = cartItemView.findViewById(R.id.cartItemMerch);
-            itemPrice = cartItemView.findViewById(R.id.cartItemPrice);
-            itemImage = cartItemView.findViewById(R.id.cartItemImage);
-            totalPrice = cartItemView.findViewById(R.id.cartItemTotalPrice);
-            btnRemoveItem = cartItemView.findViewById(R.id.btnRemoveCartItem);
+
+            try {
+                itemName = cartItemView.findViewById(R.id.cartItemName);
+                itemMerch = cartItemView.findViewById(R.id.cartItemMerch);
+                itemPrice = cartItemView.findViewById(R.id.cartItemPrice);
+                itemCount = cartItemView.findViewById(R.id.cartItemCount);
+                totalPrice = cartItemView.findViewById(R.id.cartItemTotalPrice);
+                itemImage = cartItemView.findViewById(R.id.cartItemImage);
+                btnRemoveItem = cartItemView.findViewById(R.id.btnRemoveCartItem);
+            } catch (Exception e) {
+                Log.e("ViewHolder", "Error initializing views: " + e.getMessage());
+            }
         }
     }
 }
