@@ -673,10 +673,9 @@ void addCartItem(int clientFD)
 void getCartItems(int clientFD)
 {
   cout<<"cart is viewed";
-  int userid = server::recvInt(clientFD);
+  int userId = server::recvInt(clientFD);
   vector<vector<string>> cartId_query =
-      db.query("SELECT cartId FROM cart WHERE " + to_string(userid) +
-               " = userId;");
+      db.query("SELECT cartId FROM cart WHERE userId =" + to_string(userId) +" ;");
   if (cartId_query.empty())
   {
     server::send(clientFD, 0);
