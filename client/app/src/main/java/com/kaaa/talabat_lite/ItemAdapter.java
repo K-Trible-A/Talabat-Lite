@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +22,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         public String name, description;
         public float price;
         Bitmap img;
-        public itemData ()
-        { }
         public itemData (int id, String name , String description , float price , Bitmap img)
         {
             this.name = name;
@@ -60,7 +57,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         holder.itemImage.setImageBitmap(item.img);
 
         holder.itemView.setOnClickListener(v -> {
-
             Intent itemManagementActivity = new Intent(context,ItemManagementActivity.class);
             itemManagementActivity.putExtra("id",item.id);
             itemManagementActivity.putExtra("name",item.name);

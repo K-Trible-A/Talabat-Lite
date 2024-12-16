@@ -10,10 +10,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -21,11 +29,9 @@ public class LoginActivity extends AppCompatActivity {
     private Button buttonLogin;
     private TextView registrationText;
     private ProgressBar progressBar;
-    Intent outIntent;
-    Intent afterLoginIntent;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         initUI();
@@ -42,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     private void setupListeners(){
         buttonLogin.setOnClickListener(view -> new Thread(this::loginAuth).start());
         registrationText.setOnClickListener(v -> {
-            outIntent = new Intent(LoginActivity.this, UserRegistrationActivity.class);
+            Intent outIntent = new Intent(LoginActivity.this, UserRegistrationActivity.class);
             startActivity(outIntent);
         });
     }
@@ -59,35 +65,64 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         try {
-            socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(globals.AUTHENTICATE_CLIENT);
-
-            socketHelper.getInstance().sendString(email);
-            socketHelper.getInstance().sendString(pass);
-
-            int ok = socketHelper.getInstance().recvInt();
-
-            socketHelper.getInstance().close();
-
-            if(ok != -1){
-                globals.userId = ok;
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login success!", Toast.LENGTH_SHORT).show());
-                socketHelper.getInstance().connect();
-                socketHelper.getInstance().sendInt(globals.CHECK_ACCOUNT_TYPE);
-                socketHelper.getInstance().sendInt(globals.userId);
-                int accountType = socketHelper.getInstance().recvInt();
-                if (accountType == globals.MERCHANT)
-                {
-                    afterLoginIntent = new Intent(LoginActivity.this,MerchantActivity.class);
+            // API URL
+            URL server = new URL(globals.serverURL + "/login");
+            HttpURLConnection conn = (HttpURLConnection) server.openConnection();
+            // Setup request
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            conn.setDoOutput(true);
+            // Create JSON payload
+            JSONObject json = new JSONObject();
+            json.put("email", email);
+            json.put("password", pass);
+            // Send the request
+            OutputStream os = conn.getOutputStream();
+            os.write(json.toString().getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+            // Get the response code
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                runOnUiThread(()-> Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show());
+                // Read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+                // Parse the response JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                globals.userId = jsonResponse.getInt("userId");
+                int accountType = jsonResponse.getInt("accountType");
+                Log.i("userId", String.valueOf(globals.userId));
+                Log.i("AccountType", String.valueOf(accountType));
+                if(accountType == 1){
+//                    Intent afterLoginIntent = new Intent(this, Customer.class);
+//                    startActivity(afterLoginIntent);
+                }
+                else if(accountType == 2){
+                    Intent afterLoginIntent = new Intent(LoginActivity.this, MerchantActivity.class);
+                    // remove the activity from the stack
+                    afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(afterLoginIntent);
                 }
-
+                else if(accountType == 3){
+//                    Intent afterLoginIntent = new Intent(LoginActivity.this, MerchantActivity.class);
+//                    afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(afterLoginIntent);
+                }
+            } else if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                runOnUiThread(()-> Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show());
+            } else {
+                runOnUiThread(()-> Toast.makeText(this, "Server error: " + responseCode, Toast.LENGTH_SHORT).show());
             }
-            else{
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login failed!", Toast.LENGTH_SHORT).show());
-            }
-        } catch (IOException e) {
-            runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Failed to Connect", Toast.LENGTH_SHORT).show());
+            conn.disconnect();
+        } catch (JSONException | IOException e) {
+            runOnUiThread(()-> Toast.makeText(this, "Server not reached", Toast.LENGTH_SHORT).show());
+            //Log.e("LoginActivity", "Connection error", e);
         }
         runOnUiThread(() -> progressBar.setVisibility(View.GONE));
     }

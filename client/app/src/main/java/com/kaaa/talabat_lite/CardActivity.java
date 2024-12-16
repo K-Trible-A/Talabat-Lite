@@ -14,7 +14,6 @@ public class CardActivity extends AppCompatActivity {
 
     EditText cardNumber, expiryDate, CVV;
     Button submitButton;
-    Intent outIntent;
     private static final String PREFS_NAME = "CardPrefs";
     private static final String KEY_CARD_NUMBER = "cardNumber";
     private static final String KEY_EXPIRY_DATE = "expiryDate";
@@ -28,7 +27,6 @@ public class CardActivity extends AppCompatActivity {
         initUI();
         loadSavedData();
         setupListeners();
-
     }
 
     protected void initUI() {
@@ -66,7 +64,7 @@ public class CardActivity extends AppCompatActivity {
                 return;
             }
             saveData(cardNumberStr, expiryDateStr, CVVStr);
-            outIntent = new Intent(CardActivity.this, MerchantRegistrationActivity.class);
+            Intent outIntent = new Intent(CardActivity.this, MerchantRegistrationActivity.class);
             outIntent.putExtra("cardNumber", cardNumberStr);
             outIntent.putExtra("expiryDate", expiryDateStr);
             outIntent.putExtra("CVV", CVVStr);

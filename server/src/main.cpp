@@ -1,33 +1,40 @@
-#include "../include/constants.hpp"
 #include "../include/database.hpp"
-#include "../include/server.hpp"
-#include <iostream>
+#include "../include/routes.hpp"
+#include <crow.h>
+#include <cstdlib>
 
 using namespace std;
 
+crow::SimpleApp server;
 Database db("Database.db");
-funcPtr actions[MAX_ACTIONS];
 
-void server::handleClient(int clientFD) {
-  int code = server::recvInt(clientFD);
-  if(code >= 1000)
-    actions[code](clientFD);
-  close(clientFD);
+// Define a type for route handlers
+using RouteDefinition = std::function<void()>;
+
+// List of route definitions
+void registerRoutes() {
+  helloServer();
+  authClient();
+  merchantRegistration();
+  customerRegistration();
+  courierRegistration();
+  addItem();
+  uploadImage();
+  retrieveItem();
+  retrieveItemImage();
+  deleteItem();
+  getMerchantInfoHome();
+  getItems();
+  getMerchantData();
+  changePickupAddress();
+  getMerchantsSearchResults();
+  getItemsSearchResults();
 }
 
 int main() {
-  db.createSchema();
-  string IP;
-  int portNum, queueSz;
-  std::cout << "Enter IP address of the server :" << std::endl;
-  std::cin >> IP;
-  std::cout << "Enter the port number :" << std::endl;
-  std::cin >> portNum;
-  std::cout << "Enter the queue size :" << std::endl;
-  std::cin >> queueSz;
-  server srv(IP, portNum, queueSz);
-
-  srv.listenLoop(); // Start accepting clients connections.
-
+  if (!db.createSchema())
+    exit(EXIT_FAILURE);
+  registerRoutes();
+  server.port(8080).multithreaded().run();
   return 0;
 }
