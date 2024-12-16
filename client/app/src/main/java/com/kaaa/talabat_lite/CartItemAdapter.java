@@ -70,8 +70,8 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
 
         cartItemData cartItem = cartItemList.get(position);
         // Set item details
-        holder.itemName.setText(cartItem.itemName != null ? cartItem.itemName : "Unknown Item");
-        holder.itemMerch.setText(cartItem.merchName != null ? cartItem.merchName : "Unknown Merchant");
+        holder.itemName.setText(cartItem.itemName);
+        holder.itemMerch.setText(cartItem.merchName);
         holder.itemCount.setText(String.valueOf(cartItem.itemCount));
         holder.totalPrice.setText(String.format("%.1f", cartItem.itemTotalPrice));
         holder.itemPrice.setText(String.format("%.1f", cartItem.itemPrice));
