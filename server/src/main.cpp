@@ -31,7 +31,7 @@ void registerRoutes() {
   getItemsSearchResults();
   getMerchantActiveOrders();
   getOrderDetails();
-  void getAccountType();
+  getAccountType();
 }
 
 int main() {
