@@ -26,17 +26,17 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgCustomerPicture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_marginBottom="8dp"
                 android:contentDescription="Customer Picture"
+                android:scaleType="centerCrop"
                 android:src="@drawable/customer_icon"
                 app:strokeColor="@color/white"
-                app:strokeWidth="0dp"
-                tools:ignore="HardcodedText" />
+                app:strokeWidth="2dp"
+                tools:ignore="HardcodedText,ImageContrastCheck" />
 
             <Button
                 android:id="@+id/btnChangePicture"
@@ -80,7 +80,7 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:hint="edit Your City"
-                tools:ignore="Autofill,HardcodedText,TextFields" />
+                tools:ignore="Autofill,HardcodedText,TextFields,VisualLintTextFieldSize" />
         </LinearLayout>
 
         <TextView
@@ -106,7 +106,7 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:hint="edit Your Delivery Address"
-                tools:ignore="Autofill,HardcodedText,TextFields" />
+                tools:ignore="Autofill,HardcodedText,TextFields,VisualLintTextFieldSize" />
         </LinearLayout>
 
         <!-- Set Payment Method Button -->
