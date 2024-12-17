@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
+        android:usesCleartextTraffic="true"
         android:name=".Talabat_Lite"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -30,7 +31,7 @@
             android:name=".CategorieActivity"
             android:exported="false" />
         <activity
-            android:name=".CustomerViewofMerchant"
+            android:name=".CustomerViewOfMerchant"
             android:exported="false" />
         <activity
             android:name=".CustomerActivity"
@@ -42,37 +43,22 @@
             android:name=".CustomerRegistration"
             android:exported="true" /> <!-- Activities -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".LoginActivity"
+            android:name=".MerchantRegistrationActivity"
             android:exported="true" />
         <activity
             android:name=".CardActivity"
             android:exported="true" />
         <activity
-            android:name=".MerchantRegistrationActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".CourierRegistrationActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".UserRegistrationActivity"

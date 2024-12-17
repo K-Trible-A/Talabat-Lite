@@ -216,81 +216,100 @@ bool Database::updateData(const string &table, const vector<string> &columns,
   return true;
 }
 
-void Database::createSchema() {
+bool Database::createSchema() {
   // Enable foreign keys support
-  this->execute("PRAGMA foreign_keys = ON;");
-  this->execute( // user information
-      "CREATE TABLE IF NOT EXISTS users ("
-      "id INTEGER  PRIMARY KEY AUTOINCREMENT,"
-      "email TEXT NOT NULL UNIQUE,"
-      "password TEXT NOT NULL,"
-      "name TEXT NOT NULL,"
-      "phoneNumber TEXT NOT NULL UNIQUE,"
-      "country TEXT NOT NULL,"
-      "city TEXT NOT NULL,"
-      "accountType INTEGER NOT NULL"
-      ");");
-  this->execute( // Merchant information
-      "CREATE TABLE IF NOT EXISTS merchant ("
-      "merchantId INTEGER PRIMARY KEY AUTOINCREMENT,"
-      "userId INTEGER NOT NULL UNIQUE,"
-      "cardId INTEGER NOT NULL,"
-      "businessName TEXT NOT NULL,"
-      "businessType INTEGER NOT NULL,"
-      "keywords TEXT NOT NULL,"
-      "pickupAddress TEXT NOT NULL,"
-      "nationalID TEXT NOT NULL,"
-      "rating REAL NOT NULL,"
-      "FOREIGN KEY(cardId) REFERENCES card(cardId),"
-      "FOREIGN KEY(userId) REFERENCES users(id));");
-  this->execute( // Courier information
-      "CREATE TABLE IF NOT EXISTS courier (courierId INTEGER PRIMARY KEY "
-      "AUTOINCREMENT ,cardId INTEGER NULL ,"
-      "vehicleType TEXT NOT NULL ,"
-      "nationalID TEXT NOT NULL,"
-      "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN KEY(courierId) "
-      "REFERENCES users(id));");
-  this->execute( // Card information
-      "CREATE TABLE IF NOT EXISTS card ("
-      "cardId INTEGER PRIMARY KEY AUTOINCREMENT,"
-      "userId INTEGER,"
-      "cardNumber TEXT NULL,"
-      "CVV INTEGER NULL,"
-      "expiryDate TEXT NULL,"
-      "FOREIGN KEY(userId) REFERENCES users(id));");
-  this->execute( // customer infromation
-      "CREATE TABLE IF NOT EXISTS customer ("
-      "customerId  INTEGER PRIMARY KEY AUTOINCREMENT,"
-      "deliveryAddress  TEXT NOT NULL,"
-      "userId INTEGER NOT NULL UNIQUE,"
-      "cardId INTEGER,"
-      "FOREIGN KEY (userId) REFERENCES users (id)"
-      "ON UPDATE CASCADE,"
-      "FOREIGN KEY (cardId) REFERENCES card (cardId)"
-      "ON UPDATE CASCADE"
-      ");");
-  this->execute( // Item information
-      "CREATE TABLE IF NOT EXISTS item ("
-      "itemId INTEGER PRIMARY KEY AUTOINCREMENT,"
-      "merchantId INTEGER NOT NULL,"
-      "itemName TEXT NOT NULL,"
-      "itemPrice REAL NOT NULL,"
-      "itemDescription TEXT NULL,"
-      "itemImg BLOB NOT NULL,"
-      "FOREIGN KEY(merchantId) REFERENCES merchant(merchantId)"
-      ");");
-  this->execute( // customerImage information
-      "CREATE TABLE IF NOT EXISTS customerImage ("
-      "customerId INTEGER NOT NULL,"
-      "customerImage BLOB NOT NULL,"
-      "FOREIGN KEY(customerId) REFERENCES customer(customerId)"
-      ");");
-  this->execute( // cart information
+  if (!this->execute("PRAGMA foreign_keys = ON;"))
+    return false;
+  if (!this->execute( // user information
+          "CREATE TABLE IF NOT EXISTS users ("
+          "id INTEGER  PRIMARY KEY AUTOINCREMENT,"
+          "email TEXT NOT NULL UNIQUE,"
+          "password TEXT NOT NULL,"
+          "name TEXT NOT NULL,"
+          "phoneNumber TEXT NOT NULL UNIQUE,"
+          "country TEXT NOT NULL,"
+          "city TEXT NOT NULL,"
+          "accountType INTEGER NOT NULL"
+          ");"))
+    return false;
+  if (!this->execute( // Merchant information
+          "CREATE TABLE IF NOT EXISTS merchant ("
+          "merchantId INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "userId INTEGER NOT NULL UNIQUE,"
+          "cardId INTEGER NOT NULL,"
+          "businessName TEXT NOT NULL,"
+          "businessType INTEGER NOT NULL,"
+          "keywords TEXT NOT NULL,"
+          "pickupAddress TEXT NOT NULL,"
+          "nationalID TEXT NOT NULL,"
+          "rating REAL NOT NULL,"
+          "FOREIGN KEY(cardId) REFERENCES card(cardId),"
+          "FOREIGN KEY(userId) REFERENCES users(id));"))
+    return false;
+  if (!this->execute( // Courier information
+          "CREATE TABLE IF NOT EXISTS courier (courierId INTEGER PRIMARY KEY "
+          "AUTOINCREMENT ,"
+          "userId INTEGER NOT NULL,"
+          "vehicleType TEXT NOT NULL ,"
+          "nationalID TEXT NOT NULL,"
+          "cardId INTEGER NOT NULL,"
+          "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN "
+          "KEY(courierId) "
+          "REFERENCES users(id));"))
+    return false;
+  if (!this->execute( // Card information
+          "CREATE TABLE IF NOT EXISTS card ("
+          "cardId INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "userId INTEGER,"
+          "cardNumber TEXT NULL,"
+          "CVV INTEGER NULL,"
+          "expiryDate TEXT NULL,"
+          "FOREIGN KEY(userId) REFERENCES users(id));"))
+    return false;
+  if (!this->execute( // customer infromation
+          "CREATE TABLE IF NOT EXISTS customer ("
+          "customerId  INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "deliveryAddress  TEXT NOT NULL,"
+          "userId INTEGER NOT NULL UNIQUE,"
+          "cardId INTEGER,"
+          "FOREIGN KEY (userId) REFERENCES users (id)"
+          "ON UPDATE CASCADE,"
+          "FOREIGN KEY (cardId) REFERENCES card (cardId)"
+          "ON UPDATE CASCADE"
+          ");"))
+    return false;
+  if (!this->execute( // Item information
+          "CREATE TABLE IF NOT EXISTS item ("
+          "itemId INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "merchantId INTEGER NOT NULL,"
+          "itemName TEXT NOT NULL,"
+          "itemPrice REAL NOT NULL,"
+          "itemDescription TEXT,"
+          "imageId INTEGER NOT NULL,"
+          "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId),"
+          "FOREIGN KEY (imageId) REFERENCES itemImages(imageId)"
+          ");"))
+    return false;
+  if (!this->execute( // itemImage information
+          "CREATE TABLE IF NOT EXISTS itemImages ("
+          "imageId INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "merchantId INTEGER NOT NULL,"
+          "itemImg BLOB NOT NULL,"
+          "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId)"
+          ");"))
+    return false;
+  if (!this->execute( // customerImage information
+    "CREATE TABLE IF NOT EXISTS customerImage ("
+    "customerId INTEGER NOT NULL,"
+    "customerImage BLOB NOT NULL,"
+    "FOREIGN KEY(customerId) REFERENCES customer(customerId)"
+    ");"))return false;
+  if (!this->execute( // cart information
     " CREATE TABLE IF NOT EXISTS cart ( "
     " cartId INTEGER PRIMARY KEY AUTOINCREMENT, "
     " userId INTEGER NOT NULL " //  each cart belongs to a user
-    ");");
-  this->execute( // cartItems information
+    ");")) return false;
+  if (!this->execute( // cartItems information
     " CREATE TABLE IF NOT EXISTS cartItems ( "
     " cartId INTEGER NOT NULL, "      // Foreign key to Cart table
     " itemId INTEGER NOT NULL, "      // Foreign key to Items table
@@ -298,6 +317,7 @@ void Database::createSchema() {
     " PRIMARY KEY (cartId, itemId), "   // Composite primary key
     " FOREIGN KEY (cartId) REFERENCES cart(cartId) ON DELETE CASCADE, "
     " FOREIGN KEY (itemId) REFERENCES item(itemId) ON DELETE CASCADE "
-    " );");
+    " );"))return false;
   // Other tables
+  return true;
 }

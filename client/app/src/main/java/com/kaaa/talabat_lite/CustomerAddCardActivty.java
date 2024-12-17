@@ -3,6 +3,7 @@ package com.kaaa.talabat_lite;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -10,7 +11,14 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -71,23 +79,42 @@ public class CustomerAddCardActivty extends AppCompatActivity {
             }
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.execute(() -> {
-                    try {
-                        socketHelper.getInstance().connect();
-                        socketHelper.getInstance().sendInt(globals.ADD_CUSTOMER_CARD);
-                        socketHelper.getInstance().sendInt(globals.userId);
-                        socketHelper.getInstance().sendString(cardNumberStr);
-                        socketHelper.getInstance().sendString(expiryDateStr);
-                        socketHelper.getInstance().sendString(CVVStr);
-                        int ok = socketHelper.getInstance().recvInt();
-                        socketHelper.getInstance().close();
-                        if (ok == 1) {
-                            runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "Card is Successfully added", Toast.LENGTH_SHORT).show());
-                            outIntent = new Intent(CustomerAddCardActivty.this, CustomerActivity.class);
-                            startActivity(outIntent);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+
+                try {
+                    // Prepare the URL for the endpoint
+                    URL server = new URL(globals.serverURL + "/customer/addCard/" + globals.userId);
+                    // Create the JSON payload
+                    JSONObject jsonPayload = new JSONObject();
+                    jsonPayload.put("cardNumber", cardNumberStr);
+                    jsonPayload.put("expiryDate", expiryDateStr);
+                    jsonPayload.put("CVV", CVVStr);
+                    // Open a connection to the server
+                    HttpURLConnection conn = (HttpURLConnection) server.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    conn.setDoOutput(true); // To send a body
+                    // Send the request
+                    OutputStream os = conn.getOutputStream();
+                    os.write(jsonPayload.toString().getBytes(StandardCharsets.UTF_8));
+                    os.flush();
+                    os.close();
+
+                    // Get the response code
+                    int responseCode = conn.getResponseCode();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "Card is Successfully added", Toast.LENGTH_SHORT).show());
+                        outIntent = new Intent(CustomerAddCardActivty.this, CustomerActivity.class);
+                        startActivity(outIntent);
                     }
+
+                    conn.disconnect();
+
+                } catch (IOException e) {
+                    runOnUiThread(() -> Toast.makeText(CustomerAddCardActivty.this, "Failed to add card", Toast.LENGTH_SHORT).show());
+                } catch (JSONException e) {
+                    Log.e("CustomerAddCard", "Json error");
+                }
+
             });
         });
     }

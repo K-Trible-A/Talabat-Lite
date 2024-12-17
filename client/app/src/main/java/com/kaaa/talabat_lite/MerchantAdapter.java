@@ -52,7 +52,7 @@ public class MerchantAdapter extends RecyclerView.Adapter<MerchantAdapter.ViewHo
         holder.merchRate.setText(String.format("%.1f", merchant.rating));
 
         holder.merchImage.setOnClickListener(v -> {
-            Intent viewMerch = new Intent(context, CustomerViewofMerchant.class);
+            Intent viewMerch = new Intent(context, CustomerViewOfMerchant.class);
             viewMerch.putExtra("merch_id", merchant.id);
 
             // Check if context is an instance of Activity

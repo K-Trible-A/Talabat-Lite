@@ -4,11 +4,8 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.io.IOException;
 
 public class MerchantActivity extends AppCompatActivity {
 
@@ -16,7 +13,8 @@ public class MerchantActivity extends AppCompatActivity {
     MerchantHomeFragment merchantHomeFragment;
     MerchantOrdersFragment merchantOrdersFragment;
     MerchantProfileFragment merchantProfileFragment;
-    MerchantSearchFragment merchantSearchFragment;
+    ItemsSearchFragment itemsSearchFragment;
+    // ItemSearchFragment itemSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,17 +24,17 @@ public class MerchantActivity extends AppCompatActivity {
 
         initUI();
         setupListeners();
-
     }
-    
 
     protected void initUI() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         merchantHomeFragment = new MerchantHomeFragment();
         merchantOrdersFragment = new MerchantOrdersFragment();
         merchantProfileFragment = new MerchantProfileFragment();
-        merchantSearchFragment = new MerchantSearchFragment();
+        itemsSearchFragment = new ItemsSearchFragment();
+        // itemSearchFragment = new ItemSearchFragment();
 
+        // Initially set the Home fragment
         if (merchantHomeFragment != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, merchantHomeFragment)
@@ -44,32 +42,33 @@ public class MerchantActivity extends AppCompatActivity {
         }
     }
 
-    protected void setupListeners ()
-    {
-
+    protected void setupListeners() {
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.home)
-            {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantHomeFragment).commit();
+            if (item.getItemId() == R.id.home) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, merchantHomeFragment)
+                        .commit();
                 return true;
             }
-            if (item.getItemId() == R.id.orders)
-            {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantOrdersFragment).commit();
+            if (item.getItemId() == R.id.orders) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, merchantOrdersFragment)
+                        .commit();
                 return true;
             }
-            if (item.getItemId() == R.id.profile)
-            {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantProfileFragment).commit();
+            if (item.getItemId() == R.id.profile) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, merchantProfileFragment)
+                        .commit();
                 return true;
             }
-            if (item.getItemId() == R.id.search)
-            {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,merchantSearchFragment).commit();
+            if (item.getItemId() == R.id.search) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, itemsSearchFragment)
+                        .commit();
                 return true;
             }
             return false;
         });
-
     }
 }

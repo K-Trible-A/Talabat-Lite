@@ -14,27 +14,53 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
+
+    // Kept the original variable names
     public static class itemData {
         int id;
         public String name, description;
         public float price;
         Bitmap img;
-        public itemData ()
-        { }
-        public itemData (int id, String name , String description , float price , Bitmap img)
-        {
+
+        // Default constructor
+        public itemData() {}
+
+        // Constructor with parameters
+        public itemData(int id, String name, String description, float price, Bitmap img) {
+            this.id = id;
             this.name = name;
             this.description = description;
             this.price = price;
             this.img = img;
-            this.id = id;
+        }
+
+        // Getters for encapsulation
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public float getPrice() {
+            return price;
+        }
+
+        public Bitmap getImg() {
+            return img;
         }
     }
+
     private List<itemData> itemList;
     private Context context;
 
+    // Constructor for the adapter
     public ItemAdapter(Context context, List<itemData> itemList) {
         this.context = context;
         this.itemList = itemList;
@@ -52,21 +78,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         itemData item = itemList.get(position);
         holder.itemName.setText(item.name);
-        holder.itemPrice.setText(String.format("%.1f",item.price) + "$");
+        holder.itemPrice.setText(String.format("%.1f $", item.price)); // Formatting price
         holder.itemDescription.setText(item.description);
         holder.itemImage.setImageBitmap(item.img);
+
         holder.itemView.setOnClickListener(v -> {
-            if (!globals.isCustomer)
-            {
+            if (!globals.isCustomer) { // Ensure 'globals' is properly defined elsewhere in your project
                 Intent itemManagementActivity = new Intent(context, ItemManagementActivity.class);
                 itemManagementActivity.putExtra("id", item.id);
                 itemManagementActivity.putExtra("name", item.name);
                 itemManagementActivity.putExtra("price", item.price);
                 itemManagementActivity.putExtra("description", item.description);
                 context.startActivity(itemManagementActivity);
-            }
-            else
-            {
+            } else {
                 Intent itemActivity = new Intent(context, ItemActivity.class);
                 itemActivity.putExtra("id", item.id);
                 context.startActivity(itemActivity);
@@ -79,15 +103,18 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         return itemList.size();
     }
 
+    // ViewHolder class to hold the views for the RecyclerView
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView itemName, itemPrice, itemDescription;
         ImageView itemImage;
+
         public ViewHolder(View itemView) {
             super(itemView);
-            itemName = itemView.findViewById(R.id.itemName);
-            itemImage = itemView.findViewById(R.id.itemImage);
-            itemPrice = itemView.findViewById(R.id.itemPrice);
-            itemDescription = itemView.findViewById(R.id.item_description);
+            itemName = itemView.findViewById(R.id.itemName); // Correct ID
+            itemImage = itemView.findViewById(R.id.itemImage); // Correct ID
+            itemPrice = itemView.findViewById(R.id.itemPrice); // Correct ID
+            itemDescription = itemView.findViewById(R.id.itemDescription); // Correct ID
         }
     }
+
 }

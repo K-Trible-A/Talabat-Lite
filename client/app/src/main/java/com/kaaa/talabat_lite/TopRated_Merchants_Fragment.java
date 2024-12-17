@@ -12,7 +12,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,44 +87,63 @@ public class TopRated_Merchants_Fragment extends Fragment {
     private void getTopRated() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
+
             try {
-                socketHelper.getInstance().connect();
-                socketHelper.getInstance().sendInt(globals.GET_TOP_RATED_MERCHANTS);
-                socketHelper.getInstance().sendInt(globals.userId);
-                String Name1 = socketHelper.getInstance().recvString();
-                String Rate1 = socketHelper.getInstance().recvString();
-                String Name2 = socketHelper.getInstance().recvString();
-                String Rate2 = socketHelper.getInstance().recvString();
-                String Name3 = socketHelper.getInstance().recvString();
-                String Rate3 = socketHelper.getInstance().recvString();
-                int merch1_id=socketHelper.getInstance().recvInt();
-                int merch2_id=socketHelper.getInstance().recvInt();
-                int merch3_id=socketHelper.getInstance().recvInt();
-                int ok = socketHelper.getInstance().recvInt();
-                socketHelper.getInstance().close();
+                // Create URL connection
+                URL url = new URL(globals.serverURL + "/customer/getTopRatedMerchants/" + globals.userId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
 
-                // Update UI only on the main thread
-                requireActivity().runOnUiThread(() -> {
-                    DecimalFormat decimalFormat = new DecimalFormat("0.0");
+                int responseCode = conn.getResponseCode();
+                // Check the response code
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    Log.e("CustomerProfileFragment", "Error retrieving customer data");
+                    return;
+                }
+                // Read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+                // Parse the response JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                String Name1 = jsonResponse.getString("Name1");
+                String Name2 = jsonResponse.getString("Name2");
+                String Name3 = jsonResponse.getString("Name3");
 
-                    Merch_1_Name.setText(" ");
-                    Merch_1_Rate.setText(" ");
-                    Merch_2_Name.setText(" ");
-                    Merch_2_Rate.setText(" ");
-                    Merch_3_Name.setText(" ");
-                    Merch_3_Rate.setText(" ");
-                    merch1.setVisibility(View.INVISIBLE);
-                    merch2.setVisibility(View.INVISIBLE);
-                    merch3.setVisibility(View.INVISIBLE);
+                String Rate1 = jsonResponse.getString("Rate1");
+                String Rate2 = jsonResponse.getString("Rate2");
+                String Rate3 = jsonResponse.getString("Rate3");
 
-                    if (ok == 1) {
+                int merch1_id = jsonResponse.getInt("Id1");
+                int merch2_id = jsonResponse.getInt("Id2");
+                int merch3_id = jsonResponse.getInt("Id3");
+
+                if(conn.getResponseCode() == HttpURLConnection.HTTP_OK){
+                    // Update UI only on the main thread
+                    requireActivity().runOnUiThread(() -> {
+                        DecimalFormat decimalFormat = new DecimalFormat("0.0");
+
+                        Merch_1_Name.setText(" ");
+                        Merch_1_Rate.setText(" ");
+                        Merch_2_Name.setText(" ");
+                        Merch_2_Rate.setText(" ");
+                        Merch_3_Name.setText(" ");
+                        Merch_3_Rate.setText(" ");
+                        merch1.setVisibility(View.INVISIBLE);
+                        merch2.setVisibility(View.INVISIBLE);
+                        merch3.setVisibility(View.INVISIBLE);
+
                         if (!Name1.equals("there is no other merchants")) {
                             Merch_1_Name.setText(Name1);
                             Merch_1_Rate.setText(formatRate(Rate1, decimalFormat));
                             merch1.setVisibility(View.VISIBLE);
                             merch1.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch1_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
@@ -124,7 +151,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             });
                             Merch_1_Name.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch1_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
@@ -132,7 +159,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             });
                             Merch_1_Rate.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch1_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
@@ -145,7 +172,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             merch2.setVisibility(View.VISIBLE);
                             merch2.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch2_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
@@ -153,7 +180,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             });
                             Merch_2_Name.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch1_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
@@ -161,7 +188,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             });
                             Merch_2_Rate.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch1_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
@@ -174,7 +201,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             merch3.setVisibility(View.VISIBLE);
                             merch3.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch3_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
@@ -182,7 +209,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             });
                             Merch_3_Name.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch1_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
@@ -190,17 +217,23 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             });
                             Merch_3_Rate.setOnClickListener(v -> {
                                 Activity activity = requireActivity();
-                                Intent intent = new Intent(activity, CustomerViewofMerchant.class);
+                                Intent intent = new Intent(activity, CustomerViewOfMerchant.class);
                                 intent.putExtra("merch_id", merch1_id); // pass merhcid as string
                                 startActivity(intent);
                                 // Handle the click event here
                                 // Add your desired action, e.g., open a new activity, make a network call, etc.
                             });
                         }
-                    }
-                });
-            } catch (IOException e) {
-                Log.e("TopRated_Merchants_Fragment", "Connection Error", e);
+
+                    });
+                }
+                else{
+                    Log.e("Top3RatedMerchants", conn.getResponseMessage());
+                }
+            }catch (IOException e) {
+                Log.e("Top3RatedMerchants", "Failed to read response");
+            } catch (JSONException e) {
+                Log.e("Top3RatedMerchants", "Json error");
             }
         });
     }

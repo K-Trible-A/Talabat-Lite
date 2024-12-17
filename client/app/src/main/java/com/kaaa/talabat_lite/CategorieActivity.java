@@ -12,7 +12,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -57,20 +67,38 @@ public class CategorieActivity extends AppCompatActivity {
             try {
                 Intent intent = getIntent();
                 int businessType=intent.getIntExtra("businessType",0);
-                socketHelper.getInstance().connect();
-                socketHelper.getInstance().sendInt(globals.GET_CATEGORIE);
-                socketHelper.getInstance().sendInt(businessType);
-                int merchCount = socketHelper.getInstance().recvInt();
+                // Create URL connection
+                URL url = new URL(globals.serverURL + "/customer/getCategory/" + businessType);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
 
+                int responseCode = conn.getResponseCode();
+                // Check the response code
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    Log.e("CategoryActivity", "Error retrieving merchant data");
+                    return;
+                }
+                // Read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+                // Parse the response JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                int merchCount = jsonResponse.getInt("merchantCount");
                 List<MerchantAdapter.MerchantData> tempMerchList = new ArrayList<>();
-
+                JSONArray itemsArray = jsonResponse.getJSONArray("merchants");
                 for (int i = 0; i < merchCount; i++) {
-                    int merchId = socketHelper.getInstance().recvInt();
-                    String merchName = socketHelper.getInstance().recvString();
-                    float merchRate = socketHelper.getInstance().recvFloat();
+                    JSONObject merchantJson = itemsArray.getJSONObject(i);
+                    int merchId = merchantJson.getInt("merchId");
+                    String merchName = merchantJson.getString("merchName");
+                    float merchRate = (float) merchantJson.getDouble("merchRate");
                     tempMerchList.add(new MerchantAdapter.MerchantData(merchId, merchName, merchRate));
                 }
-                socketHelper.getInstance().close();
+                conn.disconnect();
 
                 // Update the main itemList and notify the adapter in the UI thread
                 mainHandler.post(() -> {
@@ -78,8 +106,11 @@ public class CategorieActivity extends AppCompatActivity {
                         merchList.addAll(tempMerchList);
                         merchAdapter.notifyDataSetChanged();
                 });
-            } catch (IOException e) {
+            } catch (JSONException e) {
                 Log.e("MerchantHomeFragment", "Error loading items from server", e);
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
     }

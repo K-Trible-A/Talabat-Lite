@@ -23,13 +23,13 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
 
     // Inner class for cart item data
     protected static class cartItemData {
-        int id;
-        int itemCount;
-        public String itemName;
-        public String merchName;
-        public float itemPrice;
-        public float itemTotalPrice;
-        public Bitmap itemImage;
+        private int id;
+        private int itemCount;
+        private String itemName;
+        private String merchName;
+        private float itemPrice;
+        private float itemTotalPrice;
+        private Bitmap itemImage;
 
         public cartItemData(int id, int itemCount, String itemName, String merchName, float itemPrice, float itemTotalPrice, Bitmap itemImage) {
             this.id = id;

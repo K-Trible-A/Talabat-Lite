@@ -1,7 +1,5 @@
 package com.kaaa.talabat_lite;
 
-import static com.kaaa.talabat_lite.globals.GET_MERCHANT_DATA;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,22 +12,31 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MerchantProfileFragment extends Fragment {
 
-    EditText profileBusinessType, profileKeywords, profilePickupAddress, profileRating;
-    TextView profileBusinessName;
-    Button changeAddressButton;
-    String businessName, type, keywords, pickupAddress;
+    private EditText profileBusinessType, profileKeywords, profilePickupAddress, profileRating;
+    private TextView profileBusinessName;
+    private Button changeAddressButton;
+    private String businessName, type, keywords, pickupAddress;
     float rating;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -39,6 +46,20 @@ public class MerchantProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Navigate to the Home fragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.container, new MerchantHomeFragment()) // Replace with your Home fragment class
+                        .commit();
+                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
+                if (bottomNavigationView != null)
+                {
+                    bottomNavigationView.setSelectedItemId(R.id.home);
+                }
+            }
+        });
 
         changeAddressLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -90,29 +111,39 @@ public class MerchantProfileFragment extends Fragment {
 
     private void getMerchantData() {
         try {
-            // Check if the fragment is added before accessing context
-            if (!isAdded()) {
-                Log.e("MerchantProfileFragment", "Fragment not attached to activity.");
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/getMerchantData/" + globals.userId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                Log.e("MerchantProfileFragment", "Error retrieving merchant data");
                 return;
             }
-
-            socketHelper.getInstance().connect();
-            socketHelper.getInstance().sendInt(globals.GET_MERCHANT_DATA);
-            socketHelper.getInstance().sendInt(globals.userId);
-            businessName = socketHelper.getInstance().recvString();
-            type = socketHelper.getInstance().recvString();
-            keywords = socketHelper.getInstance().recvString();
-            pickupAddress = socketHelper.getInstance().recvString();
-            rating = socketHelper.getInstance().recvFloat();
-            socketHelper.getInstance().close();
-
-            // Update UI safely on the main thread
+            // Read the response
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+            in.close();
+            // Parse the response JSON
+            JSONObject jsonResponse = new JSONObject(response.toString());
+            businessName = jsonResponse.getString("businessName");
+            keywords = jsonResponse.getString("keywords");
+            rating = (float) jsonResponse.getDouble("rating");
+            type = jsonResponse.getString("type");
+            pickupAddress = jsonResponse.getString("pickupAddress");
             mainHandler.post(this::updateUI);
-        } catch (IOException e) {
-            Log.e("MerchantProfileFragment", "Error fetching merchant data", e);
+        }catch (IOException e) {
+            Log.e("MerchantProfileFragment", "Failed to read response");
+        } catch (JSONException e) {
+            Log.e("MerchantProfileFragment", "Json error");
         }
     }
-
     private void fetchMerchantData() {
         // Execute data fetch in background
         executor.execute(this::getMerchantData);

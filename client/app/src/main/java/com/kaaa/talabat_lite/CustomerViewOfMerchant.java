@@ -1,23 +1,15 @@
 package com.kaaa.talabat_lite;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,7 +28,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MerchantHomeFragment extends Fragment {
+
+public class CustomerViewOfMerchant extends AppCompatActivity {
 
     private ItemAdapter itemAdapter;
     private List<ItemAdapter.itemData> itemList;
@@ -44,33 +37,29 @@ public class MerchantHomeFragment extends Fragment {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     TextView merchantName, merchantRating, merchantKeywords;
     String merchantNameStr, merchantKeywordsStr;
-    Button addItemButton;
-    double rating;
-    Intent addItemIntent;
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    float rating;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         if (executor.isShutdown()) {
             executor = Executors.newSingleThreadExecutor();
         }
-        View view = inflater.inflate(R.layout.fragment_merchant_home, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.itemRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_customer_viewof_merchant); // Link to your XML layout
+        RecyclerView recyclerView = findViewById(R.id.customerRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         itemList = new ArrayList<>();
-        itemAdapter = new ItemAdapter(getContext(), itemList);
+        itemAdapter = new ItemAdapter(this, itemList);
         recyclerView.setAdapter(itemAdapter);
-        initUI(view);
-        setupListeners();
+        initUI();
         fetchMerchantInfo();
-        return view;
     }
-
     private void getMerchantInfo ()
     {
         try {
             // Create URL connection
-            URL url = new URL(globals.serverURL + "/getMerchantInfoHome/" + globals.userId);
+            URL url = new URL(globals.serverURL + "/getMerchantInfoHome/" + getIntent().getIntExtra("merch_id", 0));
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
@@ -124,17 +113,14 @@ public class MerchantHomeFragment extends Fragment {
     }
     @SuppressLint("NotifyDataSetChanged")
     private void loadItemsFromServer() {
-        if (executor.isShutdown()) {
-            executor = Executors.newSingleThreadExecutor(); // Recreate the executor if it's shut down
-        }
-        executor.execute(() -> {
+        new Thread(()->{
             try {
-                URL url = new URL(globals.serverURL + "/get_items/" + globals.userId);
+                URL url = new URL(globals.serverURL + "/customer/get_items/" + getIntent().getIntExtra("merch_id", 0));
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 // Check response code
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    Log.e("MerchantHomeFragment", "Error loading items from server");
+                    Log.e("CustomerViewOfMerchant", "Error loading items from server");
                     return;
                 }
                 // Read the response
@@ -149,7 +135,9 @@ public class MerchantHomeFragment extends Fragment {
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 JSONArray itemsArray = jsonResponse.getJSONArray("items");
                 Log.i("HomeItems_items_count", String.valueOf(itemsArray.length()));
-                List<ItemAdapter.itemData> tempItemList = new ArrayList<>();
+
+                List<ItemAdapter.itemData> tempItemList = new ArrayList<>();  // Temporary list to hold items
+
                 for (int i = 0; i < itemsArray.length(); i++) {
                     JSONObject itemJson = itemsArray.getJSONObject(i);
                     int itemId = itemJson.getInt("itemId");
@@ -161,14 +149,14 @@ public class MerchantHomeFragment extends Fragment {
                     Bitmap itemImg = getItemImage(itemId);
                     tempItemList.add(new ItemAdapter.itemData(itemId, itemName, itemDescription, (float) itemPrice, itemImg));
                 }
+                connection.disconnect();
 
                 // Update the main itemList and notify the adapter in the UI thread
                 mainHandler.post(() -> {
-                    if (isAdded()) { // Check if fragment is still attached
-                        itemList.clear();
-                        itemList.addAll(tempItemList);
-                        itemAdapter.notifyDataSetChanged();
-                    }
+                    itemList.clear();
+                    itemList.addAll(tempItemList);
+                    itemAdapter.notifyDataSetChanged();
+
                 });
 
             } catch (IOException e) {
@@ -176,40 +164,26 @@ public class MerchantHomeFragment extends Fragment {
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }).start();
+
     }
 
-    private void fetchMerchantInfo() {
-        if (executor.isShutdown()) {
-            executor = Executors.newSingleThreadExecutor(); // Recreate executor if it was shut down
-        }
 
+    private void fetchMerchantInfo() {
         executor.execute(() -> {
             getMerchantInfo();
             mainHandler.post(() -> {
-                if (isAdded()) { // Check if fragment is still attached
-                    updateUI(); // Update UI after fetching merchant info
-                    loadItemsFromServer(); // Load items only after merchant info is fetched
-                }
+                loadItemsFromServer();
+                updateUI();
+                // Load items only after merchant info is fetched
             });
         });
     }
-
-protected void initUI(View view)
+    protected void initUI()
     {
-        merchantName = view.findViewById(R.id.merchantName);
-        merchantKeywords = view.findViewById(R.id.merchantKeywords);
-        merchantRating = view.findViewById(R.id.merchantRating);
-        addItemButton = view.findViewById(R.id.addItemButton);
-    }
-    protected void setupListeners()
-    {
-        addItemButton.setOnClickListener(view -> new Thread(this::addItem).start());
-    }
-    private void addItem ()
-    {
-        addItemIntent = new Intent(requireContext(),AddItemActivity.class);
-        startActivity(addItemIntent);
+        merchantName = findViewById(R.id.merchantName);
+        merchantKeywords = findViewById(R.id.merchantKeywords);
+        merchantRating = findViewById(R.id.merchantRating);
     }
     @SuppressLint("DefaultLocale")
     private void updateUI()
@@ -217,12 +191,5 @@ protected void initUI(View view)
         merchantName.setText(merchantNameStr);
         merchantRating.setText(String.format("Rating: %.1f", rating));
         merchantKeywords.setText(merchantKeywordsStr);
-    }
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (!executor.isShutdown()) {
-            executor.shutdownNow();
-        }
     }
 }

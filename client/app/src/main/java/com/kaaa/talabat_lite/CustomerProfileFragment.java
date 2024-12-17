@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,37 +23,36 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CustomerProfileFragment extends Fragment {
-
-    private EditText Name, Password, Country, City, Address;
-
-    TextView tvCurrentName ,tvCurrentCountry ,tvCurrentPassword ,tvCurrentCity ,tvCurrentDeliveryAddress ;
-
+    private EditText City, Address;
+    private TextView tvCurrentCity ,tvCurrentDeliveryAddress ;
     private Button btnPaymentMethod, btnSave, btnChangePicture;
-
     private ImageView imgCustomerPicture;
-
-    private Bitmap customerImage;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_customer_profile, container, false);
-
         // Initialize Views
         initUi(view);
         getdataofcustomer();
-
-
         // Save Profile Data
         btnSave.setOnClickListener(v -> saveProfileData());
-
         btnPaymentMethod.setOnClickListener(v -> {
             Activity activity = requireActivity();
             Intent intent = new Intent(activity, CustomerAddCardActivty.class);
@@ -69,20 +69,39 @@ public class CustomerProfileFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void initUi(View view)
     {
-        Name = view.findViewById(R.id.etName);
-        Password = view.findViewById(R.id.etPassword);
-        Country = view.findViewById(R.id.etCountry);
         City = view.findViewById(R.id.etCity);
         Address = view.findViewById(R.id.etAddress);
         btnPaymentMethod = view.findViewById(R.id.btnSetPaymentMethod);
         btnSave = view.findViewById(R.id.btnSave);
-        tvCurrentName = view.findViewById(R.id.tvCurrentName);
-        tvCurrentCountry = view.findViewById(R.id.tvCurrentCountry);
-        tvCurrentPassword = view.findViewById(R.id.tvCurrentPassword);
         tvCurrentCity = view.findViewById(R.id.tvCurrentCity);
         tvCurrentDeliveryAddress = view.findViewById(R.id.tvCurrentDeliveryAddress);
         imgCustomerPicture = view.findViewById(R.id.imgCustomerPicture);
         btnChangePicture = view.findViewById(R.id.btnChangePicture);
+    }
+    private Bitmap getCustomerImage() {
+        Bitmap temp;
+        try {
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/customer/getImage/" + globals.userId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                Log.i("CustomerProfileFragment","No Customer image");
+                return null;
+            }
+            // Read the response
+            InputStream inputStream = conn.getInputStream();
+            temp = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            Log.i("CustomerProfileFragment","Error retrieving customer image");
+            return null;
+        }
+        return temp;
     }
     @SuppressLint("RestrictedApi")
     private void getdataofcustomer()
@@ -90,91 +109,97 @@ public class CustomerProfileFragment extends Fragment {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                socketHelper.getInstance().connect();
-                socketHelper.getInstance().sendInt(globals.GET_CUSTOMER_DATA);
-                socketHelper.getInstance().sendInt(globals.userId);
-                String currentName = socketHelper.getInstance().recvString();
-                String currentPassword = socketHelper.getInstance().recvString();
-                String currentCountry = socketHelper.getInstance().recvString();
-                String currentCity = socketHelper.getInstance().recvString();
-                String currentDeliveryAddress = socketHelper.getInstance().recvString();
-                int ok = socketHelper.getInstance().recvInt();
-                socketHelper.getInstance().close();
-                if (ok == 1) {
-                    tvCurrentName.setText(MessageFormat.format("Current Name: {0}", currentName));
-                    tvCurrentCountry.setText(MessageFormat.format("Current Country: {0}", currentCountry));
-                    tvCurrentPassword.setText(MessageFormat.format("Current Password: {0}", currentPassword));
+                // Create URL connection
+                URL url = new URL(globals.serverURL + "/customer/getData/" + globals.userId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+
+                int responseCode = conn.getResponseCode();
+                // Check the response code
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    Log.e("CustomerProfileFragment", "Error retrieving customer data");
+                    return;
+                }
+                // Read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+                // Parse the response JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                String currentCity = jsonResponse.getString("city");
+                String currentDeliveryAddress = jsonResponse.getString("customerAddress");
+                if(conn.getResponseCode() == HttpURLConnection.HTTP_OK){
                     tvCurrentCity.setText(MessageFormat.format("Current City: {0}", currentCity));
                     tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", currentDeliveryAddress));
                 }
-                socketHelper.getInstance().connect();
-                socketHelper.getInstance().sendInt(globals.GET_CUSTOMER_IMAGE);
-                socketHelper.getInstance().sendInt(globals.userId);
-                int hasImage=socketHelper.getInstance().recvInt();
-                if (hasImage==1)
-                {
-                    customerImage = socketHelper.getInstance().recvImg();
-                    if (customerImage != null) {
-                        getActivity().runOnUiThread(() -> imgCustomerPicture.setImageBitmap(customerImage));
-                    } else {
-                        Log.e(TAG, "Error: Customer image is null.");
-                    }
+                else{
+                    Log.e("CustomerProfileFragment", conn.getResponseMessage());
                 }
-                socketHelper.getInstance().close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            }catch (IOException e) {
+                Log.e("CustomerProfileFragment", "Failed to read response");
+            } catch (JSONException e) {
+                Log.e("CustomerProfileFragment", "Json error");
+            }
+
+            Bitmap customerImage = getCustomerImage();
+            if(customerImage !=  null){
+                requireActivity().runOnUiThread(() -> imgCustomerPicture.setImageBitmap(customerImage));
+            }
+            else{
+                Log.e(TAG, "Error: Customer image is null.");
             }
         });
     }
     private void saveProfileData() {
-        String name = Name.getText().toString().trim();
-        String password = Password.getText().toString().trim();
-        String country = Country.getText().toString().trim();
         String city = City.getText().toString().trim();
         String address = Address.getText().toString().trim();
 
-        if (name.isEmpty() && password.isEmpty() && country.isEmpty() && city.isEmpty() && address.isEmpty()) {
+        if (city.isEmpty() && address.isEmpty()) {
             Toast.makeText(getContext(), "Please fill any of the fields", Toast.LENGTH_SHORT).show();
             return;
         }
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                socketHelper.getInstance().connect();
-                socketHelper.getInstance().sendInt(globals.EDIT_CUSTOMER_DATA);
-                socketHelper.getInstance().sendInt(globals.userId);
-                socketHelper.getInstance().sendString(name);
-                socketHelper.getInstance().sendString(password);
-                socketHelper.getInstance().sendString(country);
-                socketHelper.getInstance().sendString(city);
-                socketHelper.getInstance().sendString(address);
+                // Prepare the URL for the endpoint
+                URL server = new URL(globals.serverURL + "/customer/setData/" + globals.userId);
+                // Create the JSON payload
+                JSONObject jsonPayload = new JSONObject();
+                jsonPayload.put("address", address);
+                jsonPayload.put("city", city);
 
-                int ok = socketHelper.getInstance().recvInt();
-                socketHelper.getInstance().close();
+                // Open a connection to the server
+                HttpURLConnection conn = (HttpURLConnection) server.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true); // To send a body
+                // Send the request
+                OutputStream os = conn.getOutputStream();
+                os.write(jsonPayload.toString().getBytes(StandardCharsets.UTF_8));
+                os.flush();
+                os.close();
+                // Get the response code
+                int responseCode = conn.getResponseCode();
 
-                getActivity().runOnUiThread(() -> {
-                    if (ok == 1) {
-                        if (!name.isEmpty())
-                            tvCurrentName.setText(MessageFormat.format("Current Name: {0}", name));
-                        if (!country.isEmpty())
-                            tvCurrentCountry.setText(MessageFormat.format("Current Country: {0}", country));
-                        if (!password.isEmpty())
-                            tvCurrentPassword.setText(MessageFormat.format("Current Password: {0}", password));
-                        if (!city.isEmpty())
-                            tvCurrentCity.setText(MessageFormat.format("Current City: {0}", city));
-                        if (!address.isEmpty())
-                            tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", address));
-
-                        Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "Failed to update profile", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    if (!city.isEmpty())
+                        tvCurrentCity.setText(MessageFormat.format("Current City: {0}", city));
+                    if (!address.isEmpty())
+                        tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", address));
+                    Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(getContext(), "Failed to update profile", Toast.LENGTH_SHORT).show();
+                }
+                conn.disconnect();
             } catch (IOException e) {
-                getActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(), "Error saving profile: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
+                Log.e("CustomerProfileFragment", "Error: Edit customer data");
+            } catch (JSONException e) {
+                Log.e("CustomerProfileFragment", "Json error");
             }
         });
         // Save the data (to a database, server, or shared preferences)
