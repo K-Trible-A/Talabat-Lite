@@ -29,6 +29,9 @@ void registerRoutes() {
   changePickupAddress();
   getMerchantsSearchResults();
   getItemsSearchResults();
+  getMerchantActiveOrders();
+  getOrderDetails();
+  void getAccountType();
 }
 
 int main() {

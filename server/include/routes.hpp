@@ -20,3 +20,6 @@ void getMerchantData();
 void changePickupAddress();
 void getMerchantsSearchResults();
 void getItemsSearchResults();
+void getMerchantActiveOrders();
+void getOrderDetails();
+void getAccountType();
