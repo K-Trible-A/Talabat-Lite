@@ -14,15 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 
-public class MerchantOrderAdapter extends RecyclerView.Adapter<MerchantOrderAdapter.ViewHolder> {
+public class CourierOrderAdapter extends RecyclerView.Adapter<CourierOrderAdapter.ViewHolder> {
     public static class orderData {
         public String orderId;
-        public String customerName;
+        public String merchantName;
         public String totalAmount;
-        public orderData (int orderId, String customerName , float totalAmount)
+        public orderData (int orderId, String merchantName , float totalAmount)
         {
             this.orderId = String.valueOf(orderId);
-            this.customerName = customerName;
+            this.merchantName = merchantName;
             this.totalAmount = String.format("%.1f",totalAmount);
         }
     }
@@ -30,7 +30,7 @@ public class MerchantOrderAdapter extends RecyclerView.Adapter<MerchantOrderAdap
     private List<orderData> orderList;
     private Context context;
 
-    public MerchantOrderAdapter(Context context, List<orderData> orderList) {
+    public CourierOrderAdapter(Context context, List<orderData> orderList) {
         this.context = context;
         this.orderList = orderList;
     }
@@ -38,7 +38,7 @@ public class MerchantOrderAdapter extends RecyclerView.Adapter<MerchantOrderAdap
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.merchant_order_row, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.courier_order_row, parent, false);
         return new ViewHolder(view);
     }
 
@@ -46,9 +46,10 @@ public class MerchantOrderAdapter extends RecyclerView.Adapter<MerchantOrderAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         orderData order = orderList.get(position);
-        holder.orderId.setText("#" + order.orderId);
-        holder.customerName.setText(order.customerName);
+        holder.orderId.setText( "#" + order.orderId);
+        holder.merchantName.setText(order.merchantName);
         holder.totalAmount.setText(order.totalAmount + " EGP");
+
         holder.itemView.setOnClickListener(v -> {
             Intent orderDetailsActivity = new Intent(context,OrderDetailsActivity.class);
             orderDetailsActivity.putExtra("orderId",order.orderId);
@@ -62,11 +63,11 @@ public class MerchantOrderAdapter extends RecyclerView.Adapter<MerchantOrderAdap
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView orderId, customerName, totalAmount;
+        TextView orderId, merchantName, totalAmount;
         public ViewHolder(View itemView) {
             super(itemView);
             orderId = itemView.findViewById(R.id.orderId);
-            customerName = itemView.findViewById(R.id.customerName);
+            merchantName = itemView.findViewById(R.id.merchantName);
             totalAmount = itemView.findViewById(R.id.totalAmount);
         }
     }

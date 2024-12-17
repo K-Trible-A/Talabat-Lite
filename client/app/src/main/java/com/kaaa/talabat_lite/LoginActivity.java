@@ -111,9 +111,9 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(afterLoginIntent);
                 }
                 else if(accountType == 3){
-//                    Intent afterLoginIntent = new Intent(LoginActivity.this, MerchantActivity.class);
-//                    afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(afterLoginIntent);
+                    Intent afterLoginIntent = new Intent(LoginActivity.this, CourierActivity.class);
+                    afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(afterLoginIntent);
                 }
             } else if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 runOnUiThread(()-> Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show());

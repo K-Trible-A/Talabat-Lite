@@ -43,6 +43,8 @@ void registerRoutes() {
   getOrderDetails();
   getAccountType();
   removeCartItem();
+  getCourierData();
+  getCourierOrdersFromServer();
 }
 
 int main() {

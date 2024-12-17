@@ -78,6 +78,9 @@
         <activity
             android:name=".OrderDetailsActivity"
             android:exported="true" />
+        <activity
+            android:name=".CourierActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

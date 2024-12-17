@@ -11,6 +11,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class CustomerActivity extends AppCompatActivity  {
     public TopRated_Merchants_Fragment top_rated_fragment = new TopRated_Merchants_Fragment();
     public CustomerProfileFragment customer_profile = new CustomerProfileFragment();
+    public MerchantsSearchFragment merchantsSearchFragment = new MerchantsSearchFragment();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +34,9 @@ public class CustomerActivity extends AppCompatActivity  {
                 return true;
             }
             else if(item.getItemId()==R.id.nav_search) {
-                Toast.makeText(this, "Search Selected", Toast.LENGTH_SHORT).show();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, merchantsSearchFragment)
+                        .commit();
                 return true;
             }
             else if(item.getItemId()==R.id.nav_profile)
