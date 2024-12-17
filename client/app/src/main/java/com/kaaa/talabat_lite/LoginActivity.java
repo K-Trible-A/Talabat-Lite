@@ -100,8 +100,9 @@ public class LoginActivity extends AppCompatActivity {
                 Log.i("userId", String.valueOf(globals.userId));
                 Log.i("AccountType", String.valueOf(accountType));
                 if(accountType == 1){
-//                    Intent afterLoginIntent = new Intent(this, Customer.class);
-//                    startActivity(afterLoginIntent);
+                    globals.isCustomer = true;
+                    Intent afterLoginIntent = new Intent(this, CustomerActivity.class);
+                    startActivity(afterLoginIntent);
                 }
                 else if(accountType == 2){
                     Intent afterLoginIntent = new Intent(LoginActivity.this, MerchantActivity.class);

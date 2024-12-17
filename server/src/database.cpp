@@ -298,6 +298,27 @@ bool Database::createSchema() {
           "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId)"
           ");"))
     return false;
+  if (!this->execute( // customerImage information
+    "CREATE TABLE IF NOT EXISTS customerImage ("
+    "customerId INTEGER NOT NULL,"
+    "customerImage BLOB NOT NULL,"
+    "FOREIGN KEY(customerId) REFERENCES customer(customerId)"
+    ");"))return false;
+  if (!this->execute( // cart information
+    " CREATE TABLE IF NOT EXISTS cart ( "
+    " cartId INTEGER PRIMARY KEY AUTOINCREMENT, "
+    " userId INTEGER NOT NULL " //  each cart belongs to a user
+    ");")) return false;
+  if (!this->execute( // cartItems information
+    " CREATE TABLE IF NOT EXISTS cartItems ( "
+    " cartId INTEGER NOT NULL, "      // Foreign key to Cart table
+    " itemId INTEGER NOT NULL, "      // Foreign key to Items table
+    " quantity INTEGER NOT NULL, "    // Quantity of this item in the cart
+    " PRIMARY KEY (cartId, itemId), "   // Composite primary key
+    " FOREIGN KEY (cartId) REFERENCES cart(cartId) ON DELETE CASCADE, "
+    " FOREIGN KEY (itemId) REFERENCES item(itemId) ON DELETE CASCADE "
+    " );"))return false;
+  // Other tables
   if (!this->execute(
         "CREATE TABLE IF NOT EXISTS orders ("
         "orderId INTEGER PRIMARY KEY AUTOINCREMENT,"

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    tools:context=".CustomerProfileFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Top Spacer to provide consistent height from the top -->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="70dp" />
+
+        <!-- Customer Picture Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="176dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgCustomerPicture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="Customer Picture"
+                android:src="@drawable/customer_icon"
+                app:strokeColor="@color/white"
+                app:strokeWidth="0dp"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:id="@+id/btnChangePicture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change Picture"
+                android:textColor="@android:color/white"
+                tools:ignore="HardcodedText,TextContrastCheck" />
+        </LinearLayout>
+
+        <!-- Name Section -->
+
+        <!-- Country Section -->
+
+        <!-- Password Section -->
+
+        <!-- City Section -->
+
+        <!-- Delivery Address Section -->
+
+        <TextView
+            android:id="@+id/tvCurrentCity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
+            android:text="Current City: "
+            android:textColor="#000000"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText,TextSizeCheck" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etCity"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:hint="edit Your City"
+                tools:ignore="Autofill,HardcodedText,TextFields" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvCurrentDeliveryAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="31dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
+            android:text="Current Delivery Address: "
+            android:textColor="#000000"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText,TextSizeCheck" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <EditText
+                android:id="@+id/etAddress"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:hint="edit Your Delivery Address"
+                tools:ignore="Autofill,HardcodedText,TextFields" />
+        </LinearLayout>
+
+        <!-- Set Payment Method Button -->
+        <Button
+            android:id="@+id/btnSetPaymentMethod"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Set Payment Method"
+            android:textColor="@android:color/white"
+            tools:ignore="HardcodedText,TextContrastCheck" />
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="305dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Save"
+            android:textColor="@android:color/white"
+            tools:ignore="HardcodedText,TextContrastCheck" />
+
+    </LinearLayout>
+</ScrollView>
+
+
+
+

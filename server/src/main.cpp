@@ -29,6 +29,16 @@ void registerRoutes() {
   changePickupAddress();
   getMerchantsSearchResults();
   getItemsSearchResults();
+  getCustomerImage();
+  getCustomerData();
+  setCustomerData();
+  addCustomerImage();
+  getTopRatedMerchants();
+  getCartItems();
+  getCategory();
+  addCustomerCard();
+  customerGetItems();
+  addItemToCart();
   getMerchantActiveOrders();
   getOrderDetails();
   getAccountType();

@@ -19,10 +19,34 @@
         android:theme="@style/Theme.TalabatLite"
         tools:targetApi="31">
         <activity
+            android:name=".CartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddCustomerImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerAddCardActivty"
+            android:exported="false" />
+        <activity
+            android:name=".CategorieActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerViewOfMerchant"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ItemManagementActivity"
             android:exported="false" />
         <activity
             android:name=".CustomerRegistration"
+            android:exported="true" />
+        <activity
+            android:name=".MerchantRegistrationActivity"
+            android:exported="true" />
+        <activity
+            android:name=".CardActivity"
             android:exported="true" />
         <activity
             android:name=".LoginActivity"
@@ -31,13 +55,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".CardActivity"
-            android:exported="true" />
-        <activity
-            android:name=".MerchantRegistrationActivity"
-            android:exported="true">
         </activity>
         <activity
             android:name=".CourierRegistrationActivity"
@@ -57,9 +74,6 @@
             android:exported="true" />
         <activity
             android:name=".AddItemActivity"
-            android:exported="true" />
-        <activity
-            android:name=".CustomerViewOfMerchant"
             android:exported="true" />
         <activity
             android:name=".OrderDetailsActivity"

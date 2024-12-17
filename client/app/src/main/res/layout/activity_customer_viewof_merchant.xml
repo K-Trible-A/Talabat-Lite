@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CustomerViewofMerchant">
+
+    <!-- Merchant Info Section -->
+
+    <!-- RecyclerView Section -->
+    <LinearLayout
+        android:id="@+id/merchantInfoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="0dp"
+        android:orientation="horizontal"
+        android:padding="24dp"> <!-- Adjust this margin to lower the layout -->
+
+        <!-- Merchant Profile Picture -->
+        <ImageView
+            android:id="@+id/merchantProfilePicture"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/merchant_profile_picture"
+            android:elevation="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile_icon" />
+
+        <!-- Merchant Name and Rating -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/merchantName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/merchant_name"
+                android:textColor="@android:color/black"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/merchantRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/rating_4_5"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="16sp"
+                tools:ignore="TextContrastCheck" />
+
+            <!-- Merchant keywords -->
+            <TextView
+                android:id="@+id/merchantKeywords"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="burger, chicken, pasta"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/customerRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/merchantInfoLayout"
+        android:layout_marginTop="16dp"
+        tools:listitem="@layout/item_row" />
+</RelativeLayout>
