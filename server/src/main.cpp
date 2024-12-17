@@ -39,6 +39,9 @@ void registerRoutes() {
   addCustomerCard();
   customerGetItems();
   addItemToCart();
+  getMerchantActiveOrders();
+  getOrderDetails();
+  getAccountType();
 }
 
 int main() {

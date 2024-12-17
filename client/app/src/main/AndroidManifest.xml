@@ -41,7 +41,7 @@
             android:exported="false" />
         <activity
             android:name=".CustomerRegistration"
-            android:exported="true" /> <!-- Activities -->
+            android:exported="true" />
         <activity
             android:name=".MerchantRegistrationActivity"
             android:exported="true" />
@@ -74,6 +74,9 @@
             android:exported="true" />
         <activity
             android:name=".AddItemActivity"
+            android:exported="true" />
+        <activity
+            android:name=".OrderDetailsActivity"
             android:exported="true" />
     </application>
 

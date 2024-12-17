@@ -40,7 +40,7 @@ import java.util.concurrent.Executors;
 
 public class CustomerProfileFragment extends Fragment {
     private EditText City, Address;
-    private TextView tvCurrentCity ,tvCurrentDeliveryAddress ;
+    private TextView tvCurrentCity, tvCurrentDeliveryAddress;
     private Button btnPaymentMethod, btnSave, btnChangePicture;
     private ImageView imgCustomerPicture;
 
@@ -58,17 +58,16 @@ public class CustomerProfileFragment extends Fragment {
             Intent intent = new Intent(activity, CustomerAddCardActivty.class);
             startActivity(intent);
         });
-        btnChangePicture.setOnClickListener(v ->
-        {
+        btnChangePicture.setOnClickListener(v -> {
             Activity activity = requireActivity();
             Intent intent = new Intent(activity, AddCustomerImageActivity.class);
             startActivity(intent);
         });
         return view;
     }
+
     @SuppressLint("SetTextI18n")
-    private void initUi(View view)
-    {
+    private void initUi(View view) {
         City = view.findViewById(R.id.etCity);
         Address = view.findViewById(R.id.etAddress);
         btnPaymentMethod = view.findViewById(R.id.btnSetPaymentMethod);
@@ -78,6 +77,7 @@ public class CustomerProfileFragment extends Fragment {
         imgCustomerPicture = view.findViewById(R.id.imgCustomerPicture);
         btnChangePicture = view.findViewById(R.id.btnChangePicture);
     }
+
     private Bitmap getCustomerImage() {
         Bitmap temp;
         try {
@@ -90,7 +90,7 @@ public class CustomerProfileFragment extends Fragment {
             int responseCode = conn.getResponseCode();
             // Check the response code
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                Log.i("CustomerProfileFragment","No Customer image");
+                Log.i("CustomerProfileFragment", "No Customer image");
                 return null;
             }
             // Read the response
@@ -98,14 +98,14 @@ public class CustomerProfileFragment extends Fragment {
             temp = BitmapFactory.decodeStream(inputStream);
             inputStream.close();
         } catch (IOException e) {
-            Log.i("CustomerProfileFragment","Error retrieving customer image");
+            Log.i("CustomerProfileFragment", "Error retrieving customer image");
             return null;
         }
         return temp;
     }
+
     @SuppressLint("RestrictedApi")
-    private void getdataofcustomer()
-    {
+    private void getdataofcustomer() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
@@ -132,28 +132,36 @@ public class CustomerProfileFragment extends Fragment {
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 String currentCity = jsonResponse.getString("city");
                 String currentDeliveryAddress = jsonResponse.getString("customerAddress");
-                if(conn.getResponseCode() == HttpURLConnection.HTTP_OK){
-                    tvCurrentCity.setText(MessageFormat.format("Current City: {0}", currentCity));
-                    tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", currentDeliveryAddress));
-                }
-                else{
-                    Log.e("CustomerProfileFragment", conn.getResponseMessage());
-                }
-            }catch (IOException e) {
+
+                // Update the TextViews on the main thread
+                requireActivity().runOnUiThread(() -> {
+                    try {
+                        if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                            tvCurrentCity.setText(MessageFormat.format("Current City: {0}", currentCity));
+                            tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", currentDeliveryAddress));
+                        } else {
+                            Log.e("CustomerProfileFragment", conn.getResponseMessage());
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } catch (IOException e) {
                 Log.e("CustomerProfileFragment", "Failed to read response");
             } catch (JSONException e) {
                 Log.e("CustomerProfileFragment", "Json error");
             }
 
+            // Update the customer image on the main thread
             Bitmap customerImage = getCustomerImage();
-            if(customerImage !=  null){
+            if (customerImage != null) {
                 requireActivity().runOnUiThread(() -> imgCustomerPicture.setImageBitmap(customerImage));
-            }
-            else{
+            } else {
                 Log.e(TAG, "Error: Customer image is null.");
             }
         });
     }
+
     private void saveProfileData() {
         String city = City.getText().toString().trim();
         String address = Address.getText().toString().trim();
@@ -185,16 +193,17 @@ public class CustomerProfileFragment extends Fragment {
                 // Get the response code
                 int responseCode = conn.getResponseCode();
 
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    if (!city.isEmpty())
-                        tvCurrentCity.setText(MessageFormat.format("Current City: {0}", city));
-                    if (!address.isEmpty())
-                        tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", address));
-                    Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(getContext(), "Failed to update profile", Toast.LENGTH_SHORT).show();
-                }
+                requireActivity().runOnUiThread(() -> {
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        if (!city.isEmpty())
+                            tvCurrentCity.setText(MessageFormat.format("Current City: {0}", city));
+                        if (!address.isEmpty())
+                            tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", address));
+                        Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to update profile", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 conn.disconnect();
             } catch (IOException e) {
                 Log.e("CustomerProfileFragment", "Error: Edit customer data");
@@ -202,7 +211,5 @@ public class CustomerProfileFragment extends Fragment {
                 Log.e("CustomerProfileFragment", "Json error");
             }
         });
-        // Save the data (to a database, server, or shared preferences)
-        Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
     }
 }

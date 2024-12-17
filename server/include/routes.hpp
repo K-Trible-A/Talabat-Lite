@@ -30,3 +30,6 @@ void getCategory();
 void addCustomerCard();
 void customerGetItems();
 void addItemToCart();
+void getMerchantActiveOrders();
+void getOrderDetails();
+void getAccountType();

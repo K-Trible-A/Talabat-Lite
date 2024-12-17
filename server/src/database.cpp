@@ -319,5 +319,29 @@ bool Database::createSchema() {
     " FOREIGN KEY (itemId) REFERENCES item(itemId) ON DELETE CASCADE "
     " );"))return false;
   // Other tables
+  if (!this->execute(
+        "CREATE TABLE IF NOT EXISTS orders ("
+        "orderId INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "createdAt DATETIME DEFAULT CURRENT_TIMESTAMP," // Timestamp for record creation
+        "customerId INTEGER NOT NULL,"
+        "merchantId INTEGER NOT NULL,"
+        "totalAmount REAL NOT NULL,"
+        "orderStatus TEXT DEFAULT 'active',"            // 'active', 'completed', or 'canceled'
+        "assignedCourierId INTEGER,"                    //Courier who accepted the order, NULL if not accepted yet
+        "FOREIGN KEY (customerId) REFERENCES customer(customerId),"
+        "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId)"
+        ");"))
+    return false;
+
+  if (!this->execute( // order items
+      "CREATE TABLE IF NOT EXISTS orderItems ("
+      "orderItemId INTEGER PRIMARY KEY AUTOINCREMENT,"
+      "orderId INTEGER NOT NULL,"
+      "itemId INTEGER NOT NULL,"
+      "quantity INTEGER NOT NULL,"
+      "FOREIGN KEY (itemId) REFERENCES item(itemId),"
+      "FOREIGN KEY (orderId) REFERENCES orders(orderId)"
+      ");"))
+    return false;
   return true;
 }
