@@ -1252,3 +1252,83 @@ void getAccountType() {
         return crow::response(200, responseBody);
       });
 }
+void getCourierData()
+{
+  CROW_ROUTE(server, "/getCourierData/<int>")
+      .methods("GET"_method)([](const crow::request &req, int userId) {
+        // Validate the item ID
+        if (userId <= 0) {
+          return crow::response(400, "Invalid user ID");
+        }
+        // from users email,name,phoneNumber, country,city
+        // from courier nationalID vehicleType
+          vector<vector<string>> ans =
+              db.query("SELECT email, name, phoneNumber, country, city "
+                "FROM users WHERE id = " +to_string(userId) + " ;");
+        if (ans.empty()) {
+          return crow::response(500, "Error getCourierData");
+        }
+        string email = ans[0][0];
+        string name = ans[0][1];
+        string phoneNumber = ans[0][2];
+        string country = ans[0][3];
+        string city = ans[0][4];
+        vector<vector<string>>ans2 =
+          db.query("SELECT nationalID, vehicleType  "
+                "FROM courier WHERE courier.userId = " +to_string(userId) + " ;");
+        if (ans2.empty()) {
+          return crow::response(500, "Error getCourierData");
+        }
+        string nationalId = ans2[0][0];
+        string vehicleType = ans2[0][1];
+        crow::json::wvalue responseBody;
+        responseBody["email"] = email;
+        responseBody["name"] = name;
+        responseBody["phoneNumber"] = phoneNumber;
+        responseBody["country"] = country;
+        responseBody["city"] = city;
+        responseBody["nationalId"] = nationalId;
+        responseBody["vehicleType"] = vehicleType;
+        return crow::response(200, responseBody);
+      });
+  }
+void getCourierOrdersFromServer()
+{
+  CROW_ROUTE(server, "/getCourierOrdersFromServer/<int>")
+      .methods("GET"_method)([](const crow::request &req, int userId) {
+        // Validate the item ID
+        if (userId <= 0) {
+          return crow::response(400, "Invalid user ID");
+        }
+          vector<vector<string>> ans =
+              db.query("SELECT orderId, totalAmount,merchantId "
+                "FROM orders WHERE orderStatus = 'active';");
+
+        for (auto&row : ans)
+        {
+          string merchantId = row[2];
+          string merchantName =
+            db.query("SELECT businessName "
+                "FROM merchant WHERE merchantId = " + merchantId +";")[0][0];
+          row.pop_back();
+          row.push_back(merchantName);
+        }
+        crow::json::wvalue responseBody;
+        crow::json::wvalue::list orders;
+        crow::json::wvalue order1,order2;
+        order1["orderId"] = stoi("5123");order1["totalAmount"] = stof("801.5");
+          order1["merchantName"] = "pro";orders.push_back(std::move(order1));
+        order2["orderId"] = stoi("51122323");order2["totalAmount"] = stof("8012.5");
+          order2["merchantName"] = "HELLO";orders.push_back(std::move(order2));
+        for (auto&row : ans)
+        {
+          crow::json::wvalue order;
+          order["orderId"] = stoi(row[0]);
+          order["totalAmount"] = stof(row[1]);
+          order["merchantName"] = row[2];
+          orders.push_back(std::move(order));
+        }
+        responseBody["orders"] = std::move(orders);
+        return crow::response(200, responseBody);
+      });
+}

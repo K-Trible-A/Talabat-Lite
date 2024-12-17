@@ -45,4 +45,14 @@
     <string name="click">Click</string>
     <string name="continue1">Continue</string>
     <string name="accept_order">Accept Order</string>
+    <string name="courier_name">Courier Name</string>
+    <string name="your_name">Your Name</string>
+    <string name="vehicle_type">Vehicle Type</string>
+    <string name="national_id">National ID</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="email">Email</string>
+    <string name="country">Country</string>
+    <string name="city">City</string>
+    <string name="merchant">Merchant :</string>
+    <string name="order_id">Order ID :</string>
 </resources>
