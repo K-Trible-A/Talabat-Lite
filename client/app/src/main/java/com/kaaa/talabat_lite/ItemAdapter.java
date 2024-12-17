@@ -23,9 +23,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         public float price;
         Bitmap img;
 
-        // Default constructor
-        public itemData() {}
-
         // Constructor with parameters
         public itemData(int id, String name, String description, float price, Bitmap img) {
             this.id = id;
@@ -51,14 +48,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         public float getPrice() {
             return price;
         }
-
-        public Bitmap getImg() {
-            return img;
-        }
     }
 
-    private List<itemData> itemList;
-    private Context context;
+    private final List<itemData> itemList;
+    private final Context context;
 
     // Constructor for the adapter
     public ItemAdapter(Context context, List<itemData> itemList) {

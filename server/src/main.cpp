@@ -42,6 +42,7 @@ void registerRoutes() {
   getMerchantActiveOrders();
   getOrderDetails();
   getAccountType();
+  removeCartItem();
 }
 
 int main() {
