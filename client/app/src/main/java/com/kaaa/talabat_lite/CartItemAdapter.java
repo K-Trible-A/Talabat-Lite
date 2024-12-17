@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,21 +17,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.lang.ref.WeakReference;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHolder> {
 
     // Inner class for cart item data
-    protected static class cartItemData {
-        private int id;
-        private int itemCount;
-        private String itemName;
-        private String merchName;
-        private float itemPrice;
-        private float itemTotalPrice;
-        private Bitmap itemImage;
+    public static class cartItemData {
+        private final int id;
+        private final int itemCount;
+        private final String itemName;
+        private final String merchName;
+        private final float itemPrice;
+        private final float itemTotalPrice;
+        private final Bitmap itemImage;
 
         public cartItemData(int id, int itemCount, String itemName, String merchName, float itemPrice, float itemTotalPrice, Bitmap itemImage) {
             this.id = id;
@@ -42,13 +46,13 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
         }
     }
 
-    private List<cartItemData> cartItemList;
-    private WeakReference<Context> contextReference;
+    private final List<cartItemData> cartItemList;
+    private final Context context;
 
     public CartItemAdapter(Context context, List<cartItemData> cartItemList) {
         // Ensure the list is not null to avoid crashes
         this.cartItemList = cartItemList != null ? cartItemList : new ArrayList<>();
-        this.contextReference = new WeakReference<>(context);
+        this.context = context;
     }
 
     @NonNull
@@ -61,7 +65,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if (cartItemList == null || position >= cartItemList.size()) {
+        if (position >= cartItemList.size()) {
             Log.e("CartItemAdapter", "Invalid position or null cart item list");
             return;
         }
@@ -93,7 +97,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
 
         // Item image click listener
         holder.itemImage.setOnClickListener(v -> {
-            Context context = contextReference.get();
+            Context context = this.context;
             if (context != null) {
                 Intent viewItem = new Intent(context, ItemActivity.class);
                 viewItem.putExtra("id", cartItem.id);
@@ -104,21 +108,49 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
         // Remove item button listener
         holder.btnRemoveItem.setOnClickListener(v -> {
             Log.d("CartItemAdapter", "Remove button clicked for item: " + cartItem.itemName);
-            // Implement removal logic here
-            // Example: Remove from list and notify adapter
-            cartItemList.remove(position);
-            notifyItemRemoved(position);
-            // Optionally update the cart count and total in CartActivity
+
+            // Start a background thread to handle the network operation
+            new Thread(() -> {
+                boolean success = removeItemFromCart(cartItem.id);
+
+                // Use Handler to update the UI on the main thread after network operation
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+                mainHandler.post(() -> {
+                    if (success) {
+                        cartItemList.remove(position);
+                        notifyItemRemoved(position);
+                        Log.i("CartItemAdapter", "Item removed successfully");
+                    } else {
+                        Log.e("CartItemAdapter", "Error removing item from cart");
+                    }
+                });
+            }).start();
         });
     }
 
     @Override
     public int getItemCount() {
-        if (cartItemList == null) {
-            Log.e("CartItemAdapter", "Cart item list is null");
-            return 0;
-        }
         return cartItemList.size();
+    }
+
+    // Method to handle the network operation
+    private boolean removeItemFromCart(int itemId) {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(globals.serverURL + "/cart/removeItem/" + globals.userId + "/" + itemId);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            // Check response code
+            return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+        } catch (IOException e) {
+            Log.e("CartItemAdapter", "Error removing item from cart", e);
+            return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

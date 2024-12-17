@@ -218,7 +218,7 @@ public class ItemActivity extends AppCompatActivity {
 
                             // Schedule the intent to start after the toast duration
                             // Optional, if you want to close the current activity
-                            new Handler(Looper.getMainLooper()).postDelayed(this::finish, 2000); // Approximate Toast duration in milliseconds
+                            new Handler(Looper.getMainLooper()).postDelayed(this::finish, 1000); // Approximate Toast duration in milliseconds
                         });
                     }
                     else if (ok==0)
@@ -226,11 +226,12 @@ public class ItemActivity extends AppCompatActivity {
                         String message =" item(s) was in cart and update its quantity to "+cnt+" is successfully done !";
                         runOnUiThread(()->{
                             Toast.makeText(ItemActivity.this, message, Toast.LENGTH_SHORT).show();
-
-                            // Schedule the intent to start after the toast duration
-                            // Intent logic here
-                            // Optional, if you want to close the current activity
-                            new Handler(Looper.getMainLooper()).postDelayed(this::finish, 2000); // Approximate Toast duration in milliseconds
+                            Runnable runnable = () -> {
+                                Intent outIntent = new Intent(ItemActivity.this, CartActivity.class);
+                                finish();
+                                startActivity(outIntent);
+                            };
+                            new Handler(Looper.getMainLooper()).postDelayed(runnable, 1000); // Approximate Toast duration in milliseconds
                         });
                     }
                 }

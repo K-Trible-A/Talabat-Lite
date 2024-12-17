@@ -10,7 +10,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -69,7 +68,7 @@ public class CartActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e("CartActivityTag", "Error fetching cart items", e);
                 mainHandler.post(() ->
-                        Toast.makeText(CartActivity.this, "Failed to fetch cart items", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(CartActivity.this, "No items in the cart", Toast.LENGTH_SHORT).show()
                 );
             }
         });
