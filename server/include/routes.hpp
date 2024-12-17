@@ -35,3 +35,5 @@ void getOrderDetails();
 void getAccountType();
 void removeCartItem();
 void makeOrder();
+void getCourierData();
+void getCourierOrdersFromServer();
