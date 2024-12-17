@@ -42,6 +42,8 @@ void registerRoutes() {
   getMerchantActiveOrders();
   getOrderDetails();
   getAccountType();
+  getCourierData();
+  getCourierOrdersFromServer();
 }
 
 int main() {

@@ -60,7 +60,6 @@ public class OrderDetailsActivity extends AppCompatActivity {
         mainHandler = new Handler(Looper.getMainLooper());
         Intent outIntent = getIntent();
         orderIdStr = outIntent.getStringExtra("orderId");
-        orderIdStr = "505";
         itemList = new ArrayList<>();
         itemOrderAdapter = new ItemOrderAdapter(this, itemList);
         recyclerView.setAdapter(itemOrderAdapter);

@@ -33,3 +33,5 @@ void addItemToCart();
 void getMerchantActiveOrders();
 void getOrderDetails();
 void getAccountType();
+void getCourierData();
+void getCourierOrdersFromServer();
