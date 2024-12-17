@@ -692,3 +692,138 @@ void getItemsSearchResults(){
       return crow::response(200, responseBody);
     });
 }
+void getMerchantActiveOrders()
+{
+  CROW_ROUTE(server, "/getMerchantActiveOrders/<int>")
+    .methods("GET"_method)([](const crow::request &req, int userId) {
+      // Validate the item ID
+      if (userId <= 0) {
+        return crow::response(400, "Invalid user ID");
+      }
+      // get merchantId
+      vector<vector<string>> merchantId_query =
+          db.query("SELECT merchantId FROM merchant WHERE " + to_string(userId) +
+                   " = merchant.userId;");
+      if (merchantId_query.empty())
+        return crow::response(500, "Getting merchantId at getMerchantActiveOrders");
+      string merchantId = merchantId_query[0][0];
+      vector<vector<string>>ans =
+          db.query("SELECT orderId,totalAmount,customerId FROM orders WHERE " + merchantId  +
+                   " = orders.merchantId AND orders.orderStatus = 'active' ;" );
+      //replace customerId with customerName;
+      for (int i=0;i < ans.size();i++)
+      {
+        // get customerUserId from customer table
+        string customerUserId = db.query("SELECT userId FROM customer WHERE " + ans[i][2] + " = customer.customerId;")[0][0];
+        string customerName = db.query("SELECT name FROM users WHERE " + customerUserId + " = users.id;")[0][0];
+        ans[i].pop_back();
+        ans[i].push_back(customerName);
+      }
+      crow::json::wvalue responseBody;
+      crow::json::wvalue::list orders;
+      // answer have orderId, totalAmount , customerName
+
+      for (auto &row : ans) {
+        crow::json::wvalue order;
+        order["orderId"] = stoi(row[0]);
+        order["totalAmount"] = stof(row[1]);
+        order["customerName"] = row[2];
+        orders.push_back(std::move(order));
+      }
+      responseBody["orders"] = std::move(orders);
+      return crow::response(200, responseBody);
+    });
+}
+void getOrderDetails()
+{
+  CROW_ROUTE(server, "/getOrderDetails/<int>")
+    .methods("GET"_method)([](const crow::request &req, int orderId) {
+      // Validate the item ID
+      if (orderId <= 0) {
+        return crow::response(400, "Invalid orderId ID");
+      }
+      // get merchantId
+      vector<vector<string>> merchantId_query =
+          db.query("SELECT merchantId FROM orders WHERE " + to_string(orderId) +
+                   " = orders.orderId;");
+      if (merchantId_query.empty())
+        return crow::response(500, "Getting merchantId at getOrderDetails");
+      string merchantId = merchantId_query[0][0];
+      // get customerId
+      vector<vector<string>> customerId_query =
+          db.query("SELECT customerId FROM orders WHERE " + to_string(orderId) +
+                   " = orders.orderId;");
+      if (customerId_query.empty())
+        return crow::response(500, "Getting customerId at getOrderDetails");
+      string customerId = customerId_query[0][0];
+      vector<vector<string>>sql =
+        db.query("SELECT businessName,pickupAddress FROM merchant WHERE " + merchantId +
+                   " = merchant.merchantId;");
+      if (sql.empty())
+        return crow::response(500, "Getting businessName or pickupAddress at getOrderDetails");
+      string businessName = sql[0][0];
+      string pickupAddress = sql[0][1];
+      vector<vector<string>>sql2 =
+        db.query("SELECT totalAmount,orderStatus,createdAt FROM orders WHERE " + to_string(orderId)  +
+                   " = orders.orderId ;" );
+      if (sql2.empty())
+        return crow::response(500, "Getting totalAmount or orderStatus at getOrderDetails");
+      string totalAmount = sql2[0][0];
+      string orderStatus = sql2[0][1];
+      string createdAt = sql2[0][2];
+      string customerAddress =
+        db.query("SELECT deliveryAddress FROM customer WHERE " + customerId +
+                   " = customer.customerId ;" )[0][0];
+      vector<vector<string>>orderItem =
+          db.query("SELECT quantity,itemId FROM orderItems WHERE " + to_string(orderId)  +
+                   " = orderItems.orderId ;" );
+      //replace customerId with customerName;
+      for (int i=0;i < orderItem.size();i++)
+      {
+        // get itemName and itemPrice from item table
+        string itemId = orderItem[i][1];
+        string itemName = db.query("SELECT itemName FROM item WHERE " + itemId + " = item.itemId;")[0][0];
+        string itemPrice = db.query("SELECT itemPrice FROM item WHERE " + itemId + " = item.itemId;")[0][0];
+        orderItem[i].pop_back();
+        orderItem[i].push_back(itemName);
+        orderItem[i].push_back(itemPrice);
+      }
+      crow::json::wvalue responseBody;
+      responseBody["businessName"] = businessName;
+      responseBody["pickupAddress"] = pickupAddress;
+      responseBody["totalAmount"] = stof(totalAmount);
+      responseBody["orderStatus"] = orderStatus;
+      responseBody["createdAt"] = createdAt;
+      responseBody["customerAddress"] = customerAddress;
+      crow::json::wvalue::list items;
+      //orderItem = {quantitiy,itemName,itemPrice}
+      for (auto &row : orderItem) {
+        crow::json::wvalue item;
+        item["quantity"] = stoi(row[0]);
+        item["itemName"] = row[1];
+        item["itemPrice"] = stof(row[2]);
+        items.push_back(std::move(item));
+      }
+      responseBody["items"] = std::move(items);
+      return crow::response(200, responseBody);
+    });
+}
+void getAccountType()
+{
+  CROW_ROUTE(server, "/getAccountType/<int>")
+    .methods("GET"_method)([](const crow::request &req, int userId) {
+      // Validate the item ID
+      if (userId <= 0) {
+        return crow::response(400, "Invalid user ID");
+      }
+      vector<vector<string>>sql =
+        db.query("SELECT accountType FROM users WHERE " + to_string(userId) +
+                   " = users.id;");
+      if (sql.empty())
+        return crow::response(500, "Getting accountType ");
+      string accountType = sql[0][0];
+      crow::json::wvalue responseBody;
+      responseBody["accountType"] = accountType;
+      return crow::response(200, responseBody);
+    });
+}

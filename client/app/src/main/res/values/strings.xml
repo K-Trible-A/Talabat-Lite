@@ -18,7 +18,7 @@
     <string name="business_name">Business name</string>
     <string name="business_type_field">Business Type</string>
     <string name="keywords">Keywords</string>
-    <string name="pickup_address">Pickup Address</string>
+    <string name="pickup_address">Pickup Address : </string>
     <string name="keywords_field">Keywords</string>
     <string name="pickup_address_field">Pickup address</string>
     <string name="business_type">Business type</string>
@@ -36,4 +36,13 @@
     <string name="merchant_name">Merchant Name</string>
     <string name="merchant_profile_picture">Merchant profile picture</string>
     <string name="rating_4_5">Rating: 4.5</string>
+    <string name="date_created">Date Created</string>
+    <string name="order_status">Order Status</string>
+    <string name="ordey_summary">Ordey Summary</string>
+    <string name="customer_address">Customer Address :</string>
+    <string name="refresh">Refresh</string>
+    <string name="total">Total :</string>
+    <string name="click">Click</string>
+    <string name="continue1">Continue</string>
+    <string name="accept_order">Accept Order</string>
 </resources>
