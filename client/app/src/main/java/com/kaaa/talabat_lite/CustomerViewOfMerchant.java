@@ -87,7 +87,7 @@ public class CustomerViewOfMerchant extends AppCompatActivity {
         try {
             merchantImg = getProfileImg(getIntent().getIntExtra("merch_id", 0));
             // Create URL connection
-            URL url = new URL(globals.serverURL + "/getMerchantInfoHome/" + getIntent().getIntExtra("merch_id", 0));
+            URL url = new URL(globals.serverURL + "/customer/getMerchantInfoHome/" + getIntent().getIntExtra("merch_id", 0));
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 

@@ -47,7 +47,7 @@ void registerRoutes() {
   getCourierOrdersFromServer();
   uploadProfileImage();
   getProfileImage();
-}
+  customerGetsMerchantInfoHome();
 
 int main() {
   if (!db.createSchema())

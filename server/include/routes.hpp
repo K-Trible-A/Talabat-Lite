@@ -39,3 +39,4 @@ void getCourierData();
 void getCourierOrdersFromServer();
 void uploadProfileImage();
 void getProfileImage();
+void customerGetsMerchantInfoHome();
