@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
@@ -21,6 +22,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
@@ -50,6 +53,20 @@ public class CustomerProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_customer_profile, container, false);
         // Initialize Views
         initUi(view);
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Navigate to the Home fragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.container, new TopRated_Merchants_Fragment()) // Replace with your Home fragment class
+                        .commit();
+                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
+                if (bottomNavigationView != null)
+                {
+                    bottomNavigationView.setSelectedItemId(R.id.home);
+                }
+            }
+        });
         getdataofcustomer();
         // Save Profile Data
         btnSave.setOnClickListener(v -> saveProfileData());

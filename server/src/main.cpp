@@ -45,7 +45,10 @@ void registerRoutes() {
   removeCartItem();
   getCourierData();
   getCourierOrdersFromServer();
+  uploadProfileImage();
+  getProfileImage();
   customerGetsMerchantInfoHome();
+  getProfileImageMerchId();
 }
 
 int main() {

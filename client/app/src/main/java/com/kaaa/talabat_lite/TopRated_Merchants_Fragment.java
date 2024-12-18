@@ -3,6 +3,8 @@ package com.kaaa.talabat_lite;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import android.view.View;
@@ -18,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,7 +34,7 @@ public class TopRated_Merchants_Fragment extends Fragment {
     TextView Merch_1_Rate, Merch_2_Rate, Merch_3_Rate;
     Button Rest,phar,Groc,cartView;
     ImageView merch1, merch2, merch3;
-
+    Bitmap img1, img2, img3;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -84,6 +87,30 @@ public class TopRated_Merchants_Fragment extends Fragment {
         phar = ratedMerchants.findViewById(R.id.btnPharmacy);
         cartView = ratedMerchants.findViewById(R.id.btnViewCart);
     }
+    private Bitmap getProfileImg(int id) throws IOException {
+        Bitmap temp;
+        try {
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/get_profile_image_merchId/" + id);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+
+                return null;
+            }
+            // Read the response
+            InputStream inputStream = conn.getInputStream();
+            temp = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return temp;
+    }
     private void getTopRated() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
@@ -121,6 +148,10 @@ public class TopRated_Merchants_Fragment extends Fragment {
                 int merch1_id = jsonResponse.getInt("Id1");
                 int merch2_id = jsonResponse.getInt("Id2");
                 int merch3_id = jsonResponse.getInt("Id3");
+                img1 = getProfileImg(merch1_id);
+                img2 = getProfileImg(merch2_id);
+                img3 = getProfileImg(merch3_id);
+
 
                 if(conn.getResponseCode() == HttpURLConnection.HTTP_OK){
                     // Update UI only on the main thread
@@ -138,6 +169,10 @@ public class TopRated_Merchants_Fragment extends Fragment {
                         merch3.setVisibility(View.INVISIBLE);
 
                         if (!Name1.equals("there is no other merchants")) {
+                            if (img1 != null)
+                            {
+                                merch1.setImageBitmap(img1);
+                            }
                             Merch_1_Name.setText(Name1);
                             Merch_1_Rate.setText(formatRate(Rate1, decimalFormat));
                             merch1.setVisibility(View.VISIBLE);
@@ -167,6 +202,10 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             });
                         }
                         if (!Name2.equals("there is no other merchants")) {
+                            if (img2 != null)
+                            {
+                                merch2.setImageBitmap(img2);
+                            }
                             Merch_2_Name.setText(Name2);
                             Merch_2_Rate.setText(formatRate(Rate2, decimalFormat));
                             merch2.setVisibility(View.VISIBLE);
@@ -196,6 +235,10 @@ public class TopRated_Merchants_Fragment extends Fragment {
                             });
                         }
                         if (!Name3.equals("there is no other merchants")) {
+                            if (img3 != null)
+                            {
+                                merch3.setImageBitmap(img3);
+                            }
                             Merch_3_Name.setText(Name3);
                             Merch_3_Rate.setText(formatRate(Rate3, decimalFormat));
                             merch3.setVisibility(View.VISIBLE);

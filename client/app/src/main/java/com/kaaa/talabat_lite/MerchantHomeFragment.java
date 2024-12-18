@@ -7,14 +7,13 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -43,8 +42,10 @@ public class MerchantHomeFragment extends Fragment {
     private  ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     TextView merchantName, merchantRating, merchantKeywords;
+    ImageView profilePicture;
     String merchantNameStr, merchantKeywordsStr;
     Button addItemButton;
+    Bitmap profileImg;
     double rating;
     Intent addItemIntent;
     @Override
@@ -69,6 +70,7 @@ public class MerchantHomeFragment extends Fragment {
     private void getMerchantInfo ()
     {
         try {
+            profileImg = getProfileImg();
             // Create URL connection
             URL url = new URL(globals.serverURL + "/getMerchantInfoHome/" + globals.userId);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -122,6 +124,30 @@ public class MerchantHomeFragment extends Fragment {
         }
         return temp;
     }
+    private Bitmap getProfileImg() throws IOException {
+        Bitmap temp;
+        try {
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/get_profile_image/" + globals.userId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+
+                return null;
+            }
+            // Read the response
+            InputStream inputStream = conn.getInputStream();
+            temp = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return temp;
+    }
     @SuppressLint("NotifyDataSetChanged")
     private void loadItemsFromServer() {
         if (executor.isShutdown()) {
@@ -129,6 +155,7 @@ public class MerchantHomeFragment extends Fragment {
         }
         executor.execute(() -> {
             try {
+
                 URL url = new URL(globals.serverURL + "/get_items/" + globals.userId);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
@@ -195,12 +222,13 @@ public class MerchantHomeFragment extends Fragment {
         });
     }
 
-protected void initUI(View view)
+    protected void initUI(View view)
     {
         merchantName = view.findViewById(R.id.merchantName);
         merchantKeywords = view.findViewById(R.id.merchantKeywords);
         merchantRating = view.findViewById(R.id.merchantRating);
         addItemButton = view.findViewById(R.id.addItemButton);
+        profilePicture = view.findViewById(R.id.merchantProfilePicture);
     }
     protected void setupListeners()
     {
@@ -217,6 +245,10 @@ protected void initUI(View view)
         merchantName.setText(merchantNameStr);
         merchantRating.setText(String.format("Rating: %.1f", rating));
         merchantKeywords.setText(merchantKeywordsStr);
+        if (profileImg != null) {
+            profilePicture.setImageBitmap(profileImg);
+        }
+
     }
     @Override
     public void onDestroyView() {

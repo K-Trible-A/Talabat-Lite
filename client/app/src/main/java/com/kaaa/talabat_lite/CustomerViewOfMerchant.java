@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +39,8 @@ public class CustomerViewOfMerchant extends AppCompatActivity {
     TextView merchantName, merchantRating, merchantKeywords;
     String merchantNameStr, merchantKeywordsStr;
     float rating;
+    ImageView merchantPicture;
+    Bitmap merchantImg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +58,34 @@ public class CustomerViewOfMerchant extends AppCompatActivity {
         initUI();
         fetchMerchantInfo();
     }
+    private Bitmap getProfileImg(int id) throws IOException {
+        Bitmap temp;
+        try {
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/get_profile_image_merchId/" + id);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+
+                return null;
+            }
+            // Read the response
+            InputStream inputStream = conn.getInputStream();
+            temp = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return temp;
+    }
     private void getMerchantInfo ()
     {
         try {
+            merchantImg = getProfileImg(getIntent().getIntExtra("merch_id", 0));
             // Create URL connection
             URL url = new URL(globals.serverURL + "/customer/getMerchantInfoHome/" + getIntent().getIntExtra("merch_id", 0));
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -184,6 +212,7 @@ public class CustomerViewOfMerchant extends AppCompatActivity {
         merchantName = findViewById(R.id.merchantName);
         merchantKeywords = findViewById(R.id.merchantKeywords);
         merchantRating = findViewById(R.id.merchantRating);
+        merchantPicture = findViewById(R.id.merchantProfilePicture);
     }
     @SuppressLint("DefaultLocale")
     private void updateUI()
@@ -191,5 +220,9 @@ public class CustomerViewOfMerchant extends AppCompatActivity {
         merchantName.setText(merchantNameStr);
         merchantRating.setText(String.format("Rating: %.1f", rating));
         merchantKeywords.setText(merchantKeywordsStr);
+        if (merchantImg != null)
+        {
+            merchantPicture.setImageBitmap(merchantImg);
+        }
     }
 }

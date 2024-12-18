@@ -243,9 +243,12 @@ bool Database::createSchema() {
           "pickupAddress TEXT NOT NULL,"
           "nationalID TEXT NOT NULL,"
           "rating REAL NOT NULL,"
+          "profileImgId INTEGER,"
           "FOREIGN KEY(cardId) REFERENCES card(cardId),"
-          "FOREIGN KEY(userId) REFERENCES users(id));"))
+          "FOREIGN KEY(userId) REFERENCES users(id),"
+          "FOREIGN KEY(profileImgId) REFERENCES merchantImages(imageId) ON DELETE SET NULL);"))
     return false;
+	  
   if (!this->execute( // Courier information
           "CREATE TABLE IF NOT EXISTS courier (courierId INTEGER PRIMARY KEY "
           "AUTOINCREMENT ,"
@@ -343,5 +346,14 @@ bool Database::createSchema() {
       "FOREIGN KEY (orderId) REFERENCES orders(orderId)"
       ");"))
     return false;
+  if (!this->execute( // merchantImage information
+          "CREATE TABLE IF NOT EXISTS merchantImages ("
+          "imageId INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "merchantId INTEGER,"
+          "profileImg BLOB NOT NULL,"
+          "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId) ON DELETE CASCADE"
+          ");"))
+    return false;
+  
   return true;
 }

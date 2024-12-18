@@ -51,7 +51,9 @@ public class merchantArrayAdapter extends ArrayAdapter<merchantView> {
 
         // Set the data for the current position
         merchantView currentMerchant = merchantsToView.get(position);
-        viewHolder.merchantPicture.setImageResource(currentMerchant.getMerchantPicture());
+        if (currentMerchant.getMerchantPicture()!=null) {
+            viewHolder.merchantPicture.setImageBitmap(currentMerchant.getMerchantPicture());
+        }
         viewHolder.merchantName.setText(currentMerchant.getMerchantName());
         viewHolder.merchantKeywords.setText(currentMerchant.getMerchantKeywords());
         viewHolder.merchantRate.setText(currentMerchant.getMerchantRate());
