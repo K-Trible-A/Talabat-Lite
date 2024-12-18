@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +22,13 @@ public class MerchantAdapter extends RecyclerView.Adapter<MerchantAdapter.ViewHo
         int id;
         public String name;
         public float rating;
+        public Bitmap image;
 
-        public MerchantData(int id, String name, float rating) {
+        public MerchantData(int id, String name, float rating, Bitmap image) {
             this.name = name;
             this.rating = rating;
             this.id = id;
+            this.image = image;
         }
     }
 
@@ -50,6 +53,10 @@ public class MerchantAdapter extends RecyclerView.Adapter<MerchantAdapter.ViewHo
         MerchantData merchant = MerchantList.get(position);
         holder.merchName.setText(merchant.name);
         holder.merchRate.setText(String.format("%.1f", merchant.rating));
+        if (merchant.image != null)
+        {
+            holder.merchImage.setImageBitmap(merchant.image);
+        }
 
         holder.merchImage.setOnClickListener(v -> {
             Intent viewMerch = new Intent(context, CustomerViewOfMerchant.class);

@@ -2,6 +2,8 @@ package com.kaaa.talabat_lite;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -58,6 +61,30 @@ public class CategorieActivity extends AppCompatActivity {
             mainHandler.post(this::loadItemsFromServer);
             });
     }
+    private Bitmap getProfileImg(int id) throws IOException {
+        Bitmap temp;
+        try {
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/get_profile_image_merchId/" + id);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+
+                return null;
+            }
+            // Read the response
+            InputStream inputStream = conn.getInputStream();
+            temp = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return temp;
+    }
     @SuppressLint("NotifyDataSetChanged")
     private void loadItemsFromServer() {
         if (executor.isShutdown()) {
@@ -96,7 +123,8 @@ public class CategorieActivity extends AppCompatActivity {
                     int merchId = merchantJson.getInt("merchId");
                     String merchName = merchantJson.getString("merchName");
                     float merchRate = (float) merchantJson.getDouble("merchRate");
-                    tempMerchList.add(new MerchantAdapter.MerchantData(merchId, merchName, merchRate));
+                    Bitmap merchImg = getProfileImg(merchId);
+                    tempMerchList.add(new MerchantAdapter.MerchantData(merchId, merchName, merchRate,merchImg));
                 }
                 conn.disconnect();
 
