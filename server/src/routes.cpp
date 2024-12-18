@@ -1095,12 +1095,12 @@ void addItemToCart() {
         responseBody["merchId"] = merchId;
         // check if merchant is the same of items in cart
         vector<vector<string>> sql2 =
-            db.query("SELECT itemId from cartItems WHERE "+ cartId + " = cartItems.cartId LIMIT 1;");
+            db.query("SELECT itemId from cartItems WHERE "+ to_string(cartId) + " = cartItems.cartId LIMIT 1;");
         if (!sql2.empty())
         {
             string existingItemId = sql2[0][0];
             vector<vector<string>> sql3 =
-            db.query("SELECT userId from merchant WHERE "+ itemId + " = merchant.itemId ;");
+            db.query("SELECT userId from merchant WHERE "+ existingItemId + " = merchant.itemId ;");
             int existedMerchantId = stoi(sql3[0][0]);
             if(existedMerchantId != merchId)
             {
