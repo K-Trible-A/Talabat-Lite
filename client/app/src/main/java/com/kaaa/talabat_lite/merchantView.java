@@ -5,12 +5,14 @@ public class merchantView {
     private final String merchantKeywords;
     private final String merchantRate;
     private final int merchantPicture;
+    private final int merchantId;
 
-    public merchantView(String merchantName, String merchantKeywords, String merchantRate, int merchantPicture) {
+    public merchantView(String merchantName, String merchantKeywords, String merchantRate, int merchantPicture, int merchantId) {
         this.merchantName = merchantName;
         this.merchantKeywords = merchantKeywords;
         this.merchantRate = merchantRate;
         this.merchantPicture = merchantPicture;
+        this.merchantId = merchantId;
     }
 
     public String getMerchantName() {
@@ -23,6 +25,9 @@ public class merchantView {
 
     public String getMerchantRate() {
         return merchantRate;
+    }
+    public int getMerchantId(){
+        return merchantId;
     }
 
     public int getMerchantPicture() {
