@@ -37,3 +37,4 @@ void removeCartItem();
 void makeOrder();
 void getCourierData();
 void getCourierOrdersFromServer();
+void customerGetsMerchantInfoHome();

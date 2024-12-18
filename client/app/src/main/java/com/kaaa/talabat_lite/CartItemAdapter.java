@@ -83,7 +83,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
         // Set item details
         holder.itemName.setText("Item Name : "+cartItem.itemName);
         holder.itemMerch.setText("Merchant Name : " +cartItem.merchName);
-        holder.itemCount.setText(String.valueOf("Item Count : "+cartItem.itemCount));
+        holder.itemCount.setText("Item Count : " + cartItem.itemCount);
         holder.totalPrice.setText("Total Price : "+String.format("%.1f", cartItem.itemTotalPrice));
         holder.itemPrice.setText("One Item Price : "+String.format("%.1f", cartItem.itemPrice));
 

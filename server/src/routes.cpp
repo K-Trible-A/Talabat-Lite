@@ -499,7 +499,14 @@ void deleteItem() {
 }
 void getMerchantInfoHome() {
   CROW_ROUTE(server, "/getMerchantInfoHome/<int>")
-      .methods("GET"_method)([](const crow::request &req, int merchantId) {
+      .methods("GET"_method)([](const crow::request &req, int userId) {
+        vector<vector<string>> merchantId_query =
+            db.query("SELECT merchantId FROM merchant WHERE " +
+                     to_string(userId) + " = merchant.userId;");
+        if (merchantId_query.empty()) {
+          return crow::response(500, "Error getting merchantId");
+        }
+        int merchantId = stoi(merchantId_query[0][0]);
         const string sql =
             "SELECT businessName, keywords, rating FROM merchant "
             "WHERE merchantId = " +
@@ -843,7 +850,7 @@ void getTopRatedMerchants() {
         const string sql = "SELECT "
                            "merchant.businessName, "
                            "merchant.rating, "
-                           "merchant.userId "
+                           "merchant.merchantId "
                            "FROM "
                            "merchant "
                            "JOIN "
@@ -1349,6 +1356,32 @@ void getCourierOrdersFromServer() {
           orders.push_back(std::move(order));
         }
         responseBody["orders"] = std::move(orders);
+        return crow::response(200, responseBody);
+      });
+}
+
+void customerGetsMerchantInfoHome() {
+  CROW_ROUTE(server, "/customer/getMerchantInfoHome/<int>")
+      .methods("GET"_method)([](const crow::request &req, int merchantId) {
+        const string sql =
+            "SELECT businessName, keywords, rating FROM merchant "
+            "WHERE merchantId = " +
+            to_string(merchantId) + ";";
+        vector<vector<string>> ans = db.query(sql);
+        if (ans.empty() || ans[0].size() < 2) {
+          return crow::response(500, "Error deleting item");
+        }
+
+        const string &name = ans[0][0];
+        const string &keywords = ans[0][1];
+        float rating = stof(ans[0][2]);
+        rating = round(rating * 10) / 10; // 0.1 percision
+
+        crow::json::wvalue responseBody;
+        responseBody["businessName"] = name;
+        responseBody["keywords"] = keywords;
+        responseBody["rating"] = rating;
+
         return crow::response(200, responseBody);
       });
 }
