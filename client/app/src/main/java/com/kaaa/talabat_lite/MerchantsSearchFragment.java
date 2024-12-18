@@ -1,6 +1,8 @@
 package com.kaaa.talabat_lite;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +21,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -104,7 +107,30 @@ public class MerchantsSearchFragment extends Fragment {
             }
         });
     }
+    private Bitmap getProfileImg(int id) throws IOException {
+        Bitmap temp;
+        try {
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/get_profile_image/" + id);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
 
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+
+                return null;
+            }
+            // Read the response
+            InputStream inputStream = conn.getInputStream();
+            temp = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return temp;
+    }
     private void loadMerchantsFromServer() {
         new Thread(() -> {
             HttpURLConnection conn = null;
@@ -150,9 +176,11 @@ public class MerchantsSearchFragment extends Fragment {
                     String businessName = jsonResponse.getString("businessName" + i);
                     String keywords = jsonResponse.getString("keywords" + i);
                     float rating = (float) jsonResponse.getDouble("rating" + i);
+                    int id = jsonResponse.getInt("id" + i);
                     String rate = String.format("%.1f", rating);
+                    Bitmap img = getProfileImg(id);
                     Log.d("MerchantsSearchFragment", "Merchant: " + businessName + ", Rating: " + rate);
-                    retrievedMerchants.add(new merchantView(businessName, keywords, rate, R.drawable.profile_icon));
+                    retrievedMerchants.add(new merchantView(businessName, keywords, rate, img));
                 }
 
                 // Update UI on the main thread
