@@ -1,12 +1,14 @@
 package com.kaaa.talabat_lite;
 
+import android.graphics.Bitmap;
+
 public class merchantView {
     private final String merchantName;
     private final String merchantKeywords;
     private final String merchantRate;
-    private final int merchantPicture;
+    private final Bitmap merchantPicture;
 
-    public merchantView(String merchantName, String merchantKeywords, String merchantRate, int merchantPicture) {
+    public merchantView(String merchantName, String merchantKeywords, String merchantRate, Bitmap merchantPicture) {
         this.merchantName = merchantName;
         this.merchantKeywords = merchantKeywords;
         this.merchantRate = merchantRate;
@@ -25,7 +27,7 @@ public class merchantView {
         return merchantRate;
     }
 
-    public int getMerchantPicture() {
+    public Bitmap getMerchantPicture() {
         return merchantPicture;
     }
 }
