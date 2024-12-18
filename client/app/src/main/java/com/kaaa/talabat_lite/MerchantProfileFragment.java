@@ -2,6 +2,8 @@ package com.kaaa.talabat_lite;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -25,6 +28,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -35,13 +39,16 @@ public class MerchantProfileFragment extends Fragment {
 
     private EditText profileBusinessType, profileKeywords, profilePickupAddress, profileRating;
     private TextView profileBusinessName;
-    private Button changeAddressButton;
+    private ImageView profilePicture;
+    private Button changeAddressButton, editProfilePictureButton;
     private String businessName, type, keywords, pickupAddress;
     float rating;
+    private Bitmap profileImg;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private ActivityResultLauncher<Intent> changeAddressLauncher;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,11 +100,16 @@ public class MerchantProfileFragment extends Fragment {
         profileKeywords = rootView.findViewById(R.id.profileKeywords);
         profilePickupAddress = rootView.findViewById(R.id.profilePickupAddress);
         changeAddressButton = rootView.findViewById(R.id.changeAddressButton);
+        editProfilePictureButton = rootView.findViewById(R.id.editProfilePictureButton);
         profileRating = rootView.findViewById(R.id.profileRating);
+        profilePicture = rootView.findViewById(R.id.profile_icon);
+
     }
 
     protected void setupListeners() {
         changeAddressButton.setOnClickListener(view -> changePickupAddress());
+        editProfilePictureButton.setOnClickListener(view -> editProfilePicture());
+
     }
 
     private void changePickupAddress() {
@@ -108,9 +120,38 @@ public class MerchantProfileFragment extends Fragment {
         changePickupAddressIntent.putExtra("currentAddress", pickupAddress);
         changeAddressLauncher.launch(changePickupAddressIntent);
     }
+    private void editProfilePicture ()
+    {
+        Intent editProfilePictureIntent = new Intent(requireContext(),AddProfilePicActivity.class);
+        startActivity(editProfilePictureIntent);
+    }
+    private Bitmap getProfileImg() throws IOException {
+        Bitmap temp;
+        try {
+            // Create URL connection
+            URL url = new URL(globals.serverURL + "/get_profile_image/" + globals.userId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
 
+            int responseCode = conn.getResponseCode();
+            // Check the response code
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+
+                return null;
+            }
+            // Read the response
+            InputStream inputStream = conn.getInputStream();
+            temp = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return temp;
+    }
     private void getMerchantData() {
         try {
+            profileImg = getProfileImg();
             // Create URL connection
             URL url = new URL(globals.serverURL + "/getMerchantData/" + globals.userId);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -156,6 +197,9 @@ public class MerchantProfileFragment extends Fragment {
             profileKeywords.setText(keywords != null ? keywords : "No keywords set");
             profilePickupAddress.setText(pickupAddress != null ? pickupAddress : "No address set");
             profileRating.setText(String.valueOf(rating));
+            if (profileImg != null) {
+                profilePicture.setImageBitmap(profileImg);
+            }
         }
     }
 }

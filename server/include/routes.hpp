@@ -37,3 +37,5 @@ void removeCartItem();
 void makeOrder();
 void getCourierData();
 void getCourierOrdersFromServer();
+void uploadProfileImage();
+void getProfileImage();
