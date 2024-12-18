@@ -1095,14 +1095,23 @@ void addItemToCart() {
         responseBody["merchId"] = merchId;
         // check if merchant is the same of items in cart
         vector<vector<string>> sql2 =
-            db.query("SELECT itemId from cartItems WHERE "+ to_string(cartId) + " = cartItems.cartId LIMIT 1;");
+            db.query("SELECT itemId FROM cartItems WHERE "+ to_string(cartId) + " = cartItems.cartId LIMIT 1;");
         if (!sql2.empty())
         {
             string existingItemId = sql2[0][0];
             vector<vector<string>> sql3 =
-            db.query("SELECT userId from merchant WHERE "+ existingItemId + " = merchant.itemId ;");
+            db.query("SELECT "
+                                "id "
+                                "FROM "
+                                "users "
+                                "JOIN "
+                                "merchant "
+                                "ON merchant.userId = users.id "
+                                "WHERE "
+                                "merchant.merchantId = (SELECT merchantId FROM "
+                                "item WHERE itemId = " + existingItemId + ") ;");
             int existedMerchantId = stoi(sql3[0][0]);
-            if(existedMerchantId != merchId)
+            if( existedMerchantId != merchId)
             {
                 responseBody["ok"] = -1;
                 return crow::response(200, responseBody);
