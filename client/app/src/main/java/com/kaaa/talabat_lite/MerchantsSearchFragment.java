@@ -113,7 +113,7 @@ public class MerchantsSearchFragment extends Fragment {
         Bitmap temp;
         try {
             // Create URL connection
-            URL url = new URL(globals.serverURL + "/get_profile_image/" + id);
+            URL url = new URL(globals.serverURL + "/get_profile_image_merchId/" + id);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
@@ -178,12 +178,11 @@ public class MerchantsSearchFragment extends Fragment {
                     String businessName = jsonResponse.getString("businessName" + i);
                     String keywords = jsonResponse.getString("keywords" + i);
                     float rating = (float) jsonResponse.getDouble("rating" + i);
-                    int id = jsonResponse.getInt("id" + i);
                     String rate = String.format("%.1f", rating);
-                    Bitmap img = getProfileImg(id);
                     int merchantId = jsonResponse.getInt("merchantId" + i);
+                    Bitmap img = getProfileImg(merchantId);
                     Log.d("MerchantsSearchFragment", "Merchant: " + businessName + ", Rating: " + rate);
-                    retrievedMerchants.add(new merchantView(businessName, keywords, rate, R.drawable.profile_icon, merchantId));
+                    retrievedMerchants.add(new merchantView(businessName, keywords, rate, img, merchantId));
                 }
 
                 // Update UI on the main thread

@@ -48,6 +48,8 @@ void registerRoutes() {
   uploadProfileImage();
   getProfileImage();
   customerGetsMerchantInfoHome();
+  getProfileImageMerchId();
+}
 
 int main() {
   if (!db.createSchema())

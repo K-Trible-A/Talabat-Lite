@@ -40,3 +40,4 @@ void getCourierOrdersFromServer();
 void uploadProfileImage();
 void getProfileImage();
 void customerGetsMerchantInfoHome();
+void getProfileImageMerchId();

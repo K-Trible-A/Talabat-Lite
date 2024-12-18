@@ -1495,4 +1495,33 @@ void customerGetsMerchantInfoHome() {
         return crow::response(200, responseBody);
       });
 }
-
+void getProfileImageMerchId() {
+  CROW_ROUTE(server, "/get_profile_image_merchId/<int>")
+      .methods("GET"_method)([](const crow::request &req, int merchantId) {
+        // Validate the item ID
+        if (merchantId <= 0) {
+          return crow::response(400, "Invalid merchant ID");
+        }
+        // Query the database for the imageId
+        vector<vector<string>> queryImageId =
+            db.query("SELECT profileImgId "
+                     "FROM merchant WHERE merchantId = " +
+                     to_string(merchantId) + ";");
+        // Check if the item exists
+        if (queryImageId.empty()) {
+          return crow::response(404, "Image not found");
+        }
+        // Retrieve item details
+        int imageId = stoi(queryImageId[0][0]);
+        vector<vector<string>> itemImage =
+            db.query("SELECT profileImg FROM merchantImages WHERE imageId = " +
+                     to_string(imageId) + " ;");
+        if (itemImage.empty()) {
+          return crow::response(404, "Image not found");
+        }
+        crow::response res;
+        res.set_header("Content-Type", "image/jpeg");
+        res.write(itemImage[0][0]);
+        return res;
+      });
+}
