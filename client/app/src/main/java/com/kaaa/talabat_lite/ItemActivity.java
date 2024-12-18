@@ -234,6 +234,19 @@ public class ItemActivity extends AppCompatActivity {
                             new Handler(Looper.getMainLooper()).postDelayed(runnable, 1000); // Approximate Toast duration in milliseconds
                         });
                     }
+                    else if(ok==-1)
+                    {
+                        String message =" item from different merchant can't be added to cart to order !";
+                        runOnUiThread(()->{
+                            Toast.makeText(ItemActivity.this, message, Toast.LENGTH_SHORT).show();
+                            Runnable runnable = () -> {
+                                Intent outIntent = new Intent(ItemActivity.this, CartActivity.class);
+                                finish();
+                                startActivity(outIntent);
+                            };
+                            new Handler(Looper.getMainLooper()).postDelayed(runnable, 1000); // Approximate Toast duration in milliseconds
+                        });
+                    }
                 }
                 else {
                     showToast("Uploading error");
