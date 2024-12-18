@@ -627,9 +627,10 @@ void getMerchantsSearchResults() {
           [](const crow::request &req, const string &searchWord) {
             string sql;
             if (searchWord == "empty") {
-              sql = "SELECT businessName, keywords, rating, userId FROM merchant";
+
+              sql = "SELECT businessName, keywords, rating, merchantId FROM merchant";
             } else {
-              sql = "SELECT businessName, keywords, rating, userId FROM merchant "
+              sql = "SELECT businessName, keywords, rating FROM merchant "
                     "WHERE businessName LIKE '%" +
                     searchWord + "%' OR keywords LIKE '%" + searchWord +
                     "%' "
@@ -644,11 +645,11 @@ void getMerchantsSearchResults() {
               float rating = stof(ans[i][2]);
               rating = round(rating * 10) / 10;
               string rate = to_string(rating);
-	      int id = stoi(ans[i][3]);
+              int merchantId = stoi(ans[i][3]);
               responseBody["businessName" + to_string(i)] = businessName;
               responseBody["keywords" + to_string(i)] = keywords;
               responseBody["rating" + to_string(i)] = rate;
-	      responseBody["id" + to_string(i)] = id;
+              responseBody["merchantId" + to_string(i)] = merchantId;
             }
             return crow::response(200, responseBody);
           });

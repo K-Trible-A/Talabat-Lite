@@ -100,6 +100,8 @@ public class MerchantsSearchFragment extends Fragment {
             intent.putExtra("merchantName", selectedMerchant.getMerchantName());
             intent.putExtra("merchantKeywords", selectedMerchant.getMerchantKeywords());
             intent.putExtra("merchantRating", selectedMerchant.getMerchantRate());
+            intent.putExtra("merch_id", selectedMerchant.getMerchantId());
+
 
             // Start the activity
             if (getActivity() != null) {
@@ -179,8 +181,9 @@ public class MerchantsSearchFragment extends Fragment {
                     int id = jsonResponse.getInt("id" + i);
                     String rate = String.format("%.1f", rating);
                     Bitmap img = getProfileImg(id);
+                    int merchantId = jsonResponse.getInt("merchantId" + i);
                     Log.d("MerchantsSearchFragment", "Merchant: " + businessName + ", Rating: " + rate);
-                    retrievedMerchants.add(new merchantView(businessName, keywords, rate, img));
+                    retrievedMerchants.add(new merchantView(businessName, keywords, rate, R.drawable.profile_icon, merchantId));
                 }
 
                 // Update UI on the main thread
