@@ -102,6 +102,7 @@ public class LoginActivity extends AppCompatActivity {
                 if(accountType == 1){
                     globals.isCustomer = true;
                     Intent afterLoginIntent = new Intent(this, CustomerActivity.class);
+                    afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(afterLoginIntent);
                 }
                 else if(accountType == 2){

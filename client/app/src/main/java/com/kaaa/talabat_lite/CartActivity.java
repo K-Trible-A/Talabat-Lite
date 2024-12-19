@@ -1,6 +1,7 @@
 package com.kaaa.talabat_lite;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -130,10 +131,11 @@ public class CartActivity extends AppCompatActivity {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 showToast("Saving order success");
                 removeCartItems();
-                Intent outIntent = new Intent(CartActivity.this, CustomerActivity.class);
+                Intent outIntent = new Intent(CartActivity.this,CustomerActivity.class);
+                outIntent.putExtra("orders",true);
                 outIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(outIntent);
-                finish();
+                //finish();
             }
             else if(responseCode == HttpURLConnection.HTTP_CONFLICT){
                 showToast("Account with same email or phone number");
@@ -230,6 +232,10 @@ public class CartActivity extends AppCompatActivity {
                 float totalPrice = (float) itemJson.getDouble("TotalPrice");
                 totalAmount += totalPrice;
                 int itemId = itemJson.getInt("itemId");
+                if (firstItemId == 0)
+                {
+                    firstItemId = itemId;
+                }
                 int imageId = itemJson.getInt("imageId");
                 // Assuming you have a method `getItemImage(imageId)` to get the Bitmap for the item image
                 Bitmap itemImage = getItemImage(imageId);
