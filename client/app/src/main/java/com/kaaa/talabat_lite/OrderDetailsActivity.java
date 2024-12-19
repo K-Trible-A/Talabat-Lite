@@ -76,30 +76,30 @@ public class OrderDetailsActivity extends AppCompatActivity {
     private void getAccountType() {
         executorService.execute(() -> {
             try {
-            URL url = new URL(globals.serverURL + "/getAccountType/" + globals.userId);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            // Check response code
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                Log.e("OrderDetailsActivity", "Error loading items from server");
-                return;
+                URL url = new URL(globals.serverURL + "/getAccountType/" + globals.userId);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                // Check response code
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    Log.e("OrderDetailsActivity", "Error loading items from server");
+                    return;
+                }
+                // Read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+                // Parse the response JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                accountTypeStr = jsonResponse.getString("accountType");
+            } catch (IOException e) {
+                Log.e("OrderDetailsActivity", "Error loading Order data", e);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
-            // Read the response
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = in.readLine()) != null) {
-                response.append(line);
-            }
-            in.close();
-            // Parse the response JSON
-            JSONObject jsonResponse = new JSONObject(response.toString());
-            accountTypeStr = jsonResponse.getString("accountType");
-        } catch (IOException e) {
-            Log.e("OrderDetailsActivity", "Error loading Order data", e);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
         });
     }
 
@@ -180,15 +180,86 @@ public class OrderDetailsActivity extends AppCompatActivity {
         okButton = findViewById(R.id.okButton);
     }
 
+    public void merchantAcceptOrder() {
+        executorService.execute(() -> {
+            try {
+                URL url = new URL(globals.serverURL + "/merchantAcceptOrder/" + globals.userId);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                // Check response code
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    Log.e("merchantAcceptOrder", "Error loading items from server");
+                    return;
+                }
+                // Read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+                // Parse the response JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                if (jsonResponse.getInt("succeeded") == 1) {
+                    Toast.makeText(this, "Order Accepted", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Failed to accept order", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                Log.e("OrderDetailsActivity ->Merchant Accept Order", "Error loading Order data", e);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+    public void courierAcceptOrder() {
+        executorService.execute(() -> {
+            try {
+                URL url = new URL(globals.serverURL + "/courierAcceptOrder/" + globals.userId);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                // Check response code
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    Log.e("CourierAcceptOrder", "Error loading items from server");
+                    return;
+                }
+                // Read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+                // Parse the response JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+
+
+                if (jsonResponse.getInt("succeeded") == 1) {
+                    runOnUiThread(() -> Toast.makeText(OrderDetailsActivity.this, "Order Accepted", Toast.LENGTH_SHORT).show());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(OrderDetailsActivity.this, "This order has already been accepted by your friend. Please select a different order. ", Toast.LENGTH_SHORT).show());
+                }
+            } catch (IOException e) {
+                Log.e("OrderDetailsActivity ->Courier Accept Order", "Error loading Order data", e);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     protected void setupListeners() {
         okButton.setOnClickListener(v -> executorService.execute(() -> {
-            executorService.execute(() -> {
-                if(accountTypeStr.equals("1")){
 
-                }
+            if (accountTypeStr.equals("1")) {
 
-            });
-                mainHandler.post(this::onDestroy);
+            } else if (accountTypeStr.equals("2")) {       //Merchant
+                merchantAcceptOrder();
+            } else {                                      //Courier
+                courierAcceptOrder();
+            }
+            finish();
         }));
     }
 

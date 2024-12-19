@@ -52,6 +52,8 @@ void registerRoutes() {
   saveOrder();
   deleteCart();
   getCustomerOrdersFromServer();
+  merchantAcceptOrder();
+  courierAcceptOrder();
 }
 
 int main() {

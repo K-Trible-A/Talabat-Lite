@@ -1643,3 +1643,60 @@ void getCustomerOrdersFromServer() {
         return crow::response(200, responseBody);
       });
 }
+void merchantAcceptOrder()
+{
+  CROW_ROUTE(server, "/merchantAcceptOrder/<int>")
+      .methods("GET"_method)([](const crow::request &req, int userId) {
+        // Validate the item ID
+        if (userId <= 0) {
+          return crow::response(400, "Invalid user ID");
+        }
+        crow::json::wvalue responseBody;
+        responseBody["succeeded"] = 0;
+        vector<vector<string>>ans =
+            db.query("SELECT merchantId "
+                     "FROM merchant WHERE userId  = " + to_string(userId) + ";");
+          if (ans.size() > 1)
+          {
+            return crow::response(400, "Multiple Users with same merchantId");
+          }else if (ans.size() == 0)
+          {
+            return crow::response(400, "No merchant match this userId");
+          }
+          string merchantId = ans[0][0];
+        db.query("UPDATE orders SET orderStatus = 'Preparing'  "
+                     "WHERE orderStatus = 'active' AND merchantId = " + merchantId + ";");
+
+        responseBody["succeeded"] = 1;
+        return crow::response(200, responseBody);
+      });
+}
+void courierAcceptOrder()
+{
+  CROW_ROUTE(server, "/courierAcceptOrder/<int>")
+      .methods("GET"_method)([](const crow::request &req, int userId) {
+        // Validate the item ID
+        if (userId <= 0) {
+          return crow::response(400, "Invalid user ID");
+        }
+        crow::json::wvalue responseBody;
+        responseBody["succeeded"] = 0;
+        vector<vector<string>>ans =
+            db.query("SELECT courierId "
+                     "FROM courier WHERE userId  = " + to_string(userId) + ";");
+        if (ans.size() > 1)
+        {
+          return crow::response(400, "Multiple Users with same courierId");
+        }else if (ans.size() == 0)
+        {
+          return crow::response(400, "No courier match this userId");
+        }
+        string courierId = ans[0][0];
+        //Database::updateData("orders",{"orderStatus","assignedCourierId"},{"Delivering", courierId},)
+        db.query("UPDATE orders SET orderStatus = 'Delivering', assignedCourierId =  " + courierId +
+                     " WHERE orderStatus = 'Preparing' AND assignedCourierId = 12345;");
+
+        responseBody["succeeded"] = 1;
+        return crow::response(200, responseBody);
+      });
+}
