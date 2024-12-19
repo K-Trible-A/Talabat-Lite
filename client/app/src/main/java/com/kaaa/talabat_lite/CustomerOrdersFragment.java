@@ -11,10 +11,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +52,20 @@ public class CustomerOrdersFragment extends Fragment {
         orderList = new ArrayList<>();
         customerOrderAdapter = new CustomerOrderAdapter(getContext(), orderList);
         recyclerView.setAdapter(customerOrderAdapter);
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Navigate to the Home fragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.container, new TopRated_Merchants_Fragment()) // Replace with your Home fragment class
+                        .commit();
+                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
+                if (bottomNavigationView != null)
+                {
+                    bottomNavigationView.setSelectedItemId(R.id.home);
+                }
+            }
+        });
         initUI(view);
         setupListeners();
         fetchOrders();
