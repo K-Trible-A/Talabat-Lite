@@ -1343,14 +1343,6 @@ void getCourierOrdersFromServer() {
         crow::json::wvalue responseBody;
         crow::json::wvalue::list orders;
         crow::json::wvalue order1, order2;
-        order1["orderId"] = stoi("5123");
-        order1["totalAmount"] = stof("801.5");
-        order1["merchantName"] = "pro";
-        orders.push_back(std::move(order1));
-        order2["orderId"] = stoi("51122323");
-        order2["totalAmount"] = stof("8012.5");
-        order2["merchantName"] = "HELLO";
-        orders.push_back(std::move(order2));
         for (auto &row : ans) {
           crow::json::wvalue order;
           order["orderId"] = stoi(row[0]);
@@ -1586,3 +1578,41 @@ void getProfileImageMerchId() {
                 return crow::response(200, "Cart has been deleted successfully");
       });
 } 
+void getCustomerOrdersFromServer()
+{
+  CROW_ROUTE(server, "/getCustomerOrdersFromServer/<int>")
+      .methods("GET"_method)([](const crow::request &req, int userId) {
+        // Validate the item ID
+        if (userId <= 0) {
+          return crow::response(400, "Invalid user ID");
+        }
+        string customerId =
+            db.query("SELECT customerId "
+                     "FROM customer WHERE userId  = " + to_string(userId) + ";")[0][0];
+        vector<vector<string>> ans =
+            db.query("SELECT orderId, totalAmount,merchantId "
+                     "FROM orders WHERE customerId = " + customerId + ";");
+        for (auto &row : ans) {
+          string merchantId = row[2];
+          string merchantName = db.query("SELECT businessName "
+                                         "FROM merchant WHERE merchantId = " +
+                                         merchantId + ";")[0][0];
+          row.pop_back();
+          row.push_back(merchantName);
+        }
+
+        crow::json::wvalue responseBody;
+        crow::json::wvalue::list orders;
+        crow::json::wvalue order1, order2;
+        for (auto &row : ans) {
+          crow::json::wvalue order;
+          order["orderId"] = stoi(row[0]);
+          order["totalAmount"] = stof(row[1]);
+          order["merchantName"] = row[2];
+          orders.push_back(std::move(order));
+        }
+        responseBody["orders"] = std::move(orders);
+        return crow::response(200, responseBody);
+      });
+}
+

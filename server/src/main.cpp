@@ -51,6 +51,7 @@ void registerRoutes() {
   getProfileImageMerchId();
   saveOrder();
   deleteCart();
+  getCustomerOrdersFromServer();
 }
 
 int main() {
