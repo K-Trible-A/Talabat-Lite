@@ -44,3 +44,5 @@ void getProfileImageMerchId();
 void saveOrder();
 void deleteCart();
 void getCustomerOrdersFromServer();
+void merchantAcceptOrder();
+void courierAcceptOrder();
