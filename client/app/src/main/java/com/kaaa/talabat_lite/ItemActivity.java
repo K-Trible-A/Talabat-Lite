@@ -234,6 +234,11 @@ public class ItemActivity extends AppCompatActivity {
                             new Handler(Looper.getMainLooper()).postDelayed(runnable, 1000); // Approximate Toast duration in milliseconds
                         });
                     }
+                    else if(ok == -1){
+                        runOnUiThread(()->{
+                            Toast.makeText(ItemActivity.this, "You can only order for on merchant at a time", Toast.LENGTH_SHORT).show();
+                        });
+                    }
                 }
                 else {
                     showToast("Uploading error");

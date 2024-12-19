@@ -246,19 +246,20 @@ bool Database::createSchema() {
           "profileImgId INTEGER,"
           "FOREIGN KEY(cardId) REFERENCES card(cardId),"
           "FOREIGN KEY(userId) REFERENCES users(id),"
-          "FOREIGN KEY(profileImgId) REFERENCES merchantImages(imageId) ON DELETE SET NULL);"))
+          "FOREIGN KEY(profileImgId) REFERENCES merchantImages(imageId) ON "
+          "DELETE SET NULL);"))
     return false;
-	  
+
   if (!this->execute( // Courier information
-          "CREATE TABLE IF NOT EXISTS courier (courierId INTEGER PRIMARY KEY "
-          "AUTOINCREMENT ,"
-          "userId INTEGER NOT NULL,"
-          "vehicleType TEXT NOT NULL ,"
-          "nationalID TEXT NOT NULL,"
-          "cardId INTEGER NOT NULL,"
-          "FOREIGN KEY(cardId) REFERENCES card(cardId) , FOREIGN "
-          "KEY(courierId) "
-          "REFERENCES users(id));"))
+          "CREATE TABLE IF NOT EXISTS courier ("
+          "courierId INTEGER PRIMARY KEY AUTOINCREMENT, "
+          "userId INTEGER NOT NULL, "
+          "vehicleType TEXT NOT NULL, "
+          "nationalID TEXT NOT NULL, "
+          "cardId INTEGER NOT NULL, "
+          "FOREIGN KEY(cardId) REFERENCES card(cardId), "
+          "FOREIGN KEY(userId) REFERENCES users(id) "
+          ");"))
     return false;
   if (!this->execute( // Card information
           "CREATE TABLE IF NOT EXISTS card ("
@@ -302,58 +303,60 @@ bool Database::createSchema() {
           ");"))
     return false;
   if (!this->execute( // customerImage information
-    "CREATE TABLE IF NOT EXISTS customerImage ("
-    "customerId INTEGER NOT NULL,"
-    "customerImage BLOB NOT NULL,"
-    "FOREIGN KEY(customerId) REFERENCES customer(customerId)"
-    ");"))return false;
+          "CREATE TABLE IF NOT EXISTS customerImage ("
+          "customerId INTEGER NOT NULL,"
+          "customerImage BLOB NOT NULL,"
+          "FOREIGN KEY(customerId) REFERENCES customer(customerId)"
+          ");"))
+    return false;
   if (!this->execute( // cart information
-    " CREATE TABLE IF NOT EXISTS cart ( "
-    " cartId INTEGER PRIMARY KEY AUTOINCREMENT, "
-    " userId INTEGER NOT NULL " //  each cart belongs to a user
-    ");")) return false;
-  if (!this->execute( // cartItems information
-    " CREATE TABLE IF NOT EXISTS cartItems ( "
-    " cartId INTEGER NOT NULL, "      // Foreign key to Cart table
-    " itemId INTEGER NOT NULL, "      // Foreign key to Items table
-    " quantity INTEGER NOT NULL, "    // Quantity of this item in the cart
-    " PRIMARY KEY (cartId, itemId), "   // Composite primary key
-    " FOREIGN KEY (cartId) REFERENCES cart(cartId) ON DELETE CASCADE, "
-    " FOREIGN KEY (itemId) REFERENCES item(itemId) ON DELETE CASCADE "
-    " );"))return false;
-  // Other tables
+          "CREATE TABLE IF NOT EXISTS cart ( "
+          "cartId INTEGER PRIMARY KEY AUTOINCREMENT, "
+          "userId INTEGER NOT NULL, " // userId of customer account
+          "merchantId INTEGER NOT NULL, "
+          "itemId INTEGER NOT NULL, "
+          "quantity INTEGER NOT NULL, "
+          "FOREIGN KEY(userId) REFERENCES users(id), "
+          "FOREIGN KEY(merchantId) REFERENCES merchant(merchantId), "
+          "FOREIGN KEY(itemId) REFERENCES item(itemId)"
+          ");"))
+    return false;
   if (!this->execute(
-        "CREATE TABLE IF NOT EXISTS orders ("
-        "orderId INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "createdAt DATETIME DEFAULT CURRENT_TIMESTAMP," // Timestamp for record creation
-        "customerId INTEGER NOT NULL,"
-        "merchantId INTEGER NOT NULL,"
-        "totalAmount REAL NOT NULL,"
-        "orderStatus TEXT DEFAULT 'active',"            // 'active', 'completed', or 'canceled'
-        "assignedCourierId INTEGER,"                    //Courier who accepted the order, NULL if not accepted yet
-        "FOREIGN KEY (customerId) REFERENCES customer(customerId),"
-        "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId)"
-        ");"))
+          "CREATE TABLE IF NOT EXISTS orders ("
+          "orderId INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "createdAt DATETIME DEFAULT CURRENT_TIMESTAMP," // Timestamp for
+                                                          // record creation
+          "customerId INTEGER NOT NULL,"
+          "merchantId INTEGER NOT NULL,"
+          "totalAmount REAL NOT NULL,"
+          "orderStatus TEXT DEFAULT 'active'," // 'active', 'completed', or
+                                               // 'canceled'
+          "assignedCourierId INTEGER," // Courier who accepted the order, NULL
+                                       // if not accepted yet
+          "FOREIGN KEY (customerId) REFERENCES customer(customerId),"
+          "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId)"
+          ");"))
     return false;
 
   if (!this->execute( // order items
-      "CREATE TABLE IF NOT EXISTS orderItems ("
-      "orderItemId INTEGER PRIMARY KEY AUTOINCREMENT,"
-      "orderId INTEGER NOT NULL,"
-      "itemId INTEGER NOT NULL,"
-      "quantity INTEGER NOT NULL,"
-      "FOREIGN KEY (itemId) REFERENCES item(itemId),"
-      "FOREIGN KEY (orderId) REFERENCES orders(orderId)"
-      ");"))
+          "CREATE TABLE IF NOT EXISTS orderItems ("
+          "orderItemId INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "orderId INTEGER NOT NULL,"
+          "itemId INTEGER NOT NULL,"
+          "quantity INTEGER NOT NULL,"
+          "FOREIGN KEY (itemId) REFERENCES item(itemId),"
+          "FOREIGN KEY (orderId) REFERENCES orders(orderId)"
+          ");"))
     return false;
   if (!this->execute( // merchantImage information
           "CREATE TABLE IF NOT EXISTS merchantImages ("
           "imageId INTEGER PRIMARY KEY AUTOINCREMENT,"
           "merchantId INTEGER,"
           "profileImg BLOB NOT NULL,"
-          "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId) ON DELETE CASCADE"
+          "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId) ON DELETE "
+          "CASCADE"
           ");"))
     return false;
-  
+
   return true;
 }

@@ -198,16 +198,17 @@ public class CartActivity extends AppCompatActivity {
         List<CartItemAdapter.cartItemData> tempCartItemList = new ArrayList<>();
 
         try {
-            URL url = new URL(globals.serverURL + "/customer/getCartItems/" + globals.userId);
+            // Construct the URL to fetch cart items for the user
+            URL url = new URL(globals.serverURL + "/cart/items/" + globals.userId);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            // Check response code
+            // Check if the response is OK
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 Toast.makeText(CartActivity.this, "Unexpected error. Please try again later.", Toast.LENGTH_SHORT).show();
                 Log.e("cartActivity", "Error loading cart items from server");
                 return;
             }
-            // Read the response
+            // Read the response from the server
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder response = new StringBuilder();
             String line;
@@ -215,12 +216,13 @@ public class CartActivity extends AppCompatActivity {
                 response.append(line);
             }
             in.close();
-            // Parse the response JSON
+            // Parse the JSON response
             JSONObject jsonResponse = new JSONObject(response.toString());
             JSONArray itemsArray = jsonResponse.getJSONArray("items");
+            // Iterate through each item in the response
             for (int i = 0; i < itemsArray.length(); i++) {
                 JSONObject itemJson = itemsArray.getJSONObject(i);
-
+                // Extract the necessary fields from the JSON response
                 String itemName = itemJson.getString("itemName");
                 int itemCount = itemJson.getInt("itemCount");
                 float itemPrice = (float) itemJson.getDouble("itemPrice");
@@ -228,31 +230,28 @@ public class CartActivity extends AppCompatActivity {
                 float totalPrice = (float) itemJson.getDouble("TotalPrice");
                 totalAmount += totalPrice;
                 int itemId = itemJson.getInt("itemId");
-                if (firstItemId == 0)
-                {
-                    firstItemId = itemId; // get an item id to get the merchant id
-                }
-                Bitmap itemImage = getItemImage(itemJson.getInt("imageId"));
-
-                // Add item to temporary list
+                int imageId = itemJson.getInt("imageId");
+                // Assuming you have a method `getItemImage(imageId)` to get the Bitmap for the item image
+                Bitmap itemImage = getItemImage(imageId);
+                // Add the item to the temporary list
                 tempCartItemList.add(new CartItemAdapter.cartItemData(
                         itemId, itemCount, itemName, merchName, itemPrice, totalPrice, itemImage
                 ));
             }
-
-            // Update the UI on the main thread
+            // Update the UI on the main thread with the loaded cart items
             mainHandler.post(() -> {
-                cartItemDataList.clear();
-                cartItemDataList.addAll(tempCartItemList);
-                cartAdapter.notifyDataSetChanged();
+                cartItemDataList.clear();  // Clear the existing data
+                cartItemDataList.addAll(tempCartItemList);  // Add the new data
+                cartAdapter.notifyDataSetChanged();  // Notify the adapter to update the view
             });
-
         } catch (IOException e) {
             Log.e("CartActivity", "Error loading items from server", e);
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            Log.e("CartActivity", "Error parsing JSON response", e);
         }
     }
+
+
 
     @Override
     protected void onDestroy() {
