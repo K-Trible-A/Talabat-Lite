@@ -1,6 +1,7 @@
 package com.kaaa.talabat_lite;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -22,8 +23,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -35,6 +38,8 @@ public class CartActivity extends AppCompatActivity {
     private final List<CartItemAdapter.cartItemData> cartItemDataList = new ArrayList<>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    int firstItemId = 0;
+    float totalAmount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +54,105 @@ public class CartActivity extends AppCompatActivity {
 
         // Initialize "Order Now" button
         Button btnOrderNow = findViewById(R.id.btnOrderNow);
-        btnOrderNow.setOnClickListener(view ->
-                Toast.makeText(CartActivity.this, "Order placed successfully!", Toast.LENGTH_SHORT).show()
-        );
+        btnOrderNow.setOnClickListener(view -> new Thread(this::saveOrder).start());
+
 
         // Fetch cart info
         fetchCartInfo();
     }
+    private void removeCartItems()
+    {
+        try
+        {
+            URL url = new URL(globals.serverURL + "/delete_cart/");
+            JSONObject jsonPayload = new JSONObject();
+            jsonPayload.put("firstItemId", firstItemId);
+            jsonPayload.put("userId", globals.userId);
+            // Open a connection to the server
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true); // To send a body
+            // Send the request
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonPayload.toString().getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+            // Get the response code
+            int responseCode = conn.getResponseCode();
 
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                showToast("Deleted Cart Items successfully!");
+            }
+            else {
+                showToast("Deletion Error!!");
+                Log.i("CartActivity", conn.getResponseMessage());
+            }
+            conn.disconnect();
+
+        } catch (IOException e) {
+            showToast("Failed to read response");
+        } catch (JSONException e) {
+            Log.e("CartActivity", "Json error");
+        }
+    }
+    private void saveOrder()
+    {
+        if (firstItemId == 0)
+        {
+            showToast("Cart is empty !");
+            return;
+        }
+        try
+        {
+            URL url = new URL(globals.serverURL + "/save_order/");
+            JSONObject jsonPayload = new JSONObject();
+            jsonPayload.put("userId", globals.userId);
+            jsonPayload.put("firstItemId", firstItemId);
+            jsonPayload.put("totalAmount", totalAmount);
+            Log.d("Cart","id = " + globals.userId);
+            Log.d("Cart","item id = " + firstItemId);
+            Log.d("Cart","total = " + totalAmount);
+            // Open a connection to the server
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true); // To send a body
+            // Send the request
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonPayload.toString().getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+
+            // Get the response code
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                showToast("Saving order success");
+                removeCartItems();
+                Intent outIntent = new Intent(CartActivity.this, CustomerActivity.class);
+                outIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(outIntent);
+                finish();
+            }
+            else if(responseCode == HttpURLConnection.HTTP_CONFLICT){
+                showToast("Account with same email or phone number");
+            }
+            else {
+                showToast("Registration error");
+                Log.i("CartActivity", conn.getResponseMessage());
+            }
+            conn.disconnect();
+
+        } catch (IOException e) {
+            showToast("Failed to read response");
+        } catch (JSONException e) {
+            Log.e("MerchantRegistration", "Json error");
+        }
+    }
+    private void showToast(String message) {
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
+    }
     private void fetchCartInfo() {
         if (executor.isShutdown()) {
             executor = Executors.newSingleThreadExecutor();
@@ -108,7 +204,7 @@ public class CartActivity extends AppCompatActivity {
             // Check response code
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 Toast.makeText(CartActivity.this, "Unexpected error. Please try again later.", Toast.LENGTH_SHORT).show();
-                Log.e("cartActivit", "Error loading cart items from server");
+                Log.e("cartActivity", "Error loading cart items from server");
                 return;
             }
             // Read the response
@@ -130,7 +226,12 @@ public class CartActivity extends AppCompatActivity {
                 float itemPrice = (float) itemJson.getDouble("itemPrice");
                 String merchName = itemJson.getString("merchName");
                 float totalPrice = (float) itemJson.getDouble("TotalPrice");
+                totalAmount += totalPrice;
                 int itemId = itemJson.getInt("itemId");
+                if (firstItemId == 0)
+                {
+                    firstItemId = itemId; // get an item id to get the merchant id
+                }
                 Bitmap itemImage = getItemImage(itemJson.getInt("imageId"));
 
                 // Add item to temporary list
@@ -147,7 +248,7 @@ public class CartActivity extends AppCompatActivity {
             });
 
         } catch (IOException e) {
-            Log.e("MerchantHomeFragment", "Error loading items from server", e);
+            Log.e("CartActivity", "Error loading items from server", e);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
