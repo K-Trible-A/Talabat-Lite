@@ -226,12 +226,10 @@ public class ItemActivity extends AppCompatActivity {
                         String message =" item(s) was in cart and update its quantity to "+cnt+" is successfully done !";
                         runOnUiThread(()->{
                             Toast.makeText(ItemActivity.this, message, Toast.LENGTH_SHORT).show();
-                            Runnable runnable = () -> {
-                                Intent outIntent = new Intent(ItemActivity.this, CartActivity.class);
-                                finish();
-                                startActivity(outIntent);
-                            };
-                            new Handler(Looper.getMainLooper()).postDelayed(runnable, 1000); // Approximate Toast duration in milliseconds
+
+                            // Schedule the intent to start after the toast duration
+                            // Optional, if you want to close the current activity
+                            new Handler(Looper.getMainLooper()).postDelayed(this::finish, 1000); // Approximate Toast duration in milliseconds
                         });
                     }
                     else if(ok==-1)
@@ -239,12 +237,10 @@ public class ItemActivity extends AppCompatActivity {
                         String message =" item from different merchant can't be added to cart to order !";
                         runOnUiThread(()->{
                             Toast.makeText(ItemActivity.this, message, Toast.LENGTH_SHORT).show();
-                            Runnable runnable = () -> {
-                                Intent outIntent = new Intent(ItemActivity.this, CartActivity.class);
-                                finish();
-                                startActivity(outIntent);
-                            };
-                            new Handler(Looper.getMainLooper()).postDelayed(runnable, 1000); // Approximate Toast duration in milliseconds
+
+                            // Schedule the intent to start after the toast duration
+                            // Optional, if you want to close the current activity
+                            new Handler(Looper.getMainLooper()).postDelayed(this::finish, 1000); // Approximate Toast duration in milliseconds
                         });
                     }
                 }

@@ -71,7 +71,7 @@
                 android:layout_marginEnd="16dp"
                 android:text="Count: 1"
                 android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:textSize="10sp"
                 tools:ignore="HardcodedText" />
 
             <!-- TextView for total price -->
@@ -82,7 +82,7 @@
                 android:layout_marginEnd="16dp"
                 android:text="Total: $0.00"
                 android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:textSize="10sp"
                 tools:ignore="HardcodedText,TextSizeCheck" />
         </LinearLayout>
 
