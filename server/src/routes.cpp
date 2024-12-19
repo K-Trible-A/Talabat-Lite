@@ -1080,7 +1080,7 @@ void addItemToCart() {
         // get merchant of this item
         const string getMerch = "SELECT merchantId FROM "
                                 "item WHERE itemId = " +
-                                std::to_string(itemId) + ") ;";
+                                std::to_string(itemId) + " ;";
         vector<vector<string>> answer = db.query(getMerch);
         int merchId = stoi(answer[0][0]);
         crow::json::wvalue responseBody;
@@ -1093,7 +1093,7 @@ void addItemToCart() {
             string existingItemId = sql2[0][0];
             vector<vector<string>> sql3 =
             db.query("SELECT merchantId FROM "
-                                "item WHERE itemId = " + existingItemId + ") ;");
+                                "item WHERE itemId = " + existingItemId + " ;");
             int existedMerchantId = stoi(sql3[0][0]);
             if( existedMerchantId != merchId)
             {
