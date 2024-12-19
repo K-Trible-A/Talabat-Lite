@@ -1517,6 +1517,67 @@ void getProfileImageMerchId() {
         return res;
       });
 }
+ void saveOrder() {
+  CROW_ROUTE(server, "/save_order/")
+      .methods("POST"_method)([](const crow::request &req) {
+        auto body = crow::json::load(req.body);
+        if (!body) {
+          return crow::response(400, "Invalid JSON payload");
+        }
+        // Validate all required keys before accessing them
+        if (!body.has("userId") || !body.has("firstItemId") || !body.has("totalAmount")) {
+          return crow::response(400,
+                                "Missing required fields in the JSON payload");
+        }
+        // get data from json
+        int userId = body["userId"].i();
+        int firstItemId = body["firstItemId"].i();
+        float totalAmount = body["totalAmount"].d();
+        const string sql = "SELECT merchantId FROM item WHERE itemId = " + to_string(firstItemId) + ";";
+	vector <vector<string>> ans = db.query(sql);
+	int merchantId = stoi(ans[0][0]);
+	const string sql2 = "SELECT customerId FROM customer WHERE userId = " + to_string(userId) + ";";
+	vector <vector<string>> res = db.query(sql2);
+	int customerId = stoi(res[0][0]);
+        // insert user to database
+        if (!db.insertData("orders",
+                           {"customerId", "merchantId", "totalAmount", "assignedCourierId"},
+			   {to_string(customerId), to_string(merchantId), to_string(totalAmount),"NULL"})) {
+          return crow::response(500, "Error inserting order into database");
+        }
+                return crow::response(200, "Merchant registered successfully");
+      });
+}
+ void deleteCart() {
+  CROW_ROUTE(server, "/delete_cart/")
+      .methods("POST"_method)([](const crow::request &req) {
+        auto body = crow::json::load(req.body);
+        if (!body) {
+          return crow::response(400, "Invalid JSON payload");
+        }
+        // Validate all required keys before accessing them
+        if (!body.has("firstItemId") || !body.has("userId")) {
+          return crow::response(400,
+                                "Missing required fields in the JSON payload");
+        }
+	int firstItemId = body["firstItemId"].i();
+	int userId = body["userId"].i();
+	vector <vector<string>> res = db.query("SELECT cartId FROM cartItems WHERE itemId = " + to_string(firstItemId) + ";");
+	int cartId = stoi(res[0][0]);
+	res = db.query("SELECT itemId, quantity FROM cartItems WHERE cartId = " + to_string(cartId) + ";");
+	vector <vector<string>> ans = db.query("SELECT customerId FROM customer WHERE userId = " + to_string(userId) + ";");
+	int customerId = stoi(ans[0][0]);
+	vector <vector<string>> fin = db.query("SELECT orderId FROM orders WHERE customerId = " + to_string(customerId) + ";");
+	int orderId = stoi(fin[0][0]);
+	for (auto& str : res)
+	{
+             db.insertData("orderItems",{"orderId","itemId","quantity"},{to_string(orderId),str[0],str[1]});
+	}
+	db.execute("DELETE FROM cartItems WHERE cartId = " + to_string(cartId) + ";");
+
+                return crow::response(200, "Cart has been deleted successfully");
+      });
+} 
 void getCustomerOrdersFromServer()
 {
   CROW_ROUTE(server, "/getCustomerOrdersFromServer/<int>")
@@ -1554,3 +1615,4 @@ void getCustomerOrdersFromServer()
         return crow::response(200, responseBody);
       });
 }
+

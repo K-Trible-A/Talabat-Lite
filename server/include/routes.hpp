@@ -41,4 +41,6 @@ void uploadProfileImage();
 void getProfileImage();
 void customerGetsMerchantInfoHome();
 void getProfileImageMerchId();
+void saveOrder();
+void deleteCart();
 void getCustomerOrdersFromServer();
