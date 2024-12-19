@@ -74,7 +74,8 @@ public class OrderDetailsActivity extends AppCompatActivity {
     }
 
     private void getAccountType() {
-        try {
+        executorService.execute(() -> {
+            try {
             URL url = new URL(globals.serverURL + "/getAccountType/" + globals.userId);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -99,6 +100,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+        });
     }
 
     private void loadOrderFromServer() {
@@ -180,9 +182,13 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
     protected void setupListeners() {
         okButton.setOnClickListener(v -> executorService.execute(() -> {
-            // Send delete request to server
-            // After background task, update UI on the main thread
-            mainHandler.post(this::onDestroy);
+            executorService.execute(() -> {
+                if(accountTypeStr.equals("1")){
+
+                }
+
+            });
+                mainHandler.post(this::onDestroy);
         }));
     }
 
