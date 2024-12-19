@@ -1340,7 +1340,7 @@ void getCourierOrdersFromServer() {
         }
         vector<vector<string>> ans =
             db.query("SELECT orderId, totalAmount,merchantId "
-                     "FROM orders WHERE orderStatus = 'active';");
+                     "FROM orders WHERE orderStatus = 'Preparing';");
 
         for (auto &row : ans) {
           string merchantId = row[2];
@@ -1561,7 +1561,7 @@ void saveOrder() {
                            {"customerId", "merchantId", "totalAmount",
                             "assignedCourierId"},
                            {to_string(customerId), to_string(merchantId),
-                            to_string(totalAmount), "NULL"})) {
+                            to_string(totalAmount), "12345"})) {
           return crow::response(500, "Error inserting order into database");
         }
         return crow::response(200, "Merchant registered successfully");

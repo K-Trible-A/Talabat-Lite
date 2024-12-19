@@ -202,9 +202,9 @@ public class OrderDetailsActivity extends AppCompatActivity {
                 // Parse the response JSON
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 if (jsonResponse.getInt("succeeded") == 1) {
-                    Toast.makeText(this, "Order Accepted", Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> Toast.makeText(OrderDetailsActivity.this, "Order Accepted", Toast.LENGTH_SHORT).show());
                 } else {
-                    Toast.makeText(this, "Failed to accept order", Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> Toast.makeText(OrderDetailsActivity.this, "Failed to accept order", Toast.LENGTH_SHORT).show());
                 }
             } catch (IOException e) {
                 Log.e("OrderDetailsActivity ->Merchant Accept Order", "Error loading Order data", e);

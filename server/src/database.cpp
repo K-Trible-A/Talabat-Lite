@@ -331,7 +331,7 @@ bool Database::createSchema() {
           "totalAmount REAL NOT NULL,"
           "orderStatus TEXT DEFAULT 'active'," // 'active', 'completed', or
                                                // 'canceled'
-          "assignedCourierId INTEGER," // Courier who accepted the order, NULL
+          "assignedCourierId INTEGER DEFAULT 12345," // Courier who accepted the order, NULL
                                        // if not accepted yet
           "FOREIGN KEY (customerId) REFERENCES customer(customerId),"
           "FOREIGN KEY (merchantId) REFERENCES merchant(merchantId)"
