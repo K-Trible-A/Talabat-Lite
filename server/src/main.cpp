@@ -49,6 +49,7 @@ void registerRoutes() {
   getProfileImage();
   customerGetsMerchantInfoHome();
   getProfileImageMerchId();
+  getCustomerOrdersFromServer();
 }
 
 int main() {
