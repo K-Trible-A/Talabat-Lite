@@ -1582,11 +1582,11 @@ void deleteCart() {
         int firstItemId = body["firstItemId"].i();
         int userId = body["userId"].i();
         vector<vector<string>> res =
-            db.query("SELECT cartId FROM cartItems WHERE itemId = " +
+            db.query("SELECT cartId FROM cart WHERE itemId = " +
                      to_string(firstItemId) + ";");
         int cartId = stoi(res[0][0]);
         res =
-            db.query("SELECT itemId, quantity FROM cartItems WHERE cartId = " +
+            db.query("SELECT itemId, quantity FROM cart WHERE cartId = " +
                      to_string(cartId) + ";");
         vector<vector<string>> ans =
             db.query("SELECT customerId FROM customer WHERE userId = " +
@@ -1600,7 +1600,7 @@ void deleteCart() {
           db.insertData("orderItems", {"orderId", "itemId", "quantity"},
                         {to_string(orderId), str[0], str[1]});
         }
-        db.execute("DELETE FROM cartItems WHERE cartId = " + to_string(cartId) +
+        db.execute("DELETE FROM cart WHERE cartId = " + to_string(cartId) +
                    ";");
 
         return crow::response(200, "Cart has been deleted successfully");
