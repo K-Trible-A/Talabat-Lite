@@ -104,7 +104,6 @@ public class MerchantOrdersFragment extends Fragment {
                 });
 
 
-
             } catch (IOException e) {
                 Log.e("MerchantOrdersFragment", "Error loading items from server", e);
             } catch (JSONException e) {

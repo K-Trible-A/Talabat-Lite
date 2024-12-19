@@ -101,6 +101,7 @@ public class CourierOrdersFragment extends Fragment {
                     }
                 });
 
+
             } catch (IOException e) {
                 Log.e("CourierOrdersFragment", "Error loading items from server", e);
             } catch (JSONException e) {

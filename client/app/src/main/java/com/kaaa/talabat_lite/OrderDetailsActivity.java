@@ -31,8 +31,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -184,8 +186,20 @@ public class OrderDetailsActivity extends AppCompatActivity {
         executorService.execute(() -> {
             try {
                 URL url = new URL(globals.serverURL + "/merchantAcceptOrder/" + globals.userId);
+                // Create the JSON payload
+                JSONObject jsonPayload = new JSONObject();
+                jsonPayload.put("orderId", orderIdStr);
+
+                // Open a connection to the server
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setDoOutput(true); // To send a body
+                // Send the request
+                OutputStream os = connection.getOutputStream();
+                os.write(jsonPayload.toString().getBytes(StandardCharsets.UTF_8));
+                os.flush();
+                os.close();
                 // Check response code
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     Log.e("merchantAcceptOrder", "Error loading items from server");
@@ -216,6 +230,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
     public void courierAcceptOrder() {
         executorService.execute(() -> {
             try {
+
                 URL url = new URL(globals.serverURL + "/courierAcceptOrder/" + globals.userId);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
@@ -234,7 +249,6 @@ public class OrderDetailsActivity extends AppCompatActivity {
                 in.close();
                 // Parse the response JSON
                 JSONObject jsonResponse = new JSONObject(response.toString());
-
 
                 if (jsonResponse.getInt("succeeded") == 1) {
                     runOnUiThread(() -> Toast.makeText(OrderDetailsActivity.this, "Order Accepted", Toast.LENGTH_SHORT).show());

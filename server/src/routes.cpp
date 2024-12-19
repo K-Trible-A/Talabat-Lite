@@ -1646,11 +1646,20 @@ void getCustomerOrdersFromServer() {
 void merchantAcceptOrder()
 {
   CROW_ROUTE(server, "/merchantAcceptOrder/<int>")
-      .methods("GET"_method)([](const crow::request &req, int userId) {
+      .methods("POST"_method)([](const crow::request &req, int userId) {
         // Validate the item ID
+        auto body = crow::json::load(req.body);
+        if (!body) {
+          return crow::response(400, "Invalid JSON payload");
+        }
         if (userId <= 0) {
           return crow::response(400, "Invalid user ID");
         }
+        if (!body.has("orderId"))
+        {
+          return crow::response(400,"Missing required fields in the JSON payload");
+        }
+        string orderId = body["orderId"].s();
         crow::json::wvalue responseBody;
         responseBody["succeeded"] = 0;
         vector<vector<string>>ans =
@@ -1665,7 +1674,7 @@ void merchantAcceptOrder()
           }
           string merchantId = ans[0][0];
         db.query("UPDATE orders SET orderStatus = 'Preparing'  "
-                     "WHERE orderStatus = 'active' AND merchantId = " + merchantId + ";");
+                     "WHERE orderStatus = 'active' AND merchantId = " + merchantId + " AND orderId =  " + orderId  + ";");
 
         responseBody["succeeded"] = 1;
         return crow::response(200, responseBody);
