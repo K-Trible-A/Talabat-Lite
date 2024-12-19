@@ -1078,15 +1078,7 @@ void addItemToCart() {
           cartId = stoi(temp[0][0]);
         }
         // get merchant of this item
-        const string getMerch = "SELECT "
-                                "id "
-                                "FROM "
-                                "users "
-                                "JOIN "
-                                "merchant "
-                                "ON merchant.userId = users.id "
-                                "WHERE "
-                                "merchant.merchantId = (SELECT merchantId FROM "
+        const string getMerch = "SELECT merchantId FROM "
                                 "item WHERE itemId = " +
                                 std::to_string(itemId) + ") ;";
         vector<vector<string>> answer = db.query(getMerch);
@@ -1100,15 +1092,7 @@ void addItemToCart() {
         {
             string existingItemId = sql2[0][0];
             vector<vector<string>> sql3 =
-            db.query("SELECT "
-                                "id "
-                                "FROM "
-                                "users "
-                                "JOIN "
-                                "merchant "
-                                "ON merchant.userId = users.id "
-                                "WHERE "
-                                "merchant.merchantId = (SELECT merchantId FROM "
+            db.query("SELECT merchantId FROM "
                                 "item WHERE itemId = " + existingItemId + ") ;");
             int existedMerchantId = stoi(sql3[0][0]);
             if( existedMerchantId != merchId)
