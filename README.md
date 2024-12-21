@@ -30,3 +30,43 @@ cd build
 make
 ./server
 ```
+## Features
+### For Merchant: 
+#### Registration:
+- Information useful for his branding like name, keywords, profile image and rating. <br>
+- Information useful for managing delivery personnel like pick-up address. <br>
+#### Functionality:
+- Add new items with information like (name, description, price and image). <br>
+- Remove added items. <br>
+- Edit his profile information (pick-up address and profile image). <br>
+- Search for his items. <br>
+- View active orders, accept them to be sent to active orders at every courier <br>
+account. 
+### For Customer: 
+#### Registration:
+- Information useful for delivery like delivery address and phone number. <br>
+- Information useful for his profile like name and profile image. <br>
+#### Functionality:
+- View merchant categories at home and the 3 top rated merchants of his city. <br>
+- Search for all merchants. <br>
+- View cart activity <br>
+- Update item quantity or remove them from cart. <br>
+- View orders <br>
+- View & edit profile information
+### For Courier: 
+#### Registration:
+- Information like vehicle type, phone number and national id. <br>
+- Card information to get his earnings. <br>
+#### Functionality:
+- View all active orders from merchants of same city. <br>
+- View order details.<br>
+- Accept orders.<br>
+## Security Warnings
+- There is no Encryption for sensitive data like passwords, card number, ...
+- There is no protection from SQL Injection attacks.
+- No protection from DDoS attacks.
+## Screenshots
+![screenshots](https://github.com/user-attachments/assets/6c4ebe77-06ed-43cf-a8bd-d372e623f695)
+
+
+
