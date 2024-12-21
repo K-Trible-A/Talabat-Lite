@@ -845,7 +845,7 @@ void addCustomerImage() {
       });
 }
 void getTopRatedMerchants() {
-  CROW_ROUTE(server, "/customer/getTopRatedMerchants/<int>")
+  CROW_ROUTE(server, "/getTopRatedMerchants/<int>")
       .methods(crow::HTTPMethod::GET)([](const crow::request &req,
                                          const int &userId) {
         if (userId <= 0) {
@@ -853,7 +853,8 @@ void getTopRatedMerchants() {
         }
         const string sql = "SELECT "
                            "merchant.businessName, "
-                           "merchant.rating, "
+                           "merchant.rating,"
+                           "merchant.keywords, "
                            "merchant.merchantId "
                            "FROM "
                            "merchant "
@@ -864,41 +865,20 @@ void getTopRatedMerchants() {
                            "users.city = (SELECT city FROM users WHERE id = " +
                            std::to_string(userId) +
                            ") ORDER BY "
-                           "merchant.rating DESC LIMIT 3;";
+                           "merchant.rating DESC LIMIT 10;";
         vector<vector<string>> ans = db.query(sql);
-        string merch_1_Name = "there is no other merchants", merch_1_Rate = "0",
-               merch_2_Name = "there is no other merchants", merch_2_Rate = "0";
-        string merch_3_Name = "there is no other merchants", merch_3_Rate = "0";
-        int merch1_id = 0, merch2_id = 0, merch3_id = 0;
-
-        if (ans.size() >= 1) {
-          merch_1_Name = ans[0][0];
-          merch_1_Rate = ans[0][1];
-          merch1_id = stoi(ans[0][2]);
-        }
-        if (ans.size() >= 2) {
-          merch_2_Name = ans[1][0];
-          merch_2_Rate = ans[1][1];
-          merch2_id = stoi(ans[1][2]);
-        }
-        if (ans.size() >= 3) {
-          merch_3_Name = ans[2][0];
-          merch_3_Rate = ans[2][1];
-          merch3_id = stoi(ans[2][2]);
-        }
         crow::json::wvalue responseBody;
-        responseBody["Name1"] = merch_1_Name;
-        responseBody["Name2"] = merch_2_Name;
-        responseBody["Name3"] = merch_3_Name;
-
-        responseBody["Rate1"] = merch_1_Rate;
-        responseBody["Rate2"] = merch_2_Rate;
-        responseBody["Rate3"] = merch_3_Rate;
-
-        responseBody["Id1"] = merch1_id;
-        responseBody["Id2"] = merch2_id;
-        responseBody["Id3"] = merch3_id;
-
+        crow::json::wvalue::list merchants;
+        for (auto&row : ans)
+        {
+          crow::json::wvalue merchant;
+          merchant["businessName"] = row[0];
+          merchant["rating"] = stof(row[1]);
+          merchant["keywords"] = row[2];
+          merchant["merchantId"] = row[3];
+          merchants.push_back(std::move(merchant));
+        }
+        responseBody["merchants"] = std::move(merchants);
         return crow::response(200, responseBody);
       });
 }

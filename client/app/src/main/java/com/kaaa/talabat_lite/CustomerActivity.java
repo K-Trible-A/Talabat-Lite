@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class CustomerActivity extends AppCompatActivity {
-    private final TopRated_Merchants_Fragment topRatedFragment = new TopRated_Merchants_Fragment();
+    private final CustomerHomeFragment customerHomeFragment = new CustomerHomeFragment();
     private final CustomerProfileFragment customerProfileFragment = new CustomerProfileFragment();
     private final MerchantsSearchFragment merchantsSearchFragment = new MerchantsSearchFragment();
     private final CustomerOrdersFragment customerOrdersFragment = new CustomerOrdersFragment();
@@ -39,13 +39,13 @@ public class CustomerActivity extends AppCompatActivity {
             bottomNavigationView.setSelectedItemId(R.id.nav_Orders);
         } else if (getSupportFragmentManager().findFragmentById(R.id.container) == null) {
             // Default fragment to load
-            loadFragment(topRatedFragment, "TopRatedFragment");
+            loadFragment(customerHomeFragment, "CustomerHomeFragment");
         }
 
         // Set a listener for BottomNavigationView item selection
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_home) {
-                loadFragment(topRatedFragment, "TopRatedFragment");
+                loadFragment(customerHomeFragment, "CustomerHomeFragment");
                 return true;
             } else if (item.getItemId() == R.id.nav_search) {
                 loadFragment(merchantsSearchFragment, "SearchFragment");
