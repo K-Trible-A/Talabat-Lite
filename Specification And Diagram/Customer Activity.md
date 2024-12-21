@@ -9,5 +9,5 @@
 - View cart.
 #### Footer
 - Home == [[Customer MainActivity]]
-- [[Talabat-Lite UML/Talabat Lite/Talabat Lite/Search]]
-- [[Talabat-Lite UML/Talabat Lite/Talabat Lite/Customer profile]]
+- [[Search]]
+- [[Customer profile]]

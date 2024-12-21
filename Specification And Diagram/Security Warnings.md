@@ -1,0 +1,4 @@
+- There is not Encryption for the sensitive data like passwords, card number, ...
+- There is no protection from SQL Injection attacks. 
+- In strings like address, name,  ... , the entered string may cause SQL errors or even segmentation fault if it has some special characters.
+- No protection from DDoS attacks.

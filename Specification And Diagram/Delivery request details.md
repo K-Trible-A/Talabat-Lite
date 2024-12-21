@@ -3,7 +3,7 @@
 	- Accept or Close
 		- In case of Accept a request goes to the server to check the state of the order request if it's still open.
 			- If it's open respond with true and start the request.
-			- If not toast a "The request is not available" and return to the [[Talabat-Lite UML/Talabat Lite/Talabat Lite/Delivery Activity]].
+			- If not toast a "The request is not available" and return to the [[Delivery Activity]].
 - Else
 	- Update status of the request
 		- Picked up

@@ -3,4 +3,4 @@
 	- Counter to number of each item.
 	- Remove item.
 - Payment summary: total {price, discount, delivery fee, service fee}.
-- [[Talabat-Lite UML/Talabat Lite/Talabat Lite/Checkout Activity]]
+- [[Checkout Activity]]
