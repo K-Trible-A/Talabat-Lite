@@ -97,10 +97,10 @@ public class LoginActivity extends AppCompatActivity {
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 globals.userId = jsonResponse.getInt("userId");
                 int accountType = jsonResponse.getInt("accountType");
+                globals.accountType = accountType;
                 Log.i("userId", String.valueOf(globals.userId));
                 Log.i("AccountType", String.valueOf(accountType));
                 if(accountType == 1){
-                    globals.isCustomer = true;
                     Intent afterLoginIntent = new Intent(this, CustomerActivity.class);
                     afterLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(afterLoginIntent);

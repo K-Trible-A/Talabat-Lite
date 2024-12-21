@@ -76,14 +76,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         holder.itemImage.setImageBitmap(item.img);
 
         holder.itemView.setOnClickListener(v -> {
-            if (!globals.isCustomer) { // Ensure 'globals' is properly defined elsewhere in your project
+            if (globals.accountType == 2) { // Ensure 'globals' is properly defined elsewhere in your project
                 Intent itemManagementActivity = new Intent(context, ItemManagementActivity.class);
                 itemManagementActivity.putExtra("id", item.id);
                 itemManagementActivity.putExtra("name", item.name);
                 itemManagementActivity.putExtra("price", item.price);
                 itemManagementActivity.putExtra("description", item.description);
                 context.startActivity(itemManagementActivity);
-            } else {
+            } else if(globals.accountType == 1){
                 Intent itemActivity = new Intent(context, ItemActivity.class);
                 itemActivity.putExtra("id", item.id);
                 context.startActivity(itemActivity);
