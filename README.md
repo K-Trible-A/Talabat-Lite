@@ -30,6 +30,8 @@ cd build
 make
 ./server
 ```
+## Screenshots
+![screenshots](https://github.com/user-attachments/assets/6c4ebe77-06ed-43cf-a8bd-d372e623f695)
 ## Features
 ### For Merchant: 
 #### Registration:
@@ -65,8 +67,3 @@ account.
 - There is no Encryption for sensitive data like passwords, card number, ...
 - There is no protection from SQL Injection attacks.
 - No protection from DDoS attacks.
-## Screenshots
-![screenshots](https://github.com/user-attachments/assets/6c4ebe77-06ed-43cf-a8bd-d372e623f695)
-
-
-
