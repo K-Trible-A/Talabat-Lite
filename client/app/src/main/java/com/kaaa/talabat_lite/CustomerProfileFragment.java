@@ -44,7 +44,7 @@ import java.util.concurrent.Executors;
 public class CustomerProfileFragment extends Fragment {
     private EditText City, Address;
     private TextView tvCurrentCity, tvCurrentDeliveryAddress;
-    private Button btnPaymentMethod, btnSave, btnChangePicture;
+    private Button btnPaymentMethod, btnSave, btnChangePicture, logOut;
     private ImageView imgCustomerPicture;
 
     @Nullable
@@ -80,6 +80,12 @@ public class CustomerProfileFragment extends Fragment {
             Intent intent = new Intent(activity, AddCustomerImageActivity.class);
             startActivity(intent);
         });
+        logOut.setOnClickListener(v->{
+            Intent logoutIntent = new Intent(requireContext(), LoginActivity.class);
+            logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(logoutIntent);
+            requireActivity().finish();
+        });
         return view;
     }
 
@@ -93,6 +99,7 @@ public class CustomerProfileFragment extends Fragment {
         tvCurrentDeliveryAddress = view.findViewById(R.id.tvCurrentDeliveryAddress);
         imgCustomerPicture = view.findViewById(R.id.imgCustomerPicture);
         btnChangePicture = view.findViewById(R.id.btnChangePicture);
+        logOut = view.findViewById(R.id.customer_logout);
     }
 
     private Bitmap getCustomerImage() {

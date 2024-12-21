@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,7 +41,7 @@ public class MerchantProfileFragment extends Fragment {
     private EditText profileBusinessType, profileKeywords, profilePickupAddress, profileRating;
     private TextView profileBusinessName;
     private ImageView profilePicture;
-    private Button changeAddressButton, editProfilePictureButton;
+    private Button changeAddressButton, editProfilePictureButton, logOut;
     private String businessName, type, keywords, pickupAddress;
     float rating;
     private Bitmap profileImg;
@@ -101,6 +102,7 @@ public class MerchantProfileFragment extends Fragment {
         profilePickupAddress = rootView.findViewById(R.id.profilePickupAddress);
         changeAddressButton = rootView.findViewById(R.id.changeAddressButton);
         editProfilePictureButton = rootView.findViewById(R.id.editProfilePictureButton);
+        logOut = rootView.findViewById(R.id.merchant_logout);
         profileRating = rootView.findViewById(R.id.profileRating);
         profilePicture = rootView.findViewById(R.id.profile_icon);
 
@@ -109,6 +111,12 @@ public class MerchantProfileFragment extends Fragment {
     protected void setupListeners() {
         changeAddressButton.setOnClickListener(view -> changePickupAddress());
         editProfilePictureButton.setOnClickListener(view -> editProfilePicture());
+        logOut.setOnClickListener(v->{
+            Intent logoutIntent = new Intent(requireContext(), LoginActivity.class);
+            logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(logoutIntent);
+            requireActivity().finish();
+        });
 
     }
 

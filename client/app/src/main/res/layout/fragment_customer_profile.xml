@@ -120,6 +120,7 @@
             tools:ignore="HardcodedText,TextContrastCheck" />
 
         <!-- Save Button -->
+
         <Button
             android:id="@+id/btnSave"
             android:layout_width="305dp"
@@ -128,6 +129,13 @@
             android:text="Save"
             android:textColor="@android:color/white"
             tools:ignore="HardcodedText,TextContrastCheck" />
+
+        <Button
+            android:id="@+id/customer_logout"
+            android:layout_width="207dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/customer_log_out" />
 
     </LinearLayout>
 </ScrollView>

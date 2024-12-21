@@ -137,6 +137,12 @@
                 android:text="Change address"
                 android:textSize="18sp"
                 tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+            <Button
+                android:id="@+id/merchant_logout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/merchant_log_out" />
         </LinearLayout>
 
     </LinearLayout>

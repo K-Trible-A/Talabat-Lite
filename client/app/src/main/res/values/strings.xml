@@ -55,4 +55,7 @@
     <string name="city">City</string>
     <string name="merchant">Merchant :</string>
     <string name="order_id">Order ID :</string>
+    <string name="merchant_log_out">Log out</string>
+    <string name="customer_log_out">Log out</string>
+    <string name="log_out">Log out</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.kaaa.talabat_lite;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.activity.OnBackPressedCallback;
@@ -27,6 +29,7 @@ import java.util.concurrent.Executors;
 
 public class CourierProfileFragment extends Fragment {
     private EditText name,email,vehicleType,nationalId,phoneNumber,country,city;
+    private Button logOut;
     private String courierName,courierEmail,courierVehicleType,courierNationalId,courierPhoneNumber,courierCountry,courierCity;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -56,6 +59,12 @@ public class CourierProfileFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_courier_profile, container, false);
         initUI(rootView);
         fetchCourierData();  // Start fetching merchant data when fragment is loaded
+        logOut.setOnClickListener(v->{
+            Intent logoutIntent = new Intent(requireContext(), LoginActivity.class);
+            logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(logoutIntent);
+            requireActivity().finish();
+        });
         return rootView;
     }
 
@@ -67,6 +76,7 @@ public class CourierProfileFragment extends Fragment {
         phoneNumber = rootView.findViewById(R.id.phoneNumber);
         country = rootView.findViewById(R.id.country);
         city = rootView.findViewById(R.id.city);
+        logOut = rootView.findViewById(R.id.courier_logout);
     }
 
     private void getCourierData() {
