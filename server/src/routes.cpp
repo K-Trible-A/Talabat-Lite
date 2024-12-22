@@ -42,7 +42,6 @@ void authClient() {
         crow::json::wvalue responseBody;
         responseBody["userId"] = userId;
         responseBody["accountType"] = stoi(ans2[0][0]);
-        cout << "Account Type : " << ans2[0][0] << endl;
         return crow::response(200, responseBody);
       });
 }

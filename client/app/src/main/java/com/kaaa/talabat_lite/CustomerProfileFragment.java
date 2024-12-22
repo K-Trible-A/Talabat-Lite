@@ -163,6 +163,8 @@ public class CustomerProfileFragment extends Fragment {
                         if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                             tvCurrentCity.setText(MessageFormat.format("Current City: {0}", currentCity));
                             tvCurrentDeliveryAddress.setText(MessageFormat.format("Current Delivery Address: {0}", currentDeliveryAddress));
+                            City.setText(currentCity);
+                            Address.setText(currentDeliveryAddress);
                         } else {
                             Log.e("CustomerProfileFragment", conn.getResponseMessage());
                         }
