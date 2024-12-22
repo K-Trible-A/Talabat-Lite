@@ -58,7 +58,7 @@ public class CustomerProfileFragment extends Fragment {
             public void handleOnBackPressed() {
                 // Navigate to the Home fragment
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.container, new TopRated_Merchants_Fragment()) // Replace with your Home fragment class
+                        .replace(R.id.container, new CustomerHomeFragment()) // Replace with your Home fragment class
                         .commit();
                 BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
                 if (bottomNavigationView != null)

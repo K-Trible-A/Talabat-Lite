@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CustomerHomeFragment">
+
+    <!-- Categories Title -->
+    <TextView
+        android:id="@+id/tvCategories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Categories"
+        android:textColor="#0097A7"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
+
+    <!-- Category Buttons -->
+    <Button
+        android:id="@+id/btnGrocery"
+        android:layout_width="161dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="28dp"
+        android:text="Grocery"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/btnRestaurant"
+        app:layout_constraintTop_toBottomOf="@id/tvCategories"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/btnPharmacy"
+        android:layout_width="166dp"
+        android:layout_height="58dp"
+        android:layout_marginTop="12dp"
+        android:text="Pharmacy"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.506"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnGrocery"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/btnRestaurant"
+        android:layout_width="165dp"
+        android:layout_height="58dp"
+        android:layout_marginTop="28dp"
+        android:text="Restaurant"
+        app:layout_constraintEnd_toStartOf="@id/btnGrocery"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCategories"
+        tools:ignore="HardcodedText" />
+
+    <!-- Top Rated Title -->
+    <TextView
+        android:id="@+id/topRated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="270dp"
+        android:layout_marginStart="12dp"
+        android:text="Top Rated Restaurants"
+        android:textColor="#0097A7"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
+
+    <!-- ListView for Top Rated Merchants -->
+    <ListView
+        android:id="@+id/merchantList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/topRated"
+        app:layout_constraintBottom_toTopOf="@id/btnViewCart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/merchant_list_view" />
+
+    <!-- View Cart Button -->
+    <Button
+        android:id="@+id/btnViewCart"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="View Cart"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
