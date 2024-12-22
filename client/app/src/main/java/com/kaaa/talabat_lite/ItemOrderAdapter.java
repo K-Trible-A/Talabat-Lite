@@ -47,14 +47,7 @@ public class ItemOrderAdapter extends RecyclerView.Adapter<ItemOrderAdapter.View
         itemData item = orderItemList.get(position);
         holder.itemCount.setText(item.itemCount);
         holder.itemName.setText(item.itemName);
-        holder.itemPrice.setText(item.itemPrice + " EGP");
-        /*
-        holder.itemView.setOnClickListener(v -> {
-            Intent orderDetailsActivity = new Intent(context,OrderDetailsActivity.class);
-            orderDetailsActivity.putExtra("orderId",order.orderId);
-            context.startActivity(orderDetailsActivity);
-        });
-         */
+        holder.itemPrice.setText(item.itemPrice + " $");
     }
 
     @Override
