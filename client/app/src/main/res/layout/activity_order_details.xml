@@ -147,7 +147,7 @@
         android:padding="10dp"
         android:layout_below="@id/customerAddressLayout"
         android:gravity="start"
-        android:text = "@string/ordey_summary"
+        android:text = "@string/order_summary"
         android:textColor="@android:color/black"
         android:textStyle="bold"
         android:textSize="20sp" />
@@ -179,7 +179,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:text ="550.5 EGP"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
     </LinearLayout>

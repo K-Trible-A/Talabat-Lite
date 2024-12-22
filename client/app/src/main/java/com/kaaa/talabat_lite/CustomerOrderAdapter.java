@@ -48,7 +48,7 @@ public class CustomerOrderAdapter extends RecyclerView.Adapter<CustomerOrderAdap
         orderData order = orderList.get(position);
         holder.orderId.setText( "#" + order.orderId);
         holder.merchantName.setText(order.merchantName);
-        holder.totalAmount.setText(order.totalAmount + " EGP");
+        holder.totalAmount.setText(order.totalAmount + " $");
 
         holder.itemView.setOnClickListener(v -> {
             Intent orderDetailsActivity = new Intent(context,OrderDetailsActivity.class);

@@ -81,11 +81,11 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
         }
 
         // Set item details
-        holder.itemName.setText("Item Name : "+cartItem.itemName);
-        holder.itemMerch.setText("Merchant Name : " +cartItem.merchName);
+        holder.itemName.setText("Item Name : " + cartItem.itemName);
+        holder.itemMerch.setText("Merchant Name : " + cartItem.merchName);
         holder.itemCount.setText("Item Count : " + cartItem.itemCount);
-        holder.totalPrice.setText("Total Price : "+String.format("%.1f", cartItem.itemTotalPrice));
-        holder.itemPrice.setText("One Item Price : "+String.format("%.1f", cartItem.itemPrice));
+        holder.totalPrice.setText("Total Price : " + String.format("%.1f", cartItem.itemTotalPrice));
+        holder.itemPrice.setText("One Item Price : " + String.format("%.1f", cartItem.itemPrice));
 
         // Handle item image
         if (cartItem.itemImage != null) {
@@ -117,9 +117,17 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
                 Handler mainHandler = new Handler(Looper.getMainLooper());
                 mainHandler.post(() -> {
                     if (success) {
-                        cartItemList.remove(position);
-                        notifyItemRemoved(position);
-                        Log.i("CartItemAdapter", "Item removed successfully");
+                        // Synchronize access to cartItemList
+                        synchronized (cartItemList) {
+                            int positionToRemove = cartItemList.indexOf(cartItem);
+                            if (positionToRemove != -1) {
+                                cartItemList.remove(positionToRemove);
+                                notifyItemRemoved(positionToRemove);
+                                Log.i("CartItemAdapter", "Item removed successfully");
+                            } else {
+                                Log.e("CartItemAdapter", "Item not found in the list");
+                            }
+                        }
                     } else {
                         Log.e("CartItemAdapter", "Error removing item from cart");
                     }

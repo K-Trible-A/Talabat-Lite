@@ -231,7 +231,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
         executorService.execute(() -> {
             try {
 
-                URL url = new URL(globals.serverURL + "/courierAcceptOrder/" + globals.userId);
+                URL url = new URL(globals.serverURL + "/courierAcceptOrder/" + globals.userId + "/" + Integer.parseInt(orderIdStr));
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 // Check response code

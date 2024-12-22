@@ -39,8 +39,8 @@ public class CartActivity extends AppCompatActivity {
     private final List<CartItemAdapter.cartItemData> cartItemDataList = new ArrayList<>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    int firstItemId = 0;
-    float totalAmount = 0;
+    private int firstItemId = 0, orderId = -1;
+    private float totalAmount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,36 +65,20 @@ public class CartActivity extends AppCompatActivity {
     {
         try
         {
-            URL url = new URL(globals.serverURL + "/delete_cart/");
-            JSONObject jsonPayload = new JSONObject();
-            jsonPayload.put("firstItemId", firstItemId);
-            jsonPayload.put("userId", globals.userId);
-            // Open a connection to the server
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true); // To send a body
-            // Send the request
-            OutputStream os = conn.getOutputStream();
-            os.write(jsonPayload.toString().getBytes(StandardCharsets.UTF_8));
-            os.flush();
-            os.close();
-            // Get the response code
-            int responseCode = conn.getResponseCode();
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                showToast("Deleted Cart Items successfully!");
-            }
-            else {
+            URL url = new URL(globals.serverURL + "/cart/clear/" + globals.userId + "/" + orderId);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            // Check response code
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 showToast("Deletion Error!!");
-                Log.i("CartActivity", conn.getResponseMessage());
+                Log.i("CartActivity", connection.getResponseMessage());
             }
-            conn.disconnect();
-
+            else{
+                Log.e("CartActivity", "Error cart clear");
+            }
+            connection.disconnect();
         } catch (IOException e) {
             showToast("Failed to read response");
-        } catch (JSONException e) {
-            Log.e("CartActivity", "Json error");
         }
     }
     private void saveOrder()
@@ -104,16 +88,14 @@ public class CartActivity extends AppCompatActivity {
             showToast("Cart is empty !");
             return;
         }
+        loadCartItemsFromServer();
         try
         {
-            URL url = new URL(globals.serverURL + "/save_order/");
+            URL url = new URL(globals.serverURL + "/placeOrder/");
             JSONObject jsonPayload = new JSONObject();
             jsonPayload.put("userId", globals.userId);
             jsonPayload.put("firstItemId", firstItemId);
             jsonPayload.put("totalAmount", totalAmount);
-            Log.d("Cart","id = " + globals.userId);
-            Log.d("Cart","item id = " + firstItemId);
-            Log.d("Cart","total = " + totalAmount);
             // Open a connection to the server
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -130,6 +112,17 @@ public class CartActivity extends AppCompatActivity {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 showToast("Saving order success");
+                // Read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+                // Parse the response JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                orderId = jsonResponse.getInt("orderId");
                 removeCartItems();
                 Intent outIntent = new Intent(CartActivity.this,CustomerActivity.class);
                 outIntent.putExtra("orders",true);
@@ -221,6 +214,7 @@ public class CartActivity extends AppCompatActivity {
             // Parse the JSON response
             JSONObject jsonResponse = new JSONObject(response.toString());
             JSONArray itemsArray = jsonResponse.getJSONArray("items");
+            totalAmount = (float) jsonResponse.getDouble("totalAmount");
             // Iterate through each item in the response
             for (int i = 0; i < itemsArray.length(); i++) {
                 JSONObject itemJson = itemsArray.getJSONObject(i);
@@ -230,12 +224,8 @@ public class CartActivity extends AppCompatActivity {
                 float itemPrice = (float) itemJson.getDouble("itemPrice");
                 String merchName = itemJson.getString("merchName");
                 float totalPrice = (float) itemJson.getDouble("TotalPrice");
-                totalAmount += totalPrice;
                 int itemId = itemJson.getInt("itemId");
-                if (firstItemId == 0)
-                {
-                    firstItemId = itemId;
-                }
+                firstItemId = itemId;
                 int imageId = itemJson.getInt("imageId");
                 // Assuming you have a method `getItemImage(imageId)` to get the Bitmap for the item image
                 Bitmap itemImage = getItemImage(imageId);

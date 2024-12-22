@@ -868,8 +868,7 @@ void getTopRatedMerchants() {
         vector<vector<string>> ans = db.query(sql);
         crow::json::wvalue responseBody;
         crow::json::wvalue::list merchants;
-        for (auto&row : ans)
-        {
+        for (auto &row : ans) {
           crow::json::wvalue merchant;
           merchant["businessName"] = row[0];
           merchant["rating"] = stof(row[1]);
@@ -917,6 +916,17 @@ void getCartItems() {
         // Prepare response body
         crow::json::wvalue responseBody;
         crow::json::wvalue::list itemsArray;
+
+        vector<vector<string>> TotalOrderPrice =
+            db.query("SELECT SUM(i.itemPrice * c.quantity) AS totalAmount "
+                     "FROM cart c "
+                     "JOIN item i ON c.itemId = i.itemId "
+                     "WHERE c.userId = " +
+                     to_string(userId) + " ;");
+        if (TotalOrderPrice.empty()) {
+          return crow::response(500, "Error getting total order price");
+        }
+        responseBody["totalAmount"] = stof(TotalOrderPrice[0][0]);
 
         // Process the result and prepare the response
         for (const auto &cartItem : cartItems) {
@@ -1511,7 +1521,7 @@ void getProfileImageMerchId() {
       });
 }
 void saveOrder() {
-  CROW_ROUTE(server, "/save_order/")
+  CROW_ROUTE(server, "/placeOrder/")
       .methods("POST"_method)([](const crow::request &req) {
         auto body = crow::json::load(req.body);
         if (!body) {
@@ -1527,6 +1537,7 @@ void saveOrder() {
         int userId = body["userId"].i();
         int firstItemId = body["firstItemId"].i();
         float totalAmount = body["totalAmount"].d();
+
         const string sql = "SELECT merchantId FROM item WHERE itemId = " +
                            to_string(firstItemId) + ";";
         vector<vector<string>> ans = db.query(sql);
@@ -1537,52 +1548,47 @@ void saveOrder() {
         int customerId = stoi(res[0][0]);
         // insert user to database
         if (!db.insertData("orders",
-                           {"customerId", "merchantId", "totalAmount",
-                            "assignedCourierId"},
+                           {"customerId", "merchantId", "totalAmount"},
                            {to_string(customerId), to_string(merchantId),
-                            to_string(totalAmount), "12345"})) {
+                            to_string(totalAmount)})) {
           return crow::response(500, "Error inserting order into database");
         }
-        return crow::response(200, "Merchant registered successfully");
+        vector<vector<string>> orderId_query =
+            db.query("SELECT MAX(orderId) FROM orders WHERE customerId = " +
+                     to_string(customerId) +
+                     " AND merchantId = " + to_string(merchantId) + " ;");
+        if (orderId_query.empty()) {
+          return crow::response(500, "Error getting last orderId");
+        }
+        crow::json::wvalue responseBody;
+        responseBody["orderId"] = stoi(orderId_query[0][0]);
+        return crow::response(200, responseBody);
       });
 }
 void deleteCart() {
-  CROW_ROUTE(server, "/delete_cart/")
-      .methods("POST"_method)([](const crow::request &req) {
-        auto body = crow::json::load(req.body);
-        if (!body) {
-          return crow::response(400, "Invalid JSON payload");
+  CROW_ROUTE(server, "/cart/clear/<int>/<int>")
+      .methods("GET"_method)([](const crow::request &req, const int &userId,
+                                const int &orderId) {
+        vector<vector<string>> query_itemId_quantity =
+            db.query("SELECT itemId, quantity FROM cart WHERE userId = " +
+                     to_string(userId));
+        if (query_itemId_quantity.empty()) {
+          return crow::response(500, "Error getting itemId and quantity");
         }
-        // Validate all required keys before accessing them
-        if (!body.has("firstItemId") || !body.has("userId")) {
-          return crow::response(400,
-                                "Missing required fields in the JSON payload");
+        for (auto &item : query_itemId_quantity) {
+          if (item.size() < 2) {
+            return crow::response(500, "Error item info");
+          }
+          if (!db.insertData("orderItems", {"orderId", "itemId", "quantity"},
+                             {to_string(orderId), item[0], item[1]})) {
+            return crow::response(500, "Error getting itemId and quantity");
+          }
         }
-        int firstItemId = body["firstItemId"].i();
-        int userId = body["userId"].i();
-        vector<vector<string>> res =
-            db.query("SELECT cartId FROM cart WHERE itemId = " +
-                     to_string(firstItemId) + ";");
-        int cartId = stoi(res[0][0]);
-        res =
-            db.query("SELECT itemId, quantity FROM cart WHERE cartId = " +
-                     to_string(cartId) + ";");
-        vector<vector<string>> ans =
-            db.query("SELECT customerId FROM customer WHERE userId = " +
-                     to_string(userId) + ";");
-        int customerId = stoi(ans[0][0]);
-        vector<vector<string>> fin =
-            db.query("SELECT orderId FROM orders WHERE customerId = " +
-                     to_string(customerId) + ";");
-        int orderId = stoi(fin[0][0]);
-        for (auto &str : res) {
-          db.insertData("orderItems", {"orderId", "itemId", "quantity"},
-                        {to_string(orderId), str[0], str[1]});
+        if (!db.execute("DELETE FROM cart WHERE userId = " + to_string(userId) +
+                        " ;")) {
+          return crow::response(500, "Error clearing cart");
         }
-        db.execute("DELETE FROM cart WHERE cartId = " + to_string(cartId) +
-                   ";");
-
-        return crow::response(200, "Cart has been deleted successfully");
+        return crow::response(200, "success");
       });
 }
 void getCustomerOrdersFromServer() {
@@ -1622,8 +1628,7 @@ void getCustomerOrdersFromServer() {
         return crow::response(200, responseBody);
       });
 }
-void merchantAcceptOrder()
-{
+void merchantAcceptOrder() {
   CROW_ROUTE(server, "/merchantAcceptOrder/<int>")
       .methods("POST"_method)([](const crow::request &req, int userId) {
         // Validate the item ID
@@ -1634,55 +1639,54 @@ void merchantAcceptOrder()
         if (userId <= 0) {
           return crow::response(400, "Invalid user ID");
         }
-        if (!body.has("orderId"))
-        {
-          return crow::response(400,"Missing required fields in the JSON payload");
+        if (!body.has("orderId")) {
+          return crow::response(400,
+                                "Missing required fields in the JSON payload");
         }
         string orderId = body["orderId"].s();
         crow::json::wvalue responseBody;
         responseBody["succeeded"] = 0;
-        vector<vector<string>>ans =
-            db.query("SELECT merchantId "
-                     "FROM merchant WHERE userId  = " + to_string(userId) + ";");
-          if (ans.size() > 1)
-          {
-            return crow::response(400, "Multiple Users with same merchantId");
-          }else if (ans.size() == 0)
-          {
-            return crow::response(400, "No merchant match this userId");
-          }
-          string merchantId = ans[0][0];
+        vector<vector<string>> ans = db.query("SELECT merchantId "
+                                              "FROM merchant WHERE userId  = " +
+                                              to_string(userId) + ";");
+        if (ans.size() > 1) {
+          return crow::response(400, "Multiple Users with same merchantId");
+        } else if (ans.size() == 0) {
+          return crow::response(400, "No merchant match this userId");
+        }
+        string merchantId = ans[0][0];
         db.query("UPDATE orders SET orderStatus = 'Preparing'  "
-                     "WHERE orderStatus = 'active' AND merchantId = " + merchantId + " AND orderId =  " + orderId  + ";");
+                 "WHERE orderStatus = 'active' AND merchantId = " +
+                 merchantId + " AND orderId =  " + orderId + ";");
 
         responseBody["succeeded"] = 1;
         return crow::response(200, responseBody);
       });
 }
-void courierAcceptOrder()
-{
-  CROW_ROUTE(server, "/courierAcceptOrder/<int>")
-      .methods("GET"_method)([](const crow::request &req, int userId) {
+void courierAcceptOrder() {
+  CROW_ROUTE(server, "/courierAcceptOrder/<int>/<int>")
+      .methods(
+          "GET"_method)([](const crow::request &req, int userId, int orderId) {
         // Validate the item ID
         if (userId <= 0) {
           return crow::response(400, "Invalid user ID");
         }
         crow::json::wvalue responseBody;
         responseBody["succeeded"] = 0;
-        vector<vector<string>>ans =
-            db.query("SELECT courierId "
-                     "FROM courier WHERE userId  = " + to_string(userId) + ";");
-        if (ans.size() > 1)
-        {
+        vector<vector<string>> ans = db.query("SELECT courierId "
+                                              "FROM courier WHERE userId  = " +
+                                              to_string(userId) + ";");
+        if (ans.size() > 1) {
           return crow::response(400, "Multiple Users with same courierId");
-        }else if (ans.size() == 0)
-        {
+        } else if (ans.size() == 0) {
           return crow::response(400, "No courier match this userId");
         }
         string courierId = ans[0][0];
-        //Database::updateData("orders",{"orderStatus","assignedCourierId"},{"Delivering", courierId},)
-        db.query("UPDATE orders SET orderStatus = 'Delivering', assignedCourierId =  " + courierId +
-                     " WHERE orderStatus = 'Preparing' AND assignedCourierId = 12345;");
+        // Database::updateData("orders",{"orderStatus","assignedCourierId"},{"Delivering",
+        // courierId},)
+        db.query("UPDATE orders SET orderStatus = 'Delivering', "
+                 "assignedCourierId = " +
+                 courierId + " WHERE orderId = " + to_string(orderId) + " ;");
 
         responseBody["succeeded"] = 1;
         return crow::response(200, responseBody);
